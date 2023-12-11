@@ -4,7 +4,7 @@
   "license": "SEE LICENSE IN LICENSE",
   "displayName": "ARB Translator",
   "description": "Translates ARB files to Google Translator.",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "engines": {
     "vscode": "^1.84.0"
   },
@@ -54,7 +54,7 @@
     "lint": "eslint src --ext ts",
     "test": "vscode-test",
     "package": "rm -r out & vsce package",
-    "publish": "vsce publish"
+    "publish": "npm run package && vsce publish"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",

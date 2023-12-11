@@ -1,14 +1,23 @@
-body {
+body.vscode-light {
+  color: #1f1f1f;
+  background-color: white;
+}
+
+body.vscode-dark {
   color: white;
   background-color: #1f1f1f;
+}
+
+
+body {
   padding: 16px 16px 32px 16px;
   width: 400px;
 }
 
 button {
   background-color: transparent;
-  border: 1px solid white;
-  color: white;
+  border: 1px solid var(--vscode-editor-foreground);
+  color: var(--vscode-editor-foreground);
   cursor: pointer;
 }
 .content {

@@ -16,8 +16,8 @@ export class Configuration {
 
   run(context: vscode.ExtensionContext) {
     const panel = vscode.window.createWebviewPanel(
-      "languageSelection",
-      "Language Selection",
+      "ARBTranslatorConfigure",
+      "ARB Translator Configure",
       vscode.ViewColumn.One,
       {
         enableScripts: true,
