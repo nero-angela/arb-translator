@@ -1,26 +1,28 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
+import { Command } from "./app/command/command";
+import { GoogleTranslator } from "./app/translator/google_translator";
+import { Config } from "./app/util/config";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  const name = "arb-translator";
+  const config = new Config(name, context);
+  const translator = new GoogleTranslator();
+  const command = new Command(config, translator);
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "arb-translator" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('arb-translator.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from arb translator!');
-	});
-
-	context.subscriptions.push(disposable);
+  [
+    vscode.commands.registerCommand(`${name}.translate`, () =>
+      command.translate(context)
+    ),
+    vscode.commands.registerCommand(`${name}.updateSourceArbPath`, () =>
+      command.updateSourceArbPath(context)
+    ),
+    vscode.commands.registerCommand(`${name}.updateAPIKey`, () =>
+      command.updateAPIKey(context)
+    ),
+    vscode.commands.registerCommand(`${name}.configure`, () =>
+      command.configure(context)
+    ),
+  ].map((disposable) => context.subscriptions.push(disposable));
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}

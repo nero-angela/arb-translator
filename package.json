@@ -1,21 +1,48 @@
 {
   "name": "arb-translator",
-  "displayName": "arb translator",
-  "description": "",
-  "version": "0.0.1",
+  "publisher": "DevStory",
+  "license": "SEE LICENSE IN LICENSE",
+  "displayName": "ARB Translator",
+  "description": "Translates ARB files to Google Translator.",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.84.0"
   },
+  "author": {
+    "name": "DevStory"
+  },
+  "icon": "images/logo.png",
   "categories": [
-    "Other"
+    "Language Packs"
+  ],
+  "repository": "https://github.com/nero-angela/arb-translator",
+  "homepage": "https://devstory.co.kr",
+  "keyword": [
+    "arb",
+    "translator",
+    "translater",
+    "google",
+    "devstory"
   ],
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "arb-translator.helloWorld",
-        "title": "Hello World"
+        "command": "arb-translator.translate",
+        "title": "arb translator : translate"
+      },
+      {
+        "command": "arb-translator.updateSourceArbPath",
+        "title": "arb translator : update source arb path"
+      },
+      {
+        "command": "arb-translator.updateAPIKey",
+        "title": "arb translator : update Google API key"
+      },
+      {
+        "command": "arb-translator.configure",
+        "title": "arb translator : configure"
       }
     ]
   },
@@ -28,14 +55,17 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.84.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
+    "@types/vscode": "^1.84.0",
     "@typescript-eslint/eslint-plugin": "^6.13.1",
     "@typescript-eslint/parser": "^6.13.1",
-    "eslint": "^8.54.0",
-    "typescript": "^5.3.2",
     "@vscode/test-cli": "^0.0.4",
-    "@vscode/test-electron": "^2.3.8"
+    "@vscode/test-electron": "^2.3.8",
+    "eslint": "^8.54.0",
+    "typescript": "^5.3.2"
+  },
+  "dependencies": {
+    "axios": "^1.6.2"
   }
 }

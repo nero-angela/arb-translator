@@ -1,0 +1,50 @@
+body {
+  color: white;
+  background-color: #1f1f1f;
+  padding: 16px 16px 32px 16px;
+  width: 400px;
+}
+
+button {
+  background-color: transparent;
+  border: 1px solid white;
+  color: white;
+  cursor: pointer;
+}
+.content {
+  margin-bottom: 16px;
+}
+
+#language {
+  display: flex;
+  flex-direction: column;
+}
+
+#language > .header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+#language > .header > h3 {
+  flex: 1;
+}
+
+#language > .content > .wrap {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+#language > .content > .wrap > label {
+  margin-left: 4px;
+}
+
+.lv {
+  display: flex;
+  flex-direction: column;
+}
+
+.lv label {
+  margin-bottom: 4px;
+}
