@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 
 interface ConfigData {
+  arbPrefix: string;
   sourceArbFilePath: string;
   googleAPIKey: string;
   selectedLanguages: Record<string, string>[];
@@ -13,6 +14,7 @@ interface ConfigData {
 
 export class Config {
   private _initData: ConfigData = {
+    arbPrefix: "",
     sourceArbFilePath: "",
     googleAPIKey: "",
     selectedLanguages: [],

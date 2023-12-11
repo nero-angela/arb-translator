@@ -6,6 +6,7 @@ import {
   APIKeyRequiredException,
   ConfigurationRequiredException,
   InvalidSourceArbException,
+  InvalidSourceLangException,
   SourceArbRequiredException,
 } from "../util/exceptions";
 import { Toast } from "../util/toast";
@@ -63,10 +64,18 @@ export class Translate {
     // translate
     const sourceArbPathSegments = sourceArbPath.split("/");
     const sourceArbFileName = sourceArbPathSegments.pop();
-    const sourceArb = sourceArbFileName?.split(".arb")[0]!;
+    let sourceArb = sourceArbFileName?.split(".arb")[0]!;
+    const arbPrefix = this.config.data.arbPrefix;
+    if (arbPrefix) {
+      console.log(sourceArb.split(arbPrefix));
+      sourceArb = sourceArb.split(arbPrefix)[1]!;
+    }
     const sourceLang = this.translator.languages.find(
       (l) => l.arb === sourceArb
     )!;
+    if (!sourceLang) {
+      throw new InvalidSourceLangException();
+    }
 
     // get source history
     const sourceHistory = this.config.data.sourceHistory;
@@ -110,7 +119,7 @@ export class Translate {
 
       // check target language arb path
       const targetArbPath = `${sourceArbPathSegments.join("/")}/${
-        targetLang.arb
+        arbPrefix + targetLang.arb
       }.arb`;
       if (!isOverride && fs.existsSync(targetArbPath)) {
         // arb file exists

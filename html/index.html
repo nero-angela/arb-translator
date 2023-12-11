@@ -17,6 +17,17 @@
 
     <!-- Setting -->
     <section id="setting">
+      <!-- arb prefix -->
+      <div class="content lv">
+        <label for="arb-prefix">ARB file prefix</label>
+        <input
+          type="text"
+          id="arb-prefix"
+          placeholder="e.g. intl_"
+          oninput="onArbFilePrefixInputChanged()"
+        />
+      </div>
+      <!-- arb file path -->
       <div class="content lv">
         <label for="source-arb-file-path">Source arb file path</label>
         <input
@@ -25,6 +36,7 @@
           placeholder="Absolute path to the arb file that will be the translation source."
         />
       </div>
+      <!-- google api key -->
       <div class="content lv">
         <label for="google-api-key">Google API Key</label>
         <input type="text" id="google-api-key" placeholder="Google API Key" />

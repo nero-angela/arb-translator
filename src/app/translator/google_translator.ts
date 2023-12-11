@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Logger } from "../util/logger";
 import { Toast } from "../util/toast";
 import { Translator } from "./translator";
 
@@ -151,7 +152,7 @@ export class GoogleTranslator implements Translator {
       Toast.w("Update API key");
       return;
     }
-    console.log(`Total translate request : ${p.text.length}`);
+    Logger.l(`Total translate request : ${p.text.length}`);
     const result = await Promise.all(
       p.text.map((q) =>
         this._callAPI(p.apiKey, q, p.sourceLangQuery, p.targetLangQuery)
@@ -194,7 +195,7 @@ export class GoogleTranslator implements Translator {
           count++;
           return replacement;
         });
-        // console.log(`${q} -> ${query}`);
+        // Logger.l(`${q} -> ${query}`);
         const result = await axios.get(
           `https://translation.googleapis.com/language/translate/v2?key=${apiKey}&q=${query}&target=${target}&source=${source}&alt=json`
         );
@@ -209,10 +210,10 @@ export class GoogleTranslator implements Translator {
             return dictionary[match] || match;
           });
         }
-        // console.log(`${translatedText} -> ${text}`);
+        // Logger.l(`${translatedText} -> ${text}`);
         res(text);
       } catch (e: any) {
-        console.error("Translate error:", e);
+        Logger.e("Translate error:", e);
         Toast.e(e.response.data.error.errors[0].message);
         rej(e);
       }

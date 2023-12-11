@@ -46,6 +46,7 @@ export class Configuration {
       panel.webview.postMessage({
         command: "updateData",
         data: {
+          arbPrefix: this.config.data.arbPrefix,
           sourceArbFilePath: this.config.data.sourceArbFilePath,
           googleAPIKey: this.config.data.googleAPIKey,
           languages: this.translator.languages,
@@ -79,6 +80,7 @@ export class Configuration {
           case "save":
             this.config.update(context, {
               ...this.config.data,
+              arbPrefix: message.arbPrefix,
               googleAPIKey: message.googleAPIKey,
               selectedLanguages: message.languages,
               sourceArbFilePath: message.sourceArbFilePath,

@@ -6,8 +6,10 @@ import {
   APIKeyRequiredException,
   ConfigurationRequiredException,
   InvalidSourceArbException,
+  InvalidSourceLangException,
   SourceArbRequiredException,
 } from "../util/exceptions";
+import { Logger } from "../util/logger";
 import { Toast } from "../util/toast";
 import { Configuration } from "./configure";
 import { Translate } from "./translate";
@@ -72,8 +74,8 @@ export class Command {
   async translate(context: vscode.ExtensionContext) {
     try {
       await this._translate.run(context);
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      Logger.e(e);
       if (e instanceof ConfigurationRequiredException) {
         Toast.e("Please select the languages you would like to translate.");
         this.configure(context);
@@ -95,6 +97,14 @@ export class Command {
       if (e instanceof InvalidSourceArbException) {
         Toast.e("Translation source data does not exist.");
         this.updateSourceArbPath(context);
+        return;
+      }
+
+      if (e instanceof InvalidSourceLangException) {
+        Toast.e(
+          "Unable to extract language from source ARB file. If you are using a format such as 'intl_en.arb', please add 'intl_' to arbPrefix."
+        );
+        this.configure(context);
         return;
       }
     }
