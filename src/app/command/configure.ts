@@ -46,11 +46,11 @@ export class Configuration {
       panel.webview.postMessage({
         command: "updateData",
         data: {
-          arbPrefix: this.config.data.arbPrefix,
-          sourceArbFilePath: this.config.data.sourceArbFilePath,
-          googleAPIKey: this.config.data.googleAPIKey,
-          languages: this.translator.languages,
-          selectedLanguages: this.config.data.selectedLanguages,
+          arbPrefix: this.config.data.arbPrefix ?? "",
+          sourceArbFilePath: this.config.data.sourceArbFilePath ?? "",
+          googleAPIKey: this.config.data.googleAPIKey ?? "",
+          languages: this.translator.languages ?? [],
+          selectedLanguages: this.config.data.selectedLanguages ?? [],
         },
       });
     };
