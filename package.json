@@ -4,14 +4,14 @@
   "license": "SEE LICENSE IN LICENSE",
   "displayName": "ARB Translator",
   "description": "Translates ARB files to Google Translator.",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "engines": {
     "vscode": "^1.84.0"
   },
   "author": {
     "name": "DevStory"
   },
-  "icon": "images/logo.png",
+  "icon": "assets/logo.png",
   "categories": [
     "Language Packs"
   ],

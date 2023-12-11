@@ -24,20 +24,16 @@ export class Configuration {
       }
     );
     const htmlPath = vscode.Uri.file(
-      path.join(context.extensionPath, "src", "app", "html", "index.html")
+      path.join(context.extensionPath, "html", "index.html")
     ).fsPath;
     const cssPath = panel.webview
       .asWebviewUri(
-        vscode.Uri.file(
-          path.join(context.extensionPath, "src", "app", "html", "style.css")
-        )
+        vscode.Uri.file(path.join(context.extensionPath, "html", "style.css"))
       )
       .toString();
     const jsPath = panel.webview
       .asWebviewUri(
-        vscode.Uri.file(
-          path.join(context.extensionPath, "src", "app", "html", "index.js")
-        )
+        vscode.Uri.file(path.join(context.extensionPath, "html", "index.js"))
       )
       .toString();
     panel.webview.html = fs
