@@ -11,4 +11,4 @@ It is an extension program that translates [ARB(Application Resource Bundle)](ht
 Since this extension program uses Google Translator, please refer to the [link](https://cloud.google.com/translate/docs/setup) and proceed with the API setting and API Key issuance process.
 
 ## How to use
-![arb translator](https://github.com/nero-angela/arb-translator/assets/26322627/8fb0b132-cdd1-44a2-a423-e6e0259a5332)
+![arb translator demo](https://github.com/nero-angela/arb-translator/assets/26322627/bf4893a9-60af-499b-881e-3b8a06ca1a03)
