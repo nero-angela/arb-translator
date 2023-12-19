@@ -197,7 +197,9 @@ export class GoogleTranslator implements Translator {
         });
         // Logger.l(`${q} -> ${query}`);
         const result = await axios.get(
-          `https://translation.googleapis.com/language/translate/v2?key=${apiKey}&q=${query}&target=${target}&source=${source}&alt=json`
+          encodeURI(
+            `https://translation.googleapis.com/language/translate/v2?key=${apiKey}&q=${query}&target=${target}&source=${source}&alt=json&format=text`
+          )
         );
         let translatedText: string =
           result.data.data.translations[0].translatedText;
