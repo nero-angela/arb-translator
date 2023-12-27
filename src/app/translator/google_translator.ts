@@ -1,4 +1,5 @@
 import axios from "axios";
+import { hasHtmlTags } from "../util/html";
 import { Logger } from "../util/logger";
 import { Toast } from "../util/toast";
 import { Translator } from "./translator";
@@ -196,9 +197,10 @@ export class GoogleTranslator implements Translator {
           return replacement;
         });
         // Logger.l(`${q} -> ${query}`);
+        const format = hasHtmlTags(query) ? "html" : "text";
         const result = await axios.get(
           encodeURI(
-            `https://translation.googleapis.com/language/translate/v2?key=${apiKey}&q=${query}&target=${target}&source=${source}&alt=json&format=text`
+            `https://translation.googleapis.com/language/translate/v2?key=${apiKey}&q=${query}&target=${target}&source=${source}&alt=json&format=${format}`
           )
         );
         let translatedText: string =

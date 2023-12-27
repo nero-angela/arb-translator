@@ -9,3 +9,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Added
 
 - Support line break.
+
+## [0.1.8] - 23.12.27
+
+### Added
+
+- Support html tag.
