@@ -37,7 +37,6 @@ export class GoogleTranslator implements Translator {
     { query: "eo", name: "Esperanto", arb: "eo" },
     { query: "et", name: "Estonian", arb: "et" },
     { query: "ee", name: "Ewe", arb: "ee" },
-    { query: "fil", name: "Filipino (Tagalog)", arb: "fil" },
     { query: "fi", name: "Finnish", arb: "fi" },
     { query: "fr", name: "French", arb: "fr" },
     { query: "fy", name: "Frisian", arb: "fy" },

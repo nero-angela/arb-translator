@@ -4,6 +4,12 @@ All notable changes to the "arb-translator" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.1.10] - 23.12.29
+
+### Rmoved
+
+- Filipino & Tagalog deduplication
+
 ## [0.1.9] - 23.12.29
 
 ### Fixed
