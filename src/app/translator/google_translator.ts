@@ -154,15 +154,17 @@ export class GoogleTranslator implements Translator {
       return;
     }
     Logger.l(`Total translate request : ${p.text.length}`);
-    const result = await Promise.all(
-      p.text.map((q) =>
-        this._callAPI(p.apiKey, q, p.sourceLangQuery, p.targetLangQuery)
-      )
-    );
-    if (!result) {
-      return [];
-    } else {
+    try {
+      const result = await Promise.all(
+        p.text.map((q) =>
+          this._callAPI(p.apiKey, q, p.sourceLangQuery, p.targetLangQuery)
+        )
+      );
       return result;
+    } catch (error: any) {
+      Logger.e("Translate error:", error.e);
+      Toast.e(`${error.e}\n${error.q}`);
+      return [];
     }
   }
 
@@ -217,9 +219,7 @@ export class GoogleTranslator implements Translator {
         // Logger.l(`${translatedText} -> ${text}`);
         res(text);
       } catch (e: any) {
-        Logger.e("Translate error:", e);
-        Toast.e(e.response.data.error.errors[0].message);
-        rej(e);
+        rej({ e, q });
       }
     });
   }

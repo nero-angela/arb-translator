@@ -67,7 +67,6 @@ export class Translate {
     let sourceArb = sourceArbFileName?.split(".arb")[0]!;
     const arbPrefix = this.config.data.arbPrefix;
     if (arbPrefix) {
-      console.log(sourceArb.split(arbPrefix));
       sourceArb = sourceArb.split(arbPrefix)[1]!;
     }
     const sourceLang = this.translator.languages.find(
@@ -121,6 +120,8 @@ export class Translate {
       const targetArbPath = `${sourceArbPathSegments.join("/")}/${
         arbPrefix + targetLang.arb
       }.arb`;
+
+      const translateData: Record<string, string> = {};
       if (!isOverride && fs.existsSync(targetArbPath)) {
         // arb file exists
         const prevTargetData: Record<string, string> = JSON.parse(
@@ -128,12 +129,12 @@ export class Translate {
         );
         const prevTargetKeys = Object.keys(prevTargetData);
         // phrases that need translation
-        const translateData: Record<string, string> = {};
         for (const sourceKey in sourceData) {
           if (sourceKey === "@@locale") {
             targetData[sourceKey] = targetLang.arb;
             continue;
           } else if (sourceKey.includes("@")) {
+            targetData[sourceKey] = sourceData[sourceKey];
             continue;
           }
           const prevTargetHasKey = prevTargetKeys.includes(sourceKey);
@@ -151,48 +152,41 @@ export class Translate {
           translateData[sourceKey] = sourceData[sourceKey];
           targetData[sourceKey] = "will be translated";
         }
-
-        const translateKeys = Object.keys(translateData);
-        if (translateKeys.length > 0) {
-          // translate
-          const translateValues = await this.translator.translate({
-            apiKey: this.config.data.googleAPIKey,
-            text: Object.values(translateData),
-            sourceLangQuery: sourceLang.query,
-            targetLangQuery: targetLang.query,
-          });
-          if (
-            !translateValues ||
-            translateValues.length !== translateKeys.length
-          ) {
-            Toast.e("Failed to translate");
-            return;
-          }
-          translateKeys.forEach(
-            (key, index) => (targetData[key] = translateValues[index])
-          );
-        }
       } else {
         // arb file doesn't exist
-        const targetValues = await this.translator.translate({
+        for (const sourceKey in sourceData) {
+          if (sourceKey === "@@locale") {
+            targetData[sourceKey] = targetLang.arb;
+            continue;
+          } else if (sourceKey.includes("@")) {
+            targetData[sourceKey] = sourceData[sourceKey];
+            continue;
+          } else {
+            targetData[sourceKey] = "will be translated";
+            translateData[sourceKey] = sourceData[sourceKey];
+          }
+        }
+      }
+
+      // translate
+      const translateKeys = Object.keys(translateData);
+      if (translateKeys.length > 0) {
+        const translateValues = await this.translator.translate({
           apiKey: this.config.data.googleAPIKey,
-          text: sourceValues,
+          text: Object.values(translateData),
           sourceLangQuery: sourceLang.query,
           targetLangQuery: targetLang.query,
         });
-
-        if (!targetValues || targetValues.length !== sourceLength) {
+        if (
+          !translateValues ||
+          translateValues.length !== translateKeys.length
+        ) {
           Toast.e("Failed to translate");
           return;
         }
-
-        sourceKeys.forEach((key, index) => {
-          if (key === "@@locale") {
-            targetData[key] = targetLang.arb;
-          } else if (!key.includes("@")) {
-            targetData[key] = targetValues[index];
-          }
-        });
+        translateKeys.forEach(
+          (key, index) => (targetData[key] = translateValues[index])
+        );
       }
 
       // upsert target arb file
