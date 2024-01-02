@@ -86,7 +86,7 @@ export class GoogleTranslator implements Translator {
     { query: "mt", name: "Maltese", arb: "mt" },
     { query: "mi", name: "Maori", arb: "mi" },
     { query: "mr", name: "Marathi", arb: "mr" },
-    { query: "mni-Mtei", name: "Meiteilon (Manipuri)", arb: "mni_Mtei" },
+    { query: "mni-Mtei", name: "Meiteilon (Manipuri)", arb: "mni" },
     { query: "lus", name: "Mizo", arb: "lus" },
     { query: "mn", name: "Mongolian", arb: "mn" },
     { query: "my", name: "Myanmar (Burmese)", arb: "my" },

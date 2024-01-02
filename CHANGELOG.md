@@ -1,8 +1,12 @@
-# Change Log
+# [Change Log](http://keepachangelog.com/)
 
 All notable changes to the "arb-translator" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [0.1.11] - 24.01.02
+
+### Updated
+
+- Update Meiteilon arb name from "mni_Mtei" to "mni".
 
 ## [0.1.10] - 23.12.29
 
