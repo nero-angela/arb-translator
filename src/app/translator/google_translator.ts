@@ -49,7 +49,7 @@ export class GoogleTranslator implements Translator {
     { query: "ht", name: "Haitian Creole", arb: "ht" },
     { query: "ha", name: "Hausa", arb: "ha" },
     { query: "haw", name: "Hawaiian", arb: "haw" },
-    { query: "iw", name: "Hebrew", arb: "iw" },
+    { query: "iw", name: "Hebrew", arb: "he" },
     { query: "hi", name: "Hindi", arb: "hi" },
     { query: "hmn", name: "Hmong", arb: "hmn" },
     { query: "hu", name: "Hungarian", arb: "hu" },

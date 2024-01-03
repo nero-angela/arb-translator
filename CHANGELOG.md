@@ -2,6 +2,12 @@
 
 All notable changes to the "arb-translator" extension will be documented in this file.
 
+## [0.1.13] - 24.01.03
+
+### Updated
+
+- Update Hebrew arb name from "iw" to "he".
+
 ## [0.1.12] - 24.01.02
 
 ### Updated
