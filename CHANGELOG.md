@@ -2,6 +2,12 @@
 
 All notable changes to the "arb-translator" extension will be documented in this file.
 
+## [0.1.15] - 24.01.03
+
+### Updated
+
+- Update Chinese arb name from "zh_Hans" and "zh_Hant" to "zh_CN" and "zh_TW".
+
 ## [0.1.14] - 24.01.03
 
 ### Fixed
