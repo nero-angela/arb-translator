@@ -2,6 +2,12 @@
 
 All notable changes to the "arb-translator" extension will be documented in this file.
 
+## [0.1.14] - 24.01.03
+
+### Fixed
+
+- Replace "&#39;" to "'".
+
 ## [0.1.13] - 24.01.03
 
 ### Updated

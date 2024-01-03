@@ -215,6 +215,9 @@ export class GoogleTranslator implements Translator {
             return dictionary[match] || match;
           });
         }
+        // replace &#39; to '
+        text.replaceAll("&#39;", "'");
+
         // Logger.l(`${translatedText} -> ${text}`);
         res(text);
       } catch (e: any) {
