@@ -1,13 +1,14 @@
-export interface Translator {
+import { Language } from "../language/language";
 
-  // support languages
-  languages: Record<string, string>[];
+export interface Translator {
+  // translator name
+  name: string;
 
   // translate
   translate(params: {
     apiKey: string;
     text: string[];
-    sourceLangQuery: string;
-    targetLangQuery: string;
+    sourceLang: Language;
+    targetLang: Language;
   }): Promise<string[] | undefined>;
 }

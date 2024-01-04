@@ -1,30 +1,30 @@
 import * as vscode from "vscode";
-import { Command } from "./app/command/command";
-import { GoogleTranslator } from "./app/translator/google_translator";
-import { Config } from "./app/util/config";
+import { ConfigService } from "./app/config/config.service";
+import { HistoryService } from "./app/history/history.service";
+import { LanguageService } from "./app/language/language.service";
+import { TranslateCmd } from "./app/translator/translate.cmd";
 import { Logger } from "./app/util/logger";
+import { ArbService } from "./app/arb/arb.service";
 
 export function activate(context: vscode.ExtensionContext) {
   const name = "arb-translator";
   Logger.i(`Init ${name}.`);
-  const config = new Config(name, context);
-  const translator = new GoogleTranslator();
-  const command = new Command(config, translator);
+  // service
+  const historyService = new HistoryService();
+  const configService = new ConfigService();
+  const languageService = new LanguageService(configService);
+  const arbService = new ArbService(languageService);
+  const translateCmd = new TranslateCmd(
+    configService,
+    historyService,
+    languageService,
+    arbService,
+  );
 
-  [
-    vscode.commands.registerCommand(`${name}.translate`, () =>
-      command.translate(context)
-    ),
-    vscode.commands.registerCommand(`${name}.updateSourceArbPath`, () =>
-      command.updateSourceArbPath(context)
-    ),
-    vscode.commands.registerCommand(`${name}.updateAPIKey`, () =>
-      command.updateAPIKey(context)
-    ),
-    vscode.commands.registerCommand(`${name}.configure`, () =>
-      command.configure(context)
-    ),
-  ].map((disposable) => context.subscriptions.push(disposable));
+  const disposable = vscode.commands.registerCommand(`${name}.translate`, () =>
+    translateCmd.run()
+  );
+  context.subscriptions.push(disposable);
 }
 
 export function deactivate() {}
