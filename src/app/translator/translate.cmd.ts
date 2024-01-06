@@ -8,6 +8,7 @@ import { History } from "../history/history";
 import { HistoryService } from "../history/history.service";
 import { Language } from "../language/language";
 import { LanguageService } from "../language/language.service";
+import { Dialog } from "../util/dialog";
 import {
   APIKeyRequiredException,
   ConfigNotFoundException,
@@ -19,7 +20,6 @@ import {
   TranslateLanguagesRequiredException,
   WorkspaceNotFoundException,
 } from "../util/exceptions";
-import { showHomepage, showLink } from "../util/link";
 import { Logger } from "../util/logger";
 import { Toast } from "../util/toast";
 import { GoogleTranslator } from "./google_translator";
@@ -56,55 +56,31 @@ export class TranslateCmd {
       if (e instanceof WorkspaceNotFoundException) {
         Toast.e("There is no project workspace.");
       } else if (e instanceof ConfigNotFoundException) {
-        vscode.window
-          .showInformationMessage(
-            "Add the default settings required for translation to the .vscode/settings.json file?",
-            "Yes"
-          )
-          .then(async (answer) => {
-            if (answer === "Yes") {
-              await this.configService.addRequiredParams();
-              const workspacePath =
-                vscode.workspace.workspaceFolders![0].uri.path;
-              const workspaceSettingsPath = path.join(
-                workspacePath,
-                ".vscode",
-                "settings.json"
-              );
-              // open .vscode/settings.json
-              vscode.workspace
-                .openTextDocument(workspaceSettingsPath)
-                .then((document) => {
-                  vscode.window.showTextDocument(document);
-                });
-            }
-          });
+        Dialog.showConfigRequiredDialog(async () => {
+          await this.configService.addRequiredParams();
+          const workspacePath = vscode.workspace.workspaceFolders![0].uri.path;
+          const workspaceSettingsPath = path.join(
+            workspacePath,
+            ".vscode",
+            "settings.json"
+          );
+          // open .vscode/settings.json
+          vscode.workspace
+            .openTextDocument(workspaceSettingsPath)
+            .then((document) => {
+              vscode.window.showTextDocument(document);
+            });
+          // description
+          Dialog.showConfigDescriptionDialog();
+        });
       } else if (e instanceof SourceArbFilePathRequiredException) {
         Toast.e(
           "Please add arbTranslator.config.sourceArbFilePath to the .vscode/settings.json file."
         );
       } else if (e instanceof TargetLanguageCodeListRequiredException) {
-        vscode.window
-          .showErrorMessage(
-            "Please add arbTranslator.config.targetLanguageCodeList to the .vscode/settings.json file. Please refer to the link for the target LanguageCodeList list.",
-            "Link"
-          )
-          .then(async (answer) => {
-            if (answer === "Link") {
-              showHomepage();
-            }
-          });
+        Dialog.showTargetLanguageCodeListRequiredDialog();
       } else if (e instanceof APIKeyRequiredException) {
-        vscode.window
-          .showErrorMessage(
-            "Please add arbTranslator.config.googleAPIKey to the .vscode/settings.json file. Please refer to the link and proceed with the API setting and API Key issuance process.",
-            "Link"
-          )
-          .then(async (answer) => {
-            if (answer === "Link") {
-              showLink("https://cloud.google.com/translate/docs/setup");
-            }
-          });
+        Dialog.showAPIKeyRequiredDialog();
       } else if (e instanceof FileNotFoundException) {
         Toast.e(e.message);
       } else if (e instanceof InvalidLanguageCodeException) {

@@ -1,20 +1,11 @@
 import * as fs from "fs";
-import path from "path";
-import * as vscode from "vscode";
 
+import { Constant } from "../util/constant";
+import { Workspace } from "../util/workspace";
 import { History } from "./history";
 
 export class HistoryRepository {
-  historyFilePath: string;
-
-  constructor() {
-    const workspacePath = vscode.workspace.workspaceFolders![0].uri.path;
-    this.historyFilePath = path.join(
-      workspacePath,
-      ".vscode",
-      "arb_history.json"
-    );
-  }
+  historyFilePath: string = Workspace.getArbPath("history.json");
 
   async get(): Promise<History> {
     if (!fs.existsSync(this.historyFilePath)) {
@@ -43,7 +34,14 @@ export class HistoryRepository {
   set(history: History) {
     fs.writeFileSync(
       this.historyFilePath,
-      JSON.stringify(history, null, 2),
+      JSON.stringify(
+        {
+          description: `This file is for tracking changes to the source arb file in the ArbTranslator extension. (${Constant.homePage})`,
+          data: history.data,
+        },
+        null,
+        2
+      ),
       "utf8"
     );
   }

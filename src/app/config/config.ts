@@ -1,6 +1,7 @@
 export type LanguageCode = string;
 export type ArbFileName = string;
 export type ArbFilePath = string;
+export type CacheFilePath = string | undefined;
 
 export interface Config {
   arbFilePrefix?: string | undefined;
