@@ -67,7 +67,7 @@ export class GoogleTranslator implements Translator {
     Logger.l(`Total translate request : ${nRequest} (cache : ${nCache})`);
     return {
       data: results,
-      nReq: nRequest,
+      nAPICall: nRequest,
       nCache,
     };
   }

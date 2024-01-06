@@ -23,6 +23,7 @@ import {
 import { Logger } from "../util/logger";
 import { Toast } from "../util/toast";
 import { GoogleTranslator } from "./google_translator";
+import { TranslateStatistic } from "./translate.statistic";
 import { Translator } from "./translator";
 
 export class TranslateCmd {
@@ -148,9 +149,7 @@ export class TranslateCmd {
 
     // get history
     const history: History = await this.historyService.get();
-    let nEntireTotal = 0;
-    let nEntireCache = 0;
-    let nEntireReq = 0;
+    const translateStatisticList: TranslateStatistic[] = [];
     for (const targetLanguage of targetLanguages) {
       if (targetLanguage.languageCode === sourceArb.language.languageCode) {
         // skip source arb file
@@ -170,6 +169,9 @@ export class TranslateCmd {
       // translation target classification
       const nextTargetArbData: Record<string, string> = {};
       const willTranslateData: Record<string, string> = {};
+
+      // statistic
+      const translateStatistic = new TranslateStatistic();
       for (const sourceArbKey of sourceArb.keys) {
         if (sourceArbKey === "@@locale") {
           nextTargetArbData[sourceArbKey] = targetArb.language.languageCode;
@@ -186,6 +188,7 @@ export class TranslateCmd {
           if (sourceArbValue === historyArbValue) {
             // not updated
             nextTargetArbData[sourceArbKey] = targetArb.data[sourceArbKey];
+            translateStatistic.nReuse += 1;
             continue;
           }
         }
@@ -198,42 +201,40 @@ export class TranslateCmd {
       const willTranslateKeys: string[] = Object.keys(willTranslateData);
       const willTranslateValues: string[] = Object.values(willTranslateData);
       const nWillTranslate: number = willTranslateKeys.length;
-      let nCache = 0;
-      let nReq = 0;
       if (nWillTranslate > 0) {
+        // translate
         const translateResult = await this.translator.translate(
           this.configService.config.googleAPIKey,
           willTranslateValues,
           sourceArb.language,
           targetArb.language
         );
-        if (translateResult.data.length !== nWillTranslate) {
-          Toast.e("Failed to translate");
-          return;
-        }
         willTranslateKeys.forEach(
           (key, index) => (nextTargetArbData[key] = translateResult.data[index])
         );
-        nCache = translateResult.nCache;
-        nReq = translateResult.nReq;
+        translateStatistic.nAPICall = translateResult.nAPICall;
+        translateStatistic.nCache = translateResult.nCache;
       }
 
       // upsert target arb file
       this.arbService.upsert(targetArbFilePath, nextTargetArbData);
       const targetArbFileName = targetArb.filePath.split("/").pop();
-      const total = sourceArb.keys.length;
-      nEntireTotal += total;
-      nEntireCache += nCache;
-      nEntireReq += nEntireReq;
+      translateStatisticList.push(translateStatistic);
       Toast.i(
-        `🟢 ${targetArbFileName} translated. (total : ${total} / req : ${nReq} / cache: ${nCache})`
+        `🟢 ${targetArbFileName} translated. (${translateStatistic.log})`
       );
     }
 
     // create arb history
     this.historyService.update(sourceArb.data);
+    const totalTranslateStatistic = translateStatisticList.reduce(
+      (prev, curr) => {
+        return prev.sum(curr);
+      },
+      new TranslateStatistic()
+    );
     Toast.i(
-      `Total ${targetLanguages.length} languages translated. (total : ${nEntireTotal} / req : ${nEntireReq} / cache: ${nEntireCache})`
+      `Total ${targetLanguages.length} languages translated. (${totalTranslateStatistic.log})`
     );
   }
 }

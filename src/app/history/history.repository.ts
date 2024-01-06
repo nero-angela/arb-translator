@@ -21,9 +21,8 @@ export class HistoryRepository {
         values: [],
       };
     } else {
-      const data = JSON.parse(
-        await fs.promises.readFile(this.historyFilePath, "utf8")
-      );
+      const result = await fs.promises.readFile(this.historyFilePath, "utf8");
+      const data = JSON.parse(result.trim() === "" ? "{}" : result);
       return {
         data,
         keys: Object.keys(data),

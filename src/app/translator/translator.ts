@@ -2,7 +2,7 @@ import { Language } from "../language/language";
 
 export interface TranslateResult {
   data: string[];
-  nReq: number;
+  nAPICall: number;
   nCache: number;
 }
 

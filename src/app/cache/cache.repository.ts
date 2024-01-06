@@ -14,9 +14,8 @@ export class CacheRepository {
 
   public async reload(): Promise<void> {
     if (!this.isCacheFileExist) return;
-    this.cache = JSON.parse(
-      await fs.promises.readFile(this.cacheFilePath, "utf8")
-    );
+    const result = await fs.promises.readFile(this.cacheFilePath, "utf8");
+    this.cache = JSON.parse(result.trim() === "" ? "{}" : result);
   }
 
   public hasKey(key: string): boolean {
