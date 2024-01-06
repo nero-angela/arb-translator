@@ -185,18 +185,21 @@ export class TranslationCmd {
           const sourceArbValue = sourceArb.data[sourceArbKey];
           const historyArbValue = history.data[sourceArbKey];
           if (sourceArbValue === historyArbValue) {
-            // not updated
+            // skip
             nextTargetArbData[sourceArbKey] = targetArb.data[sourceArbKey];
-            translateStatistic.nReuse += 1;
+            translateStatistic.data.nSkip += 1;
             continue;
           }
         }
 
         // create & update
         // remove deleted items by adding only the key of sourceArbFile
+        if (isKeyInTargetArb) translateStatistic.data.nUpdate += 1;
+        else translateStatistic.data.nCreate += 1;
         nextTargetArbData[sourceArbKey] = "will be translated";
         willTranslateData[sourceArbKey] = sourceArb.data[sourceArbKey];
       }
+
       const willTranslateKeys: string[] = Object.keys(willTranslateData);
       const willTranslateValues: string[] = Object.values(willTranslateData);
       const nWillTranslate: number = willTranslateKeys.length;
@@ -212,8 +215,8 @@ export class TranslationCmd {
         willTranslateKeys.forEach(
           (key, index) => (nextTargetArbData[key] = translateResult.data[index])
         );
-        translateStatistic.nAPICall = translateResult.nAPICall;
-        translateStatistic.nCache = translateResult.nCache;
+        translateStatistic.data.nAPICall = translateResult.nAPICall;
+        translateStatistic.data.nCache = translateResult.nCache;
       }
 
       // upsert target arb file
@@ -221,7 +224,9 @@ export class TranslationCmd {
       const targetArbFileName = targetArb.filePath.split("/").pop();
       translateStatisticList.push(translateStatistic);
       Toast.i(
-        `🟢 ${targetArbFileName} translated. (${translateStatistic.log})`
+        `🟢 ${targetArbFileName} translated. (${type.toString()} ${
+          translateStatistic.log
+        })`
       );
     }
 
@@ -236,7 +241,7 @@ export class TranslationCmd {
     Toast.i(
       `Total ${
         targetLanguages.length
-      } languages translated(${type.toString()}). (${
+      } languages translated. (${type.toString()} ${
         totalTranslateStatistic.log
       })`
     );

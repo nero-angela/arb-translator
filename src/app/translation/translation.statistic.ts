@@ -1,23 +1,43 @@
-export class TranslationStatistic {
-  public nReuse: number;
-  public nCache: number;
-  public nAPICall: number;
+export interface TranslationStatisticData {
+  nCreate: number;
+  nUpdate: number;
+  nSkip: number;
+  nCache: number;
+  nAPICall: number;
+}
 
-  constructor(nReuse?: number, nCache?: number, nAPICall?: number) {
-    this.nReuse = nReuse ?? 0;
-    this.nCache = nCache ?? 0;
-    this.nAPICall = nAPICall ?? 0;
+export interface TranslationStatisticOptionalData {
+  nCreate?: number;
+  nUpdate?: number;
+  nSkip?: number;
+  nCache?: number;
+  nAPICall?: number;
+}
+
+export class TranslationStatistic {
+  public data: TranslationStatisticData;
+
+  constructor(param?: TranslationStatisticOptionalData) {
+    this.data = {
+      nCreate: param?.nCreate ?? 0,
+      nUpdate: param?.nUpdate ?? 0,
+      nSkip: param?.nSkip ?? 0,
+      nCache: param?.nCache ?? 0,
+      nAPICall: param?.nAPICall ?? 0,
+    };
   }
 
   public get log(): string {
-    return `nAPICall : ${this.nAPICall}, nCache: ${this.nCache}, nReuse : ${this.nReuse}`;
+    return `api: ${this.data.nAPICall}, cache: ${this.data.nCache} | create: ${this.data.nCreate}, update: ${this.data.nUpdate}, skip: ${this.data.nSkip}`;
   }
 
   public sum(other: TranslationStatistic): TranslationStatistic {
-    return new TranslationStatistic(
-      this.nReuse + other.nReuse,
-      this.nCache + other.nCache,
-      this.nAPICall + other.nAPICall
-    );
+    return new TranslationStatistic({
+      nCreate: this.data.nCreate + other.data.nCreate,
+      nUpdate: this.data.nUpdate + other.data.nUpdate,
+      nSkip: this.data.nSkip + other.data.nSkip,
+      nCache: this.data.nCache + other.data.nCache,
+      nAPICall: this.data.nAPICall + other.data.nAPICall,
+    });
   }
 }
