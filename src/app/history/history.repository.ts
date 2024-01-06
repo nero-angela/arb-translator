@@ -9,6 +9,7 @@ export class HistoryRepository {
 
   async get(): Promise<History> {
     if (!fs.existsSync(this.historyFilePath)) {
+      Workspace.createPath(this.historyFilePath);
       fs.writeFileSync(
         this.historyFilePath,
         JSON.stringify({}, null, 2),
