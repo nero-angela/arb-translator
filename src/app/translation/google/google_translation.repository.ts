@@ -1,7 +1,8 @@
 import { Language } from "../../language/language";
 import { TranslationFailureException } from "../../util/exceptions";
 import { Logger } from "../../util/logger";
-import { CacheRepository } from "../cache/cache.repository";
+import { TranslationCacheKey } from "../cache/translation_cache";
+import { TranslationCacheRepository } from "../cache/translation_cache.repository";
 import { Translation, TranslationType } from "../translation";
 import { TranslationDataSource } from "../translation.datasource";
 import { TranslationRepository } from "../translation.repository";
@@ -14,7 +15,7 @@ interface EncodeResult {
 }
 
 export class GoogleTranslationRepository implements TranslationRepository {
-  private cacheRepository = new CacheRepository();
+  private cacheRepository = new TranslationCacheRepository();
   private paidTranslationDataSource = new GoogleTranslationPaidDataSource();
   private freeTranslationDataSource = new GoogleTranslationFreeDataSource();
 
@@ -39,7 +40,7 @@ export class GoogleTranslationRepository implements TranslationRepository {
     await this.cacheRepository.reload();
     const results = await Promise.all(
       queries.map(async (query) => {
-        const cacheKey = this.getCacheKey(query, sourceLang, targetLang);
+        const cacheKey = new TranslationCacheKey(query, sourceLang, targetLang);
         const cacheValue = this.cacheRepository.get<string>(cacheKey);
         if (cacheValue) {
           // return cache
