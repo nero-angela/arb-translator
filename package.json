@@ -79,8 +79,12 @@
     },
     "commands": [
       {
-        "command": "arb-translator.translate",
-        "title": "arb translator : translate"
+        "command": "arb-translator.translatePaid",
+        "title": "arb translator : translate (paid : google API Key required)"
+      },
+      {
+        "command": "arb-translator.translateFree",
+        "title": "arb translator : translate (free : limited)"
       }
     ]
   },

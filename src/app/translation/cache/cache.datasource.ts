@@ -1,10 +1,10 @@
 import * as fs from "fs";
-import { FileNotFoundException } from "../util/exceptions";
-import { Workspace } from "../util/workspace";
+import { FileNotFoundException } from "../../util/exceptions";
+import { Workspace } from "../../util/workspace";
 
 type Cache = Record<string, any>;
 
-export class CacheRepository {
+export class CacheDataSource {
   private cacheFilePath: string = Workspace.getArbPath("cache.json");
   private cache: Cache = {};
 

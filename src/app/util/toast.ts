@@ -2,8 +2,6 @@ import * as vscode from "vscode";
 import { Logger } from "./logger";
 
 export class Toast {
-  static name: string = "arb-translator";
-
   static i(message: string) {
     Logger.i(message);
     vscode.window.showInformationMessage(message);

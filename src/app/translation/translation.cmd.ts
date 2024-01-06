@@ -3,7 +3,6 @@ import path from "path";
 import * as vscode from "vscode";
 import { Arb } from "../arb/arb";
 import { ArbService } from "../arb/arb.service";
-import { CacheService } from "../cache/cache.service";
 import { ConfigService } from "../config/config.service";
 import { History } from "../history/history";
 import { HistoryService } from "../history/history.service";
@@ -22,20 +21,20 @@ import {
 } from "../util/exceptions";
 import { Logger } from "../util/logger";
 import { Toast } from "../util/toast";
-import { GoogleTranslator } from "./google_translator";
-import { TranslateStatistic } from "./translate.statistic";
-import { Translator } from "./translator";
+import { GoogleTranslationService } from "./google/google_translation.service";
+import { TranslationType } from "./translation";
+import { TranslationService } from "./translation.service";
+import { TranslationStatistic } from "./translation.statistic";
 
-export class TranslateCmd {
-  private historyService: HistoryService;
-  private configService: ConfigService;
-  private languageService: LanguageService;
+export class TranslationCmd {
   private arbService: ArbService;
-  private translator: Translator;
+  private configService: ConfigService;
+  private historyService: HistoryService;
+  private languageService: LanguageService;
+  private translationService: TranslationService;
 
   constructor(
     arbService: ArbService,
-    cacheService: CacheService,
     configService: ConfigService,
     historyService: HistoryService,
     languageService: LanguageService
@@ -44,16 +43,16 @@ export class TranslateCmd {
     this.configService = configService;
     this.historyService = historyService;
     this.languageService = languageService;
-    this.translator = new GoogleTranslator(cacheService);
+    this.translationService = new GoogleTranslationService();
   }
 
-  async run() {
+  async run(type: TranslationType) {
     try {
       // validation
       this._checkValidation();
 
       // translate
-      await this._translate();
+      await this._translate(type);
     } catch (e: any) {
       Logger.e(e);
       if (e instanceof ConfigNotFoundException) {
@@ -131,7 +130,7 @@ export class TranslateCmd {
     }
   }
 
-  async _translate() {
+  async _translate(type: TranslationType) {
     const sourceArbFilePath = this.configService.config.sourceArbFilePath;
     const sourceArb: Arb = await this.arbService.get(sourceArbFilePath);
 
@@ -149,7 +148,7 @@ export class TranslateCmd {
 
     // get history
     const history: History = await this.historyService.get();
-    const translateStatisticList: TranslateStatistic[] = [];
+    const translateStatisticList: TranslationStatistic[] = [];
     for (const targetLanguage of targetLanguages) {
       if (targetLanguage.languageCode === sourceArb.language.languageCode) {
         // skip source arb file
@@ -171,7 +170,7 @@ export class TranslateCmd {
       const willTranslateData: Record<string, string> = {};
 
       // statistic
-      const translateStatistic = new TranslateStatistic();
+      const translateStatistic = new TranslationStatistic();
       for (const sourceArbKey of sourceArb.keys) {
         if (sourceArbKey === "@@locale") {
           nextTargetArbData[sourceArbKey] = targetArb.language.languageCode;
@@ -203,7 +202,8 @@ export class TranslateCmd {
       const nWillTranslate: number = willTranslateKeys.length;
       if (nWillTranslate > 0) {
         // translate
-        const translateResult = await this.translator.translate(
+        const translateResult = await this.translationService.translate(
+          type,
           this.configService.config.googleAPIKey,
           willTranslateValues,
           sourceArb.language,
@@ -231,10 +231,14 @@ export class TranslateCmd {
       (prev, curr) => {
         return prev.sum(curr);
       },
-      new TranslateStatistic()
+      new TranslationStatistic()
     );
     Toast.i(
-      `Total ${targetLanguages.length} languages translated. (${totalTranslateStatistic.log})`
+      `Total ${
+        targetLanguages.length
+      } languages translated(${type.toString()}). (${
+        totalTranslateStatistic.log
+      })`
     );
   }
 }

@@ -54,4 +54,8 @@ export class WorkspaceNotFoundException extends MessageException {
   }
 }
 
-export class TranslationFailureException extends MessageException {}
+export class TranslationFailureException extends MessageException {
+  constructor(message: string) {
+    super(message);
+  }
+}

@@ -1,5 +1,5 @@
 export interface Language {
-  // google translator parameter
+  // google translation parameter
   gt: string;
 
   // language name

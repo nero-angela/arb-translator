@@ -1,4 +1,4 @@
-export class TranslateStatistic {
+export class TranslationStatistic {
   public nReuse: number;
   public nCache: number;
   public nAPICall: number;
@@ -13,8 +13,8 @@ export class TranslateStatistic {
     return `nAPICall : ${this.nAPICall}, nCache: ${this.nCache}, nReuse : ${this.nReuse}`;
   }
 
-  public sum(other: TranslateStatistic): TranslateStatistic {
-    return new TranslateStatistic(
+  public sum(other: TranslationStatistic): TranslationStatistic {
+    return new TranslationStatistic(
       this.nReuse + other.nReuse,
       this.nCache + other.nCache,
       this.nAPICall + other.nAPICall

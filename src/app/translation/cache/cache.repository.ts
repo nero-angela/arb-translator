@@ -1,7 +1,7 @@
-import { CacheRepository } from "./cache.repository";
+import { CacheDataSource } from "./cache.datasource";
 
-export class CacheService {
-  private cacheRepository: CacheRepository = new CacheRepository();
+export class CacheRepository {
+  private cacheRepository: CacheDataSource = new CacheDataSource();
 
   public reload(): Promise<void> {
     return this.cacheRepository.reload();
