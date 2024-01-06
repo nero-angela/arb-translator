@@ -189,9 +189,7 @@ export class LanguageService {
       (sl) => sl.languageCode === languageCode
     );
     if (!language) {
-      throw new InvalidLanguageCodeException(
-        `${languageCode} is invalid language code.`
-      );
+      throw new InvalidLanguageCodeException(languageCode);
     }
     return language;
   }
@@ -230,9 +228,7 @@ export class LanguageService {
       );
       return languageCode;
     } catch (e: any) {
-      throw new InvalidArbFileNameException(
-        `The language code of ${arbFilePath} is not valid.`
-      );
+      throw new InvalidArbFileNameException(arbFilePath);
     }
   }
 

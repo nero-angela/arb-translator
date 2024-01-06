@@ -1,8 +1,7 @@
 import * as fs from "fs";
-import { FileNotFoundException } from "../util/exceptions";
-import { Arb } from "./arb";
-import { Logger } from "../util/logger";
 import { Language } from "../language/language";
+import { FileNotFoundException } from "../util/exceptions";
+import { Logger } from "../util/logger";
 
 export class ArbRepository {
   /**
@@ -13,7 +12,7 @@ export class ArbRepository {
    */
   async read(filePath: string): Promise<Record<string, string>> {
     if (!fs.existsSync(filePath)) {
-      throw new FileNotFoundException(`File ${filePath} not found.`);
+      throw new FileNotFoundException(filePath);
     }
     return JSON.parse(await fs.promises.readFile(filePath, "utf8"));
   }
@@ -28,8 +27,8 @@ export class ArbRepository {
 
   /**
    * Create file is not exist.
-   * @param filePath 
-   * @param language 
+   * @param filePath
+   * @param language
    */
   public createIfNotExist(filePath: string, language: Language) {
     if (!fs.existsSync(filePath)) {

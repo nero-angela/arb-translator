@@ -32,13 +32,13 @@ export class HistoryRepository {
     }
   }
 
-  set(history: History) {
+  set(data: Record<string, string>) {
     fs.writeFileSync(
       this.historyFilePath,
       JSON.stringify(
         {
           description: `This file is for tracking changes to the source arb file in the ArbTranslator extension. (${Constant.homePage})`,
-          data: history.data,
+          data,
         },
         null,
         2

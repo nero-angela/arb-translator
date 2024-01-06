@@ -4,8 +4,8 @@ import { HistoryRepository } from "./history.repository";
 export class HistoryService {
   private historyRepository: HistoryRepository = new HistoryRepository();
 
-  update(history: History) {
-    this.historyRepository.set(history);
+  update(data: Record<string, string>) {
+    this.historyRepository.set(data);
   }
 
   get(): Promise<History> {

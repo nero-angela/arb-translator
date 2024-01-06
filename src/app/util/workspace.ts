@@ -17,6 +17,7 @@ export class Workspace {
     if (!fs.existsSync(filePath)) {
       const dirPath = path.dirname(filePath);
       this.makeRecursiveDirectory(dirPath);
+      fs.writeFileSync(filePath, "");
     }
     return fs.existsSync(filePath);
   }
@@ -24,6 +25,7 @@ export class Workspace {
   private static makeRecursiveDirectory(dirPath: string): void {
     const parts = dirPath.split(path.sep);
 
+    // create directiory
     for (let i = 1; i <= parts.length; i++) {
       const currentPath = path.join(...parts.slice(0, i));
 

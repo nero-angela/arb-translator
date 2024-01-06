@@ -3,6 +3,7 @@ import path from "path";
 import * as vscode from "vscode";
 import { Arb } from "../arb/arb";
 import { ArbService } from "../arb/arb.service";
+import { CacheService } from "../cache/cache.service";
 import { ConfigService } from "../config/config.service";
 import { History } from "../history/history";
 import { HistoryService } from "../history/history.service";
@@ -13,8 +14,7 @@ import {
   APIKeyRequiredException,
   ConfigNotFoundException,
   FileNotFoundException,
-  InvalidLanguageCodeException,
-  InvalidTranslateLanguagesException,
+  MessageException,
   SourceArbFilePathRequiredException,
   ConfigurationRequiredException as TargetLanguageCodeListRequiredException,
   TranslateLanguagesRequiredException,
@@ -30,18 +30,20 @@ export class TranslateCmd {
   private configService: ConfigService;
   private languageService: LanguageService;
   private arbService: ArbService;
-  private translator: Translator = new GoogleTranslator();
+  private translator: Translator;
 
   constructor(
+    arbService: ArbService,
+    cacheService: CacheService,
     configService: ConfigService,
     historyService: HistoryService,
-    languageService: LanguageService,
-    arbService: ArbService
+    languageService: LanguageService
   ) {
+    this.arbService = arbService;
     this.configService = configService;
     this.historyService = historyService;
     this.languageService = languageService;
-    this.arbService = arbService;
+    this.translator = new GoogleTranslator(cacheService);
   }
 
   async run() {
@@ -53,9 +55,7 @@ export class TranslateCmd {
       await this._translate();
     } catch (e: any) {
       Logger.e(e);
-      if (e instanceof WorkspaceNotFoundException) {
-        Toast.e("There is no project workspace.");
-      } else if (e instanceof ConfigNotFoundException) {
+      if (e instanceof ConfigNotFoundException) {
         Dialog.showConfigRequiredDialog(async () => {
           await this.configService.addRequiredParams();
           const workspacePath = vscode.workspace.workspaceFolders![0].uri.path;
@@ -73,19 +73,11 @@ export class TranslateCmd {
           // description
           Dialog.showConfigDescriptionDialog();
         });
-      } else if (e instanceof SourceArbFilePathRequiredException) {
-        Toast.e(
-          "Please add arbTranslator.config.sourceArbFilePath to the .vscode/settings.json file."
-        );
       } else if (e instanceof TargetLanguageCodeListRequiredException) {
         Dialog.showTargetLanguageCodeListRequiredDialog();
       } else if (e instanceof APIKeyRequiredException) {
         Dialog.showAPIKeyRequiredDialog();
-      } else if (e instanceof FileNotFoundException) {
-        Toast.e(e.message);
-      } else if (e instanceof InvalidLanguageCodeException) {
-        Toast.e(e.message);
-      } else if (e instanceof InvalidTranslateLanguagesException) {
+      } else if (e instanceof MessageException) {
         Toast.e(e.message);
       } else {
         Toast.e(e);
@@ -117,7 +109,7 @@ export class TranslateCmd {
 
     // check the existence of a source arb file
     if (!fs.existsSync(sourceArbPath)) {
-      throw new FileNotFoundException(`File ${sourceArbPath} not found.`);
+      throw new FileNotFoundException(sourceArbPath);
     }
 
     // check selected languages
@@ -134,9 +126,7 @@ export class TranslateCmd {
 
     // check config translate languages
     if (!this.configService.config.targetLanguageCodeList) {
-      throw new TranslateLanguagesRequiredException(
-        `Please add translateLanguage to the .vscode/settings.json file.`
-      );
+      throw new TranslateLanguagesRequiredException();
     }
   }
 
@@ -158,6 +148,9 @@ export class TranslateCmd {
 
     // get history
     const history: History = await this.historyService.get();
+    let nEntireTotal = 0;
+    let nEntireCache = 0;
+    let nEntireReq = 0;
     for (const targetLanguage of targetLanguages) {
       if (targetLanguage.languageCode === sourceArb.language.languageCode) {
         // skip source arb file
@@ -204,344 +197,43 @@ export class TranslateCmd {
       }
       const willTranslateKeys: string[] = Object.keys(willTranslateData);
       const willTranslateValues: string[] = Object.values(willTranslateData);
-      const nTranslateData: number = willTranslateKeys.length;
-      // if (nTranslateData > 0) {
-      //   const translatedData = await this.translator.translate({
-      //     apiKey: this.configService.config.googleAPIKey,
-      //     text: willTranslateValues,
-      //     sourceLang: sourceArb.language,
-      //     targetLang: targetArb.language,
-      //   });
-      //   if (!translatedData || translatedData.length !== nTranslateData) {
-      //     Toast.e("Failed to translate");
-      //     return;
-      //   }
-      //   willTranslateKeys.forEach(
-      //     (key, index) => (nextTargetArbData[key] = translatedData[index])
-      //   );
-      // }
+      const nWillTranslate: number = willTranslateKeys.length;
+      let nCache = 0;
+      let nReq = 0;
+      if (nWillTranslate > 0) {
+        const translateResult = await this.translator.translate(
+          this.configService.config.googleAPIKey,
+          willTranslateValues,
+          sourceArb.language,
+          targetArb.language
+        );
+        if (translateResult.data.length !== nWillTranslate) {
+          Toast.e("Failed to translate");
+          return;
+        }
+        willTranslateKeys.forEach(
+          (key, index) => (nextTargetArbData[key] = translateResult.data[index])
+        );
+        nCache = translateResult.nCache;
+        nReq = translateResult.nReq;
+      }
 
       // upsert target arb file
       this.arbService.upsert(targetArbFilePath, nextTargetArbData);
       const targetArbFileName = targetArb.filePath.split("/").pop();
-      Toast.i(`🟢 ${targetArbFileName} translated.`);
+      const total = sourceArb.keys.length;
+      nEntireTotal += total;
+      nEntireCache += nCache;
+      nEntireReq += nEntireReq;
+      Toast.i(
+        `🟢 ${targetArbFileName} translated. (total : ${total} / req : ${nReq} / cache: ${nCache})`
+      );
     }
 
     // create arb history
-
-    // const sourceHistory = this.configService.config.sourceHistory;
-    // const prevSelectedLanguages = sourceHistory?.selectedLanguages ?? [];
-    // const prevSourceData = sourceHistory?.sourceData ?? {};
-    // const prevSourceKeys = Object.keys(prevSourceData);
-    // const prevSourceLang = sourceHistory?.sourceLang;
-
-    // for (let i = 0; i < selectedLanguages.length; i++) {
-    //   const selectedLanguage = selectedLanguages[i];
-    //   const targetLang = this.translator.supportLanguages.find(
-    //     (l) => l.query === selectedLanguage.query
-    //   )!;
-    //   const targetData: Record<string, string> = {};
-    //   if (targetLang.name === sourceLang.name) {
-    //     continue;
-    //   }
-
-    //   // check override or not
-    //   let isOverride: Boolean = false;
-    //   if (prevSourceLang && prevSourceLang.name !== sourceLang.name) {
-    //     // check the whether the source language has changed or not
-    //     const confirmRes =
-    //       (await vscode.window.showInformationMessage(
-    //         `The source language has changed from ${prevSourceLang.name} to ${sourceLang.name}. Override the target language files(${selectedLanguages.length}) with new translations?`,
-    //         "Override",
-    //         "No"
-    //       )) ?? "No";
-    //     if (confirmRes === "No") {
-    //       isOverride = false;
-    //       return;
-    //     } else {
-    //       isOverride = true;
-    //     }
-    //   } else if (
-    //     !prevSelectedLanguages.find((pl) => pl.name === selectedLanguage.name)
-    //   ) {
-    //     // check the whether the selected language is the previously translated language;
-    //     isOverride = true;
-    //   }
-
-    //   // check target language arb path
-    //   const targetArbPath = `${sourceArbPathSegments.join("/")}/${
-    //     arbPrefix + targetLang.arb
-    //   }.arb`;
-
-    //   const translateData: Record<string, string> = {};
-    //   if (!isOverride && fs.existsSync(targetArbPath)) {
-    //     // arb file exists
-    //     const prevTargetData: Record<string, string> = JSON.parse(
-    //       await fs.promises.readFile(targetArbPath, "utf8")
-    //     );
-    //     const prevTargetKeys = Object.keys(prevTargetData);
-    //     // phrases that need translation
-    //     for (const sourceKey in sourceData) {
-    //       if (sourceKey === "@@locale") {
-    //         targetData[sourceKey] = targetLang.arb;
-    //         continue;
-    //       } else if (sourceKey.includes("@")) {
-    //         targetData[sourceKey] = sourceData[sourceKey];
-    //         continue;
-    //       }
-    //       const prevTargetHasKey = prevTargetKeys.includes(sourceKey);
-    //       const prevSourceHasKey = prevSourceKeys.includes(sourceKey);
-    //       if (prevTargetHasKey && prevSourceHasKey) {
-    //         const isNotChanged =
-    //           prevSourceData[sourceKey] === sourceData[sourceKey];
-    //         if (isNotChanged) {
-    //           // not changed -> caching (not translate)
-    //           targetData[sourceKey] = prevTargetData[sourceKey];
-    //           continue;
-    //         }
-    //       }
-
-    //       translateData[sourceKey] = sourceData[sourceKey];
-    //       targetData[sourceKey] = "will be translated";
-    //     }
-    //   } else {
-    //     // arb file doesn't exist
-    //     for (const sourceKey in sourceData) {
-    //       if (sourceKey === "@@locale") {
-    //         targetData[sourceKey] = targetLang.arb;
-    //         continue;
-    //       } else if (sourceKey.includes("@")) {
-    //         targetData[sourceKey] = sourceData[sourceKey];
-    //         continue;
-    //       } else {
-    //         targetData[sourceKey] = "will be translated";
-    //         translateData[sourceKey] = sourceData[sourceKey];
-    //       }
-    //     }
-    //   }
-
-    //   // translate
-    //   const translateKeys = Object.keys(translateData);
-    //   if (translateKeys.length > 0) {
-    //     const translateValues = await this.translator.translate({
-    //       apiKey: this.configService.config.googleAPIKey,
-    //       text: Object.values(translateData),
-    //       sourceLangQuery: sourceLang.query,
-    //       targetLangQuery: targetLang.query,
-    //     });
-    //     if (
-    //       !translateValues ||
-    //       translateValues.length !== translateKeys.length
-    //     ) {
-    //       Toast.e("Failed to translate");
-    //       return;
-    //     }
-    //     translateKeys.forEach(
-    //       (key, index) => (targetData[key] = translateValues[index])
-    //     );
-    //   }
-
-    //   // upsert target arb file
-    //   const targetJsonData: string = JSON.stringify(targetData, null, 2);
-    //   fs.writeFileSync(targetArbPath, targetJsonData, "utf8");
-
-    //   Toast.i(`🟢 ${targetLang.arb}.arb translated.`);
-
-    //   // update sourceHistory
-    //   this.configService.update({
-    //     ...this.configService.config,
-    //     sourceHistory: {
-    //       sourceLang,
-    //       sourceData,
-    //       selectedLanguages,
-    //     },
-    //   });
-    // }
+    this.historyService.update(sourceArb.data);
+    Toast.i(
+      `Total ${targetLanguages.length} languages translated. (total : ${nEntireTotal} / req : ${nEntireReq} / cache: ${nEntireCache})`
+    );
   }
-  // /**
-  //  * @throw ConfigurationRequiredException
-  //  * @param context
-  //  * @returns
-  //  */
-  // async run(context: vscode.ExtensionContext) {
-  //   // check source.arb path
-  //   let sourceArbPath = this.configService.config.sourceArbFilePath;
-  //   if (!sourceArbPath) {
-  //     throw new SourceArbRequiredException();
-  //   }
-
-  //   // check selected languages
-  //   const selectedLanguages = this.configService.config.selectedLanguages;
-  //   if (selectedLanguages.length == 0) {
-  //     throw new ConfigurationRequiredException();
-  //   }
-
-  //   // check API key
-  //   let apiKey = this.configService.config.googleAPIKey;
-  //   if (!apiKey) {
-  //     throw new APIKeyRequiredException();
-  //   }
-
-  //   // read source.arb
-  //   if (!fs.existsSync(sourceArbPath)) {
-  //     throw new InvalidSourceArbException();
-  //   }
-
-  //   const sourceData: Record<string, string> = JSON.parse(
-  //     await fs.promises.readFile(sourceArbPath, "utf8")
-  //   );
-  //   const sourceKeys: string[] = Object.keys(sourceData);
-  //   const sourceValues: string[] = Object.values(sourceData);
-  //   const sourceLength: number = sourceKeys.length;
-  //   if (!sourceData) {
-  //     Toast.e(`Failed to json parse`);
-  //   } else if (sourceLength == 0) {
-  //     Toast.i(`There is no data`);
-  //   }
-
-  //   // translate
-  //   const sourceArbPathSegments = sourceArbPath.split("/");
-  //   const sourceArbFileName = sourceArbPathSegments.pop();
-  //   let sourceArb = sourceArbFileName?.split(".arb")[0]!;
-  //   const arbPrefix = this.configService.config.arbPrefix;
-  //   if (arbPrefix) {
-  //     sourceArb = sourceArb.split(arbPrefix)[1]!;
-  //   }
-  //   const sourceLang = this.translator.languages.find(
-  //     (l) => l.arb === sourceArb
-  //   )!;
-  //   if (!sourceLang) {
-  //     throw new InvalidSourceLangException();
-  //   }
-
-  //   // get source history
-  //   const sourceHistory = this.configService.config.sourceHistory;
-  //   const prevSelectedLanguages = sourceHistory?.selectedLanguages ?? [];
-  //   const prevSourceData = sourceHistory?.sourceData ?? {};
-  //   const prevSourceKeys = Object.keys(prevSourceData);
-  //   const prevSourceLang = sourceHistory?.sourceLang;
-
-  //   for (let i = 0; i < selectedLanguages.length; i++) {
-  //     const selectedLanguage = selectedLanguages[i];
-  //     const targetLang = this.translator.languages.find(
-  //       (l) => l.query === selectedLanguage.query
-  //     )!;
-  //     const targetData: Record<string, string> = {};
-  //     if (targetLang.name === sourceLang.name) {
-  //       continue;
-  //     }
-
-  //     // check override or not
-  //     let isOverride: Boolean = false;
-  //     if (prevSourceLang && prevSourceLang.name !== sourceLang.name) {
-  //       // check the whether the source language has changed or not
-  //       const confirmRes =
-  //         (await vscode.window.showInformationMessage(
-  //           `The source language has changed from ${prevSourceLang.name} to ${sourceLang.name}. Override the target language files(${selectedLanguages.length}) with new translations?`,
-  //           "Override",
-  //           "No"
-  //         )) ?? "No";
-  //       if (confirmRes === "No") {
-  //         isOverride = false;
-  //         return;
-  //       } else {
-  //         isOverride = true;
-  //       }
-  //     } else if (
-  //       !prevSelectedLanguages.find((pl) => pl.name === selectedLanguage.name)
-  //     ) {
-  //       // check the whether the selected language is the previously translated language;
-  //       isOverride = true;
-  //     }
-
-  //     // check target language arb path
-  //     const targetArbPath = `${sourceArbPathSegments.join("/")}/${
-  //       arbPrefix + targetLang.arb
-  //     }.arb`;
-
-  //     const translateData: Record<string, string> = {};
-  //     if (!isOverride && fs.existsSync(targetArbPath)) {
-  //       // arb file exists
-  //       const prevTargetData: Record<string, string> = JSON.parse(
-  //         await fs.promises.readFile(targetArbPath, "utf8")
-  //       );
-  //       const prevTargetKeys = Object.keys(prevTargetData);
-  //       // phrases that need translation
-  //       for (const sourceKey in sourceData) {
-  //         if (sourceKey === "@@locale") {
-  //           targetData[sourceKey] = targetLang.arb;
-  //           continue;
-  //         } else if (sourceKey.includes("@")) {
-  //           targetData[sourceKey] = sourceData[sourceKey];
-  //           continue;
-  //         }
-  //         const prevTargetHasKey = prevTargetKeys.includes(sourceKey);
-  //         const prevSourceHasKey = prevSourceKeys.includes(sourceKey);
-  //         if (prevTargetHasKey && prevSourceHasKey) {
-  //           const isNotChanged =
-  //             prevSourceData[sourceKey] === sourceData[sourceKey];
-  //           if (isNotChanged) {
-  //             // not changed -> caching (not translate)
-  //             targetData[sourceKey] = prevTargetData[sourceKey];
-  //             continue;
-  //           }
-  //         }
-
-  //         translateData[sourceKey] = sourceData[sourceKey];
-  //         targetData[sourceKey] = "will be translated";
-  //       }
-  //     } else {
-  //       // arb file doesn't exist
-  //       for (const sourceKey in sourceData) {
-  //         if (sourceKey === "@@locale") {
-  //           targetData[sourceKey] = targetLang.arb;
-  //           continue;
-  //         } else if (sourceKey.includes("@")) {
-  //           targetData[sourceKey] = sourceData[sourceKey];
-  //           continue;
-  //         } else {
-  //           targetData[sourceKey] = "will be translated";
-  //           translateData[sourceKey] = sourceData[sourceKey];
-  //         }
-  //       }
-  //     }
-
-  //     // translate
-  //     const translateKeys = Object.keys(translateData);
-  //     if (translateKeys.length > 0) {
-  //       const translateValues = await this.translator.translate({
-  //         apiKey: this.configService.config.googleAPIKey,
-  //         text: Object.values(translateData),
-  //         sourceLangQuery: sourceLang.query,
-  //         targetLangQuery: targetLang.query,
-  //       });
-  //       if (
-  //         !translateValues ||
-  //         translateValues.length !== translateKeys.length
-  //       ) {
-  //         Toast.e("Failed to translate");
-  //         return;
-  //       }
-  //       translateKeys.forEach(
-  //         (key, index) => (targetData[key] = translateValues[index])
-  //       );
-  //     }
-
-  //     // upsert target arb file
-  //     const targetJsonData: string = JSON.stringify(targetData, null, 2);
-  //     fs.writeFileSync(targetArbPath, targetJsonData, "utf8");
-
-  //     Toast.i(`🟢 ${targetLang.arb}.arb translated.`);
-
-  //     // update sourceHistory
-  //     this.configService.update({
-  //       ...this.configService.config,
-  //       sourceHistory: {
-  //         sourceLang,
-  //         sourceData,
-  //         selectedLanguages,
-  //       },
-  //     });
-  //   }
-  // }
 }
