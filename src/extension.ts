@@ -8,7 +8,7 @@ import { TranslationCmd } from "./app/translation/translation.cmd";
 import { Logger } from "./app/util/logger";
 
 export function activate(context: vscode.ExtensionContext) {
-  const name = "arb-translator";
+  const name: string = "arb-translator";
   Logger.i(`Init ${name}.`);
   const historyService = new HistoryService();
   const configService = new ConfigService();
@@ -26,6 +26,9 @@ export function activate(context: vscode.ExtensionContext) {
       translationCmd.run(TranslationType.paid)
     ),
     vscode.commands.registerCommand(`${name}.translateFree`, () =>
+      translationCmd.run(TranslationType.free)
+    ),
+    vscode.commands.registerCommand(`${name}.createCache`, () =>
       translationCmd.run(TranslationType.free)
     ),
   ].map((disposable) => context.subscriptions.push(disposable));

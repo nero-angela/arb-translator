@@ -1,6 +1,6 @@
 import * as fs from "fs";
-import { FileNotFoundException } from "../../util/exceptions";
-import { Workspace } from "../../util/workspace";
+import { FileNotFoundException } from "../util/exceptions";
+import { Workspace } from "../util/workspace";
 import { Cache, TranslationCacheKey } from "./translation_cache";
 
 export class TranslationCacheDataSource {
