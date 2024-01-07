@@ -9,15 +9,15 @@ export class TranslationCacheRepository {
     return this.cacheRepository.reload();
   }
 
-  public hasKey(key: TranslationCacheKey): boolean {
-    return this.cacheRepository.hasKey(key);
+  public hasKey(cacheKey: TranslationCacheKey): boolean {
+    return this.cacheRepository.hasKey(cacheKey);
   }
 
-  public get<T>(key: TranslationCacheKey): T | undefined {
-    return this.cacheRepository.get(key);
+  public get<T>(cacheKey: TranslationCacheKey): T | undefined {
+    return this.cacheRepository.get(cacheKey);
   }
 
-  public upsert(key: TranslationCacheKey, value: any) {
-    return this.cacheRepository.upsert(key, value);
+  public upsert(cacheKey: TranslationCacheKey, value: any) {
+    return this.cacheRepository.upsert(cacheKey, value);
   }
 }
