@@ -8,6 +8,9 @@ import { History } from "../history/history";
 import { HistoryService } from "../history/history.service";
 import { Language } from "../language/language";
 import { LanguageService } from "../language/language.service";
+import { TranslationType } from "../translation/translation";
+import { TranslationService } from "../translation/translation.service";
+import { TranslationStatistic } from "../translation/translation.statistic";
 import { Dialog } from "../util/dialog";
 import {
   APIKeyRequiredException,
@@ -21,9 +24,6 @@ import {
 } from "../util/exceptions";
 import { Logger } from "../util/logger";
 import { Toast } from "../util/toast";
-import { TranslationType } from "./translation";
-import { TranslationService } from "./translation.service";
-import { TranslationStatistic } from "./translation.statistic";
 
 interface InitParams {
   arbService: ArbService;
@@ -33,7 +33,7 @@ interface InitParams {
   translationService: TranslationService;
 }
 
-export class TranslationCmd {
+export class TranslateCmd {
   private arbService: ArbService;
   private configService: ConfigService;
   private historyService: HistoryService;
@@ -109,15 +109,15 @@ export class TranslationCmd {
       throw new ConfigNotFoundException();
     }
 
-    // check source.arb path
-    const sourceArbPath = this.configService.config.sourceArbFilePath;
-    if (!sourceArbPath) {
+    // check source.arb file path
+    const sourceArbFilePath = this.configService.config.sourceArbFilePath;
+    if (!sourceArbFilePath) {
       throw new SourceArbFilePathRequiredException();
     }
 
     // check the existence of a source arb file
-    if (!fs.existsSync(sourceArbPath)) {
-      throw new FileNotFoundException(sourceArbPath);
+    if (!fs.existsSync(sourceArbFilePath)) {
+      throw new FileNotFoundException(sourceArbFilePath);
     }
 
     // check selected languages

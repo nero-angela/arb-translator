@@ -1,16 +1,36 @@
 import * as fs from "fs";
+import path from "path";
 import { Language } from "../language/language";
 import { FileNotFoundException } from "../util/exceptions";
 import { Logger } from "../util/logger";
 
 export class ArbRepository {
   /**
+   * Return all files in the same folder as source arb file
+   * @param sourceArbFilePath
+   * @returns
+   * @throws FileNotFoundException
+   */
+  public getArbFileList(sourceArbFilePath: string): string[] {
+    if (!fs.existsSync(sourceArbFilePath)) {
+      throw new FileNotFoundException(sourceArbFilePath);
+    }
+
+    const directoryPath = path.dirname(sourceArbFilePath);
+    const files = fs.readdirSync(directoryPath);
+    const absoluteFilePaths = files
+      .filter((file) => file.endsWith(".arb"))
+      .map((file) => path.join(directoryPath, file));
+    return absoluteFilePaths;
+  }
+
+  /**
    * Read arb file.
    * @param filePath
    * @returns Promise<Record<string, string>>
    * @throws FileNotFoundException
    */
-  async read(filePath: string): Promise<Record<string, string>> {
+  public async read(filePath: string): Promise<Record<string, string>> {
     if (!fs.existsSync(filePath)) {
       throw new FileNotFoundException(filePath);
     }

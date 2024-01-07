@@ -5,7 +5,7 @@ import { Logger } from "./util/logger";
 
 export interface App {
   name: string;
-  commands: Record<string, (...args: any[]) => any>;
+  commands: Record<string, () => void>;
 }
 
 export class ArbTranslator implements App {
@@ -16,7 +16,7 @@ export class ArbTranslator implements App {
   public commands = {
     translatePaid: () => this.di.translationCmd.run(TranslationType.paid),
     translateFree: () => this.di.translationCmd.run(TranslationType.free),
-    createCache: () => this.di.translationCmd.run(TranslationType.free),
+    createTranslationCache: () => this.di.createTranslationCache.run(),
   };
 
   constructor() {

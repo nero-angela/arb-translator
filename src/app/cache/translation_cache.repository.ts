@@ -17,7 +17,7 @@ export class TranslationCacheRepository {
     return this.cacheRepository.get(cacheKey);
   }
 
-  public upsert(cacheKey: TranslationCacheKey, value: any) {
+  public upsert(cacheKey: TranslationCacheKey, value: any): void {
     return this.cacheRepository.upsert(cacheKey, value);
   }
 }

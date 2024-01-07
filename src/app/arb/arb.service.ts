@@ -16,6 +16,16 @@ export class ArbService {
   }
 
   /**
+   * Return all files in the same folder as source arb file
+   * @param sourceArbFilePath
+   * @returns
+   * @throws FileNotFoundException
+   */
+  public getArbFileList(sourceArbFilePath: string): string[] {
+    return this.arbRepository.getArbFileList(sourceArbFilePath);
+  }
+
+  /**
    * Get arb from arbFilePath.
    * @param arbFilePath
    * @returns Promise<Arb>

@@ -6,9 +6,9 @@ export class ConfigRepository {
   private get _workspace() {
     return vscode.workspace.getConfiguration("arbTranslator");
   }
-  
+
   private _key: string = "config";
-  
+
   emptyConfig: Config = {
     arbFilePrefix: "",
     sourceArbFilePath: "",

@@ -3,13 +3,13 @@ import { Config } from "./config";
 import { ConfigRepository } from "./config.repository";
 
 interface InitParams {
-  configRepository: ConfigRepository
+  configRepository: ConfigRepository;
 }
 
 export class ConfigService {
   private configRepository: ConfigRepository;
 
-  constructor({configRepository}: InitParams) {
+  constructor({ configRepository }: InitParams) {
     this.configRepository = configRepository;
   }
 

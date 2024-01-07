@@ -21,7 +21,11 @@ export class TranslationCacheDataSource {
   }
 
   public hasKey(cacheKey: TranslationCacheKey): boolean {
-    const { sourceLanguageCode, targetLanguageCode, querySHA1 } = cacheKey;
+    const {
+      sourceLanguageCode,
+      targetLanguageCode,
+      sourceArbValueSHA1: querySHA1,
+    } = cacheKey;
     return (
       this.cache[sourceLanguageCode] &&
       this.cache[sourceLanguageCode][targetLanguageCode] &&
@@ -30,14 +34,18 @@ export class TranslationCacheDataSource {
   }
 
   public get<T>(cacheKey: TranslationCacheKey): T | undefined {
-    const { sourceLanguageCode, targetLanguageCode, querySHA1 } = cacheKey;
+    const {
+      sourceLanguageCode,
+      targetLanguageCode,
+      sourceArbValueSHA1: querySHA1,
+    } = cacheKey;
     if (this.hasKey(cacheKey)) {
       return this.cache[sourceLanguageCode][targetLanguageCode][querySHA1];
     }
     return undefined;
   }
 
-  public upsert(cacheKey: TranslationCacheKey, value: any) {
+  public upsert(cacheKey: TranslationCacheKey, value: any): void {
     // create cache file
     if (!this.isCacheFileExist) {
       if (!Workspace.createPath(this.cacheFilePath)) {
@@ -45,7 +53,11 @@ export class TranslationCacheDataSource {
       }
     }
 
-    const { sourceLanguageCode, targetLanguageCode, querySHA1 } = cacheKey;
+    const {
+      sourceLanguageCode,
+      targetLanguageCode,
+      sourceArbValueSHA1: querySHA1,
+    } = cacheKey;
 
     if (!this.cache[sourceLanguageCode]) {
       this.cache[sourceLanguageCode] = {};

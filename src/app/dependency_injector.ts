@@ -1,5 +1,7 @@
 import { ArbService } from "./arb/arb.service";
 import { TranslationCacheRepository } from "./cache/translation_cache.repository";
+import { CreateTranslationCache } from "./command/create_translation_cache.cmd";
+import { TranslateCmd } from "./command/translate.cmd";
 import { ConfigRepository } from "./config/config.repository";
 import { ConfigService } from "./config/config.service";
 import { HistoryRepository } from "./history/history.repository";
@@ -9,7 +11,6 @@ import { GoogleTranslationFreeDataSource } from "./translation/google/google_tra
 import { GoogleTranslationPaidDataSource } from "./translation/google/google_translation.paid.datasource";
 import { GoogleTranslationRepository } from "./translation/google/google_translation.repository";
 import { GoogleTranslationService } from "./translation/google/google_translation.service";
-import { TranslationCmd } from "./translation/translation.cmd";
 
 export class DependencyInjector {
   /**
@@ -38,7 +39,8 @@ export class DependencyInjector {
   /**
    * Command
    */
-  public translationCmd: TranslationCmd;
+  public translationCmd: TranslateCmd;
+  public createTranslationCache: CreateTranslationCache;
 
   constructor() {
     // data source
@@ -71,12 +73,17 @@ export class DependencyInjector {
     });
 
     // cmd
-    this.translationCmd = new TranslationCmd({
+    this.translationCmd = new TranslateCmd({
       arbService: this.arbService,
       configService: this.configService,
       historyService: this.historyService,
       languageService: this.languageService,
       translationService: this.translationService,
+    });
+    this.createTranslationCache = new CreateTranslationCache({
+      arbService: this.arbService,
+      configService: this.configService,
+      cacheRepository: this.cacheRepository,
     });
   }
 }

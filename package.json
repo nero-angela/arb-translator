@@ -87,8 +87,8 @@
         "title": "arb translator : translate (free)"
       },
       {
-        "command": "arb-translator.createCache",
-        "title": "arb translator : create translation cache"
+        "command": "arb-translator.createTranslationCache",
+        "title": "arb translator : create translation cache from arb files"
       }
     ]
   },

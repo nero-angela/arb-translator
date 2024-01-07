@@ -10,10 +10,9 @@ export type Cache = {
 };
 
 export class TranslationCacheKey {
-  private query: string;
   private sourceLanguage: Language;
   private targetLanguage: Language;
-  public querySHA1: string;
+  public sourceArbValueSHA1: string;
 
   get sourceLanguageCode(): string {
     return this.sourceLanguage.languageCode;
@@ -23,13 +22,12 @@ export class TranslationCacheKey {
   }
 
   constructor(
-    query: string,
+    sourceArbValue: string,
     sourceLanguage: Language,
     targetLanguage: Language
   ) {
-    this.query = query;
     this.sourceLanguage = sourceLanguage;
     this.targetLanguage = targetLanguage;
-    this.querySHA1 = Crypto.generateSHA1(query);
+    this.sourceArbValueSHA1 = Crypto.generateSHA1(sourceArbValue);
   }
 }
