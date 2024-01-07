@@ -3,11 +3,15 @@ import { LanguageService } from "../language/language.service";
 import { Arb } from "./arb";
 import { ArbRepository } from "./arb.repository";
 
+interface InitParams {
+  languageService: LanguageService;
+}
+
 export class ArbService {
   private arbRepository: ArbRepository = new ArbRepository();
   private languageService: LanguageService;
 
-  constructor(languageService: LanguageService) {
+  constructor({ languageService }: InitParams) {
     this.languageService = languageService;
   }
 

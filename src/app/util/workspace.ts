@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import path from "path";
 import * as vscode from "vscode";
+import { Constant } from "./constant";
 
 export class Workspace {
   public static getPath(...paths: string[]) {
@@ -10,7 +11,7 @@ export class Workspace {
 
   public static getArbPath(...paths: string[]) {
     const workspacePath = vscode.workspace.workspaceFolders![0].uri.path;
-    return path.join(workspacePath, ".vscode", "arb", ...paths);
+    return path.join(workspacePath, ".vscode", Constant.appName, ...paths);
   }
 
   public static createPath(filePath: string): boolean {

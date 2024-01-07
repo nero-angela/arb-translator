@@ -3,11 +3,17 @@ import { APIKeyRequiredException } from "../../util/exceptions";
 import { Translation, TranslationType } from "../translation";
 import { TranslationRepository } from "../translation.repository";
 import { TranslationService } from "../translation.service";
-import { GoogleTranslationRepository } from "./google_translation.repository";
+
+interface InitParams {
+  translationRepository: TranslationRepository;
+}
 
 export class GoogleTranslationService implements TranslationService {
-  private translationrRepository: TranslationRepository =
-    new GoogleTranslationRepository();
+  private translationRepository: TranslationRepository;
+
+  constructor({ translationRepository }: InitParams) {
+    this.translationRepository = translationRepository;
+  }
 
   /**
    *
@@ -29,7 +35,7 @@ export class GoogleTranslationService implements TranslationService {
       throw new APIKeyRequiredException();
     }
 
-    return await this.translationrRepository.translate(
+    return await this.translationRepository.translate(
       type,
       apiKey,
       queries,

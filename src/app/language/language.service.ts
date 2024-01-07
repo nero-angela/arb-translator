@@ -1,5 +1,5 @@
 import path from "path";
-import { ArbFileName, ArbFilePath, LanguageCode } from "../config/config";
+import { ArbFilePath, LanguageCode } from "../config/config";
 import { ConfigService } from "../config/config.service";
 import {
   InvalidArbFileNameException,
@@ -7,16 +7,14 @@ import {
   SourceArbFilePathRequiredException,
 } from "../util/exceptions";
 import { Logger } from "../util/logger";
-import { Language } from "./language";
+import { CustomArbFileName, Language } from "./language";
 
-interface CustomArbFileName {
-  data: Record<LanguageCode, ArbFileName>;
-  languageCodeList: LanguageCode[];
-  arbFileNameList: ArbFileName[];
+interface InitParams {
+  configService: ConfigService;
 }
 
 export class LanguageService {
-  constructor(configService: ConfigService) {
+  constructor({ configService }: InitParams) {
     this.configService = configService;
   }
 

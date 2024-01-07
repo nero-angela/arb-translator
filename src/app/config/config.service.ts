@@ -2,8 +2,16 @@ import { Toast } from "../util/toast";
 import { Config } from "./config";
 import { ConfigRepository } from "./config.repository";
 
+interface InitParams {
+  configRepository: ConfigRepository
+}
+
 export class ConfigService {
-  private configRepository: ConfigRepository = new ConfigRepository();
+  private configRepository: ConfigRepository;
+
+  constructor({configRepository}: InitParams) {
+    this.configRepository = configRepository;
+  }
 
   get config(): Config {
     return this.configRepository.get() ?? this.configRepository.emptyConfig;

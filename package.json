@@ -84,7 +84,11 @@
       },
       {
         "command": "arb-translator.translateFree",
-        "title": "arb translator : translate (free : limited)"
+        "title": "arb translator : translate (free)"
+      },
+      {
+        "command": "arb-translator.createCache",
+        "title": "arb translator : create translation cache"
       }
     ]
   },

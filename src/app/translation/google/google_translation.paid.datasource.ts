@@ -3,9 +3,7 @@ import { Language } from "../../language/language";
 import { hasHtmlTags } from "../../util/html";
 import { TranslationDataSource } from "../translation.datasource";
 
-export class GoogleTranslationChargeDataSource
-  implements TranslationDataSource
-{
+export class GoogleTranslationPaidDataSource implements TranslationDataSource {
   /**
    * Google Translator v2 (Google API Key required)
    * please refer to the [link](https://cloud.google.com/translate/docs/setup) and proceed with the API setting and API Key issuance process.

@@ -21,10 +21,17 @@ import {
 } from "../util/exceptions";
 import { Logger } from "../util/logger";
 import { Toast } from "../util/toast";
-import { GoogleTranslationService } from "./google/google_translation.service";
 import { TranslationType } from "./translation";
 import { TranslationService } from "./translation.service";
 import { TranslationStatistic } from "./translation.statistic";
+
+interface InitParams {
+  arbService: ArbService;
+  configService: ConfigService;
+  historyService: HistoryService;
+  languageService: LanguageService;
+  translationService: TranslationService;
+}
 
 export class TranslationCmd {
   private arbService: ArbService;
@@ -33,17 +40,18 @@ export class TranslationCmd {
   private languageService: LanguageService;
   private translationService: TranslationService;
 
-  constructor(
-    arbService: ArbService,
-    configService: ConfigService,
-    historyService: HistoryService,
-    languageService: LanguageService
-  ) {
+  constructor({
+    arbService,
+    configService,
+    historyService,
+    languageService,
+    translationService,
+  }: InitParams) {
     this.arbService = arbService;
     this.configService = configService;
     this.historyService = historyService;
     this.languageService = languageService;
-    this.translationService = new GoogleTranslationService();
+    this.translationService = translationService;
   }
 
   async run(type: TranslationType) {

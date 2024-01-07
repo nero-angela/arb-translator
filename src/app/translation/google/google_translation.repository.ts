@@ -6,25 +6,31 @@ import { Logger } from "../../util/logger";
 import { Translation, TranslationType } from "../translation";
 import { TranslationDataSource } from "../translation.datasource";
 import { TranslationRepository } from "../translation.repository";
-import { GoogleTranslationFreeDataSource } from "./google_translation.free.datasource";
-import { GoogleTranslationChargeDataSource as GoogleTranslationPaidDataSource } from "./google_translation.paid.datasource";
 
 interface EncodeResult {
   dictionary: Record<string, string>;
   encodedText: string;
 }
 
-export class GoogleTranslationRepository implements TranslationRepository {
-  private cacheRepository = new TranslationCacheRepository();
-  private paidTranslationDataSource = new GoogleTranslationPaidDataSource();
-  private freeTranslationDataSource = new GoogleTranslationFreeDataSource();
+interface InitParams {
+  cacheRepository: TranslationCacheRepository;
+  paidTranslationDataSource: TranslationDataSource;
+  freeTranslationDataSource: TranslationDataSource;
+}
 
-  private getCacheKey(
-    query: string,
-    sourceLang: Language,
-    targetLang: Language
-  ) {
-    return `${sourceLang.gt}-${targetLang.gt}-${query}`;
+export class GoogleTranslationRepository implements TranslationRepository {
+  private cacheRepository: TranslationCacheRepository;
+  private paidTranslationDataSource: TranslationDataSource;
+  private freeTranslationDataSource: TranslationDataSource;
+
+  constructor({
+    cacheRepository,
+    paidTranslationDataSource,
+    freeTranslationDataSource,
+  }: InitParams) {
+    this.cacheRepository = cacheRepository;
+    this.paidTranslationDataSource = paidTranslationDataSource;
+    this.freeTranslationDataSource = freeTranslationDataSource;
   }
 
   public async translate(
