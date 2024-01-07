@@ -80,15 +80,19 @@
     "commands": [
       {
         "command": "arb-translator.translatePaid",
-        "title": "arb translator : translate (paid : google API Key required)"
+        "title": "Arb Translator : translate (paid : google API Key required)"
       },
       {
         "command": "arb-translator.translateFree",
-        "title": "arb translator : translate (free)"
+        "title": "Arb Translator : translate (free)"
       },
       {
         "command": "arb-translator.createTranslationCache",
-        "title": "arb translator : create translation cache from arb files"
+        "title": "Arb Translator : create translation cache from arb files"
+      },
+      {
+        "command": "arb-translator.overrideSourceArbHistory",
+        "title": "Arb Translator : override source arb history"
       }
     ]
   },

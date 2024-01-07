@@ -1,6 +1,7 @@
 import { ArbService } from "./arb/arb.service";
 import { TranslationCacheRepository } from "./cache/translation_cache.repository";
 import { CreateTranslationCache } from "./command/create_translation_cache.cmd";
+import { OverrideSourceArbHistory } from "./command/override_source_arb_history.cmd";
 import { TranslateCmd } from "./command/translate.cmd";
 import { ConfigRepository } from "./config/config.repository";
 import { ConfigService } from "./config/config.service";
@@ -41,6 +42,7 @@ export class DependencyInjector {
    */
   public translationCmd: TranslateCmd;
   public createTranslationCache: CreateTranslationCache;
+  public overrideSourceArbHistory: OverrideSourceArbHistory;
 
   constructor() {
     // data source
@@ -84,6 +86,11 @@ export class DependencyInjector {
       arbService: this.arbService,
       configService: this.configService,
       cacheRepository: this.cacheRepository,
+    });
+    this.overrideSourceArbHistory = new OverrideSourceArbHistory({
+      arbService: this.arbService,
+      configService: this.configService,
+      historyService: this.historyService,
     });
   }
 }

@@ -17,6 +17,7 @@ export class ArbTranslator implements App {
     translatePaid: () => this.di.translationCmd.run(TranslationType.paid),
     translateFree: () => this.di.translationCmd.run(TranslationType.free),
     createTranslationCache: () => this.di.createTranslationCache.run(),
+    overrideSourceArbHistory: () => this.di.overrideSourceArbHistory.run(),
   };
 
   constructor() {
