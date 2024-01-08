@@ -1,4 +1,4 @@
-export interface Translation {
+export interface TranslationResult {
   data: string[];
   nAPICall: number;
   nCache: number;

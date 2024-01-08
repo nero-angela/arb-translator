@@ -166,13 +166,19 @@ export class TranslateCmd {
       const nWillTranslate: number = willTranslateKeys.length;
       if (nWillTranslate > 0) {
         // translate
-        const translateResult = await this.translationService.translate(
-          type,
-          this.configService.config.googleAPIKey,
-          willTranslateValues,
-          sourceArb.language,
-          targetArb.language
-        );
+        const translateResult =
+          type === TranslationType.paid
+            ? await this.translationService.paidTranslate({
+                apiKey: this.configService.config.googleAPIKey,
+                queries: willTranslateValues,
+                sourceLang: sourceArb.language,
+                targetLang: targetArb.language,
+              })
+            : await this.translationService.freeTranslate({
+                queries: willTranslateValues,
+                sourceLang: sourceArb.language,
+                targetLang: targetArb.language,
+              });
         willTranslateKeys.forEach(
           (key, index) => (nextTargetArbData[key] = translateResult.data[index])
         );

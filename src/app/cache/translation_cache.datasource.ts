@@ -15,11 +15,9 @@ export class TranslationCacheDataSource extends InitRequired {
   }
 
   public async init(): Promise<void> {
-    if (!this.isCacheFileExist) {
-      this.cache = {};
-      return;
-    }
-    this.cache = await JsonParser.parse(this.cacheFilePath, {});
+    this.cache = this.isCacheFileExist
+      ? await JsonParser.parse(this.cacheFilePath, {})
+      : {};
     super.initialized();
   }
 

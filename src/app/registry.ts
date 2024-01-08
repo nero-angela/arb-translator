@@ -11,8 +11,7 @@ import { ConfigService } from "./config/config.service";
 import { HistoryRepository } from "./history/history.repository";
 import { HistoryService } from "./history/history.service";
 import { LanguageService } from "./language/language.service";
-import { GoogleTranslationFreeDataSource } from "./translation/google/google_translation.free.datasource";
-import { GoogleTranslationPaidDataSource } from "./translation/google/google_translation.paid.datasource";
+import { GoogleTranslationDataSource } from "./translation/google/google_translation.datasource";
 import { GoogleTranslationRepository } from "./translation/google/google_translation.repository";
 import { GoogleTranslationService } from "./translation/google/google_translation.service";
 
@@ -21,8 +20,7 @@ export class Registry {
    * DataSource
    */
   private cacheDataSource: TranslationCacheDataSource;
-  private paidTranslationDataSource: GoogleTranslationPaidDataSource;
-  private freeTranslationDataSource: GoogleTranslationFreeDataSource;
+  private translationDataSource: GoogleTranslationDataSource;
 
   /**
    * Repository
@@ -53,8 +51,7 @@ export class Registry {
   constructor() {
     // data source
     this.cacheDataSource = new TranslationCacheDataSource();
-    this.paidTranslationDataSource = new GoogleTranslationPaidDataSource();
-    this.freeTranslationDataSource = new GoogleTranslationFreeDataSource();
+    this.translationDataSource = new GoogleTranslationDataSource();
 
     // repository
     this.cacheRepository = new TranslationCacheRepository({
@@ -62,8 +59,7 @@ export class Registry {
     });
     this.translationRepository = new GoogleTranslationRepository({
       cacheRepository: this.cacheRepository,
-      paidTranslationDataSource: this.paidTranslationDataSource,
-      freeTranslationDataSource: this.freeTranslationDataSource,
+      translationDataSource: this.translationDataSource,
     });
     this.historyRepository = new HistoryRepository();
     this.configRepository = new ConfigRepository();
@@ -80,6 +76,7 @@ export class Registry {
     });
     this.arbService = new ArbService({ languageService: this.languageService });
     this.translationService = new GoogleTranslationService({
+      cacheRepository: this.cacheRepository,
       translationRepository: this.translationRepository,
     });
 

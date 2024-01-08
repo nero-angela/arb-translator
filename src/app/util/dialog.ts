@@ -43,11 +43,11 @@ export class Dialog {
   public static showAPIKeyRequiredDialog() {
     vscode.window
       .showErrorMessage(
-        "Please add arbTranslator.config.googleAPIKey to the .vscode/settings.json file. Please refer to the link and proceed with the API setting and API Key issuance process.",
-        "Link"
+        "Please add arbTranslator.config.googleAPIKey to the .vscode/settings.json file. Please refer to the document and proceed with the API setting and API Key issuance process.",
+        "Open document"
       )
       .then(async (answer) => {
-        if (answer === "Link") {
+        if (answer === "Open document") {
           showLink("https://cloud.google.com/translate/docs/setup");
         }
       });

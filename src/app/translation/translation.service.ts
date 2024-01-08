@@ -1,13 +1,30 @@
 import { Language } from "../language/language";
-import { Translation, TranslationType } from "./translation";
+import { TranslationResult } from "./translation";
+
+export interface PaidTranslateServiceParams {
+  apiKey: string;
+  queries: string[];
+  sourceLang: Language;
+  targetLang: Language;
+}
+
+export interface FreeTranslateServiceParams {
+  queries: string[];
+  sourceLang: Language;
+  targetLang: Language;
+}
 
 export interface TranslationService {
-  // translate
-  translate(
-    type: TranslationType,
-    apiKey: string,
-    queries: string[],
-    sourceLang: Language,
-    targetLang: Language
-  ): Promise<Translation>;
+  paidTranslate({
+    apiKey,
+    queries,
+    sourceLang,
+    targetLang,
+  }: PaidTranslateServiceParams): Promise<TranslationResult>;
+
+  freeTranslate({
+    queries,
+    sourceLang,
+    targetLang,
+  }: FreeTranslateServiceParams): Promise<TranslationResult>;
 }

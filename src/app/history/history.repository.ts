@@ -2,6 +2,7 @@ import * as fs from "fs";
 
 import { Constant } from "../util/constant";
 import { InitRequired } from "../util/init_required";
+import { JsonParser } from "../util/json_parser";
 import { Workspace } from "../util/workspace";
 import { History } from "./history";
 
@@ -24,12 +25,11 @@ export class HistoryRepository extends InitRequired {
         "utf-8"
       );
     } else {
-      const jsonString = await fs.promises.readFile(
+      const result = await JsonParser.parse<Record<string, any>>(
         this.historyFilePath,
-        "utf8"
+        { data: {} }
       );
-      const result = JSON.parse(jsonString.trim() === "" ? "{}" : jsonString);
-      const data = result.data;
+      const data = result.data ?? {};
       this.history = {
         data,
         keys: Object.keys(data),
