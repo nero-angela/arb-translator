@@ -1,5 +1,6 @@
 import path from "path";
 import * as vscode from "vscode";
+import { TargetLanguageCodeSelectionMethod } from "./command/select_target_language_code.cmd";
 import { DependencyInjector } from "./dependency_injector";
 import { TranslationType } from "./translation/translation";
 import { Constant } from "./util/constant";
@@ -34,7 +35,14 @@ export class ArbTranslator implements App {
     translateFree: () => this.di.translationCmd.run(TranslationType.free),
     createTranslationCache: () => this.di.createTranslationCache.run(),
     overrideSourceArbHistory: () => this.di.overrideSourceArbHistory.run(),
-    selectTargetLanguageCode: () => this.di.selectTargetLanguageCode.run(),
+    selectTargetLanguageCode: () =>
+      this.di.selectTargetLanguageCode.run(
+        TargetLanguageCodeSelectionMethod.quickPick
+      ),
+    selectTargetLanguageCodeWithArbFiles: () =>
+      this.di.selectTargetLanguageCode.run(
+        TargetLanguageCodeSelectionMethod.arbFiles
+      ),
   };
 
   public exceptionHandler = (e: any) => {

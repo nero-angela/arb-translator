@@ -66,10 +66,10 @@ export class CreateTranslationCache {
   }
 
   private getArbFileList(sourceArbFilePath: string): string[] {
-    const arbFileList = this.arbService.getArbFileList(sourceArbFilePath);
+    const arbFiles = this.arbService.getArbFiles(sourceArbFilePath);
 
     // return excluding source arb file
-    return arbFileList.filter((arbFile) => arbFile !== sourceArbFilePath);
+    return arbFiles.filter((arbFile) => arbFile !== sourceArbFilePath);
   }
 
   private async selectArbFilesToCreateTranslationCache(

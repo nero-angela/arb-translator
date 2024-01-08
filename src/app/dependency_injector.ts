@@ -95,6 +95,7 @@ export class DependencyInjector {
       historyService: this.historyService,
     });
     this.selectTargetLanguageCode = new SelectTargetLanguageCode({
+      arbService: this.arbService,
       configService: this.configService,
       languageService: this.languageService,
     });

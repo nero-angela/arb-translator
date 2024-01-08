@@ -21,7 +21,7 @@ export class ArbService {
    * @returns
    * @throws FileNotFoundException
    */
-  public getArbFileList(sourceArbFilePath: string): string[] {
+  public getArbFiles(sourceArbFilePath: string): string[] {
     return this.arbRepository.getArbFileList(sourceArbFilePath);
   }
 
