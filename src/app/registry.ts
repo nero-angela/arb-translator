@@ -16,7 +16,7 @@ import { GoogleTranslationPaidDataSource } from "./translation/google/google_tra
 import { GoogleTranslationRepository } from "./translation/google/google_translation.repository";
 import { GoogleTranslationService } from "./translation/google/google_translation.service";
 
-export class DependencyInjector {
+export class Registry {
   /**
    * DataSource
    */

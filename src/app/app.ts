@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { Cmd } from "./command/cmd";
-import { DependencyInjector } from "./dependency_injector";
+import { Registry } from "./registry";
 import { TranslationType } from "./translation/translation";
 import { Constant } from "./util/constant";
 import { Dialog } from "./util/dialog";
@@ -22,24 +22,27 @@ export interface App {
 }
 
 export class ArbTranslator implements App {
-  private di: DependencyInjector;
+  private registry: Registry;
 
   constructor() {
     Logger.i(`${this.name} initiated.`);
-    this.di = new DependencyInjector();
+    this.registry = new Registry();
   }
 
   public name: string = Constant.appName;
 
   public commands = {
-    [Cmd.initialize]: () => this.di.initializeCmd.run(),
-    [Cmd.translatePaid]: () => this.di.translationCmd.run(TranslationType.paid),
-    [Cmd.translateFree]: () => this.di.translationCmd.run(TranslationType.free),
-    [Cmd.createTranslationCache]: () => this.di.createTranslationCache.run(),
+    [Cmd.initialize]: () => this.registry.initializeCmd.run(),
+    [Cmd.translatePaid]: () =>
+      this.registry.translationCmd.run(TranslationType.paid),
+    [Cmd.translateFree]: () =>
+      this.registry.translationCmd.run(TranslationType.free),
+    [Cmd.createTranslationCache]: () =>
+      this.registry.createTranslationCache.run(),
     [Cmd.overrideSourceArbHistory]: () =>
-      this.di.overrideSourceArbHistory.run(),
+      this.registry.overrideSourceArbHistory.run(),
     [Cmd.selectTargetLanguageCode]: () =>
-      this.di.selectTargetLanguageCode.run(),
+      this.registry.selectTargetLanguageCode.run(),
   };
 
   public init = async () => {
@@ -49,7 +52,7 @@ export class ArbTranslator implements App {
     }
 
     // initialize
-    await this.di.init();
+    await this.registry.init();
   };
 
   public onException = (e: any) => {
