@@ -8,7 +8,13 @@ export function activate(context: vscode.ExtensionContext) {
   for (const command of Object.keys(app.commands)) {
     const disposable = vscode.commands.registerCommand(
       `${app.name}.${command}`,
-      app.commands[command]
+      async () => {
+        try {
+          await app.commands[command]();
+        } catch (e) {
+          app.exceptionHandler(e);
+        }
+      }
     );
     context.subscriptions.push(disposable);
   }

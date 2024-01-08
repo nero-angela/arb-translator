@@ -2,10 +2,7 @@ import { Arb } from "../arb/arb";
 import { ArbService } from "../arb/arb.service";
 import { ConfigService } from "../config/config.service";
 import { HistoryService } from "../history/history.service";
-import {
-  MessageException,
-  SourceArbFilePathRequiredException,
-} from "../util/exceptions";
+import { SourceArbFilePathRequiredException } from "../util/exceptions";
 import { Toast } from "../util/toast";
 
 interface InitParams {
@@ -26,25 +23,17 @@ export class OverrideSourceArbHistory {
   }
 
   public async run() {
-    try {
-      // check source.arb file path
-      const sourceArbFilePath = this.configService.config.sourceArbFilePath;
-      if (!sourceArbFilePath) {
-        throw new SourceArbFilePathRequiredException();
-      }
-
-      // get source arb
-      const sourceArb: Arb = await this.arbService.get(sourceArbFilePath);
-
-      // update history
-      this.historyService.update(sourceArb.data);
-      Toast.i("Source arb history overwriting completed.");
-    } catch (e: any) {
-      if (e instanceof MessageException) {
-        Toast.e(e.message);
-      } else {
-        Toast.e(e);
-      }
+    // check source.arb file path
+    const sourceArbFilePath = this.configService.config.sourceArbFilePath;
+    if (!sourceArbFilePath) {
+      throw new SourceArbFilePathRequiredException();
     }
+
+    // get source arb
+    const sourceArb: Arb = await this.arbService.get(sourceArbFilePath);
+
+    // update history
+    this.historyService.update(sourceArb.data);
+    Toast.i("Source arb history overwriting completed.");
   }
 }

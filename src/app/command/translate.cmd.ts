@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import path from "path";
 import * as vscode from "vscode";
 import { Arb } from "../arb/arb";
 import { ArbService } from "../arb/arb.service";
@@ -11,18 +10,15 @@ import { LanguageService } from "../language/language.service";
 import { TranslationType } from "../translation/translation";
 import { TranslationService } from "../translation/translation.service";
 import { TranslationStatistic } from "../translation/translation.statistic";
-import { Dialog } from "../util/dialog";
 import {
   APIKeyRequiredException,
   ConfigNotFoundException,
+  ConfigurationRequiredException,
   FileNotFoundException,
-  MessageException,
   SourceArbFilePathRequiredException,
-  ConfigurationRequiredException as TargetLanguageCodeListRequiredException,
   TranslateLanguagesRequiredException,
   WorkspaceNotFoundException,
 } from "../util/exceptions";
-import { Logger } from "../util/logger";
 import { Toast } from "../util/toast";
 
 interface InitParams {
@@ -55,42 +51,11 @@ export class TranslateCmd {
   }
 
   async run(type: TranslationType) {
-    try {
-      // validation
-      this._checkValidation();
+    // validation
+    this._checkValidation();
 
-      // translate
-      await this._translate(type);
-    } catch (e: any) {
-      Logger.e(e);
-      if (e instanceof ConfigNotFoundException) {
-        Dialog.showConfigRequiredDialog(async () => {
-          await this.configService.addRequiredParams();
-          const workspacePath = vscode.workspace.workspaceFolders![0].uri.path;
-          const workspaceSettingsPath = path.join(
-            workspacePath,
-            ".vscode",
-            "settings.json"
-          );
-          // open .vscode/settings.json
-          vscode.workspace
-            .openTextDocument(workspaceSettingsPath)
-            .then((document) => {
-              vscode.window.showTextDocument(document);
-            });
-          // description
-          Dialog.showConfigDescriptionDialog();
-        });
-      } else if (e instanceof TargetLanguageCodeListRequiredException) {
-        Dialog.showTargetLanguageCodeListRequiredDialog();
-      } else if (e instanceof APIKeyRequiredException) {
-        Dialog.showAPIKeyRequiredDialog();
-      } else if (e instanceof MessageException) {
-        Toast.e(e.message);
-      } else {
-        Toast.e(e);
-      }
-    }
+    // translate
+    await this._translate(type);
   }
 
   private _checkValidation() {
@@ -123,7 +88,7 @@ export class TranslateCmd {
     // check selected languages
     const selectedLanguages = this.configService.config.targetLanguageCodeList;
     if (selectedLanguages.length == 0) {
-      throw new TargetLanguageCodeListRequiredException();
+      throw new ConfigurationRequiredException();
     }
 
     // check API key

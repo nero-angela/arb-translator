@@ -5,10 +5,7 @@ import { ArbService } from "../arb/arb.service";
 import { TranslationCacheKey } from "../cache/translation_cache";
 import { TranslationCacheRepository } from "../cache/translation_cache.repository";
 import { ConfigService } from "../config/config.service";
-import {
-  MessageException,
-  SourceArbFilePathRequiredException,
-} from "../util/exceptions";
+import { SourceArbFilePathRequiredException } from "../util/exceptions";
 import { Toast } from "../util/toast";
 
 interface InitParams {
@@ -29,50 +26,43 @@ export class CreateTranslationCache {
   }
 
   public async run() {
-    try {
-      // check source.arb file path
-      const sourceArbFilePath = this.configService.config.sourceArbFilePath;
-      if (!sourceArbFilePath) {
-        throw new SourceArbFilePathRequiredException();
-      }
-
-      // get arb file list from source arb directory
-      const arbFileList = this.getArbFileList(sourceArbFilePath);
-      if (arbFileList.length === 0) {
-        return Toast.i("There is no arbFile to create a translation cache.");
-      }
-
-      // select arb files to create translation cache
-      const selectedArbFiles =
-        await this.selectArbFilesToCreateTranslationCache(arbFileList);
-      if (selectedArbFiles.length === 0) {
-        return Toast.i(
-          "Please select the arbFile where you want to create the translation cache."
-        );
-      }
-
-      // override confirm
-      const isConfirm = await this.showOverrideConfirm(selectedArbFiles);
-      if (!isConfirm) {
-        return;
-      }
-
-      // create translation cache
-      const totalCreatedCache = await this.createTranslationCache(
-        sourceArbFilePath,
-        selectedArbFiles
-      );
-
-      Toast.i(
-        `${totalCreatedCache} caches created in ${selectedArbFiles.length} files`
-      );
-    } catch (e: any) {
-      if (e instanceof MessageException) {
-        Toast.e(e.message);
-      } else {
-        Toast.e(e);
-      }
+    // check source.arb file path
+    const sourceArbFilePath = this.configService.config.sourceArbFilePath;
+    if (!sourceArbFilePath) {
+      throw new SourceArbFilePathRequiredException();
     }
+
+    // get arb file list from source arb directory
+    const arbFileList = this.getArbFileList(sourceArbFilePath);
+    if (arbFileList.length === 0) {
+      return Toast.i("There is no arbFile to create a translation cache.");
+    }
+
+    // select arb files to create translation cache
+    const selectedArbFiles = await this.selectArbFilesToCreateTranslationCache(
+      arbFileList
+    );
+    if (selectedArbFiles.length === 0) {
+      return Toast.i(
+        "Please select the arbFile where you want to create the translation cache."
+      );
+    }
+
+    // override confirm
+    const isConfirm = await this.showOverrideConfirm(selectedArbFiles);
+    if (!isConfirm) {
+      return;
+    }
+
+    // create translation cache
+    const totalCreatedCache = await this.createTranslationCache(
+      sourceArbFilePath,
+      selectedArbFiles
+    );
+
+    Toast.i(
+      `${totalCreatedCache} caches created in ${selectedArbFiles.length} files`
+    );
   }
 
   private getArbFileList(sourceArbFilePath: string): string[] {
