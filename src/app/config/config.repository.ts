@@ -1,7 +1,11 @@
 import * as vscode from "vscode";
+import { InitRequired } from "../util/init_required";
 import { Config } from "./config";
+import { Logger } from "../util/logger";
 
-export class ConfigRepository {
+export class ConfigRepository extends InitRequired {
+  public className: string = "ConfigRepository";
+
   // Create new every time because of cache
   private get _workspace() {
     return vscode.workspace.getConfiguration("arbTranslator");
@@ -9,18 +13,26 @@ export class ConfigRepository {
 
   private _key: string = "config";
 
-  emptyConfig: Config = {
-    arbFilePrefix: "",
+  private defaultConfig: Config = {
     sourceArbFilePath: "",
     googleAPIKey: "",
     targetLanguageCodeList: [],
   };
+  private config: Config = this.defaultConfig;
 
-  get(): Config | undefined {
-    return this._workspace.get(this._key);
+  public init(): void {
+    this.config = this._workspace.get<Config>(this._key) ?? this.defaultConfig;
+    super.initialized();
   }
 
-  set(value: Config): Thenable<void> {
-    return this._workspace.update(this._key, value);
+  public get(): Config {
+    super.checkInit();
+    return this.config;
+  }
+
+  public set(value: Config): Thenable<void> {
+    super.checkInit();
+    this.config = { ...value };
+    return this._workspace.update(this._key, this.config);
   }
 }

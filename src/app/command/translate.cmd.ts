@@ -120,7 +120,7 @@ export class TranslateCmd {
       });
 
     // get history
-    const history: History = await this.historyService.get();
+    const history: History = this.historyService.get();
     const translateStatisticList: TranslationStatistic[] = [];
     for (const targetLanguage of targetLanguages) {
       if (targetLanguage.languageCode === sourceArb.language.languageCode) {

@@ -1,4 +1,5 @@
 import { ArbService } from "./arb/arb.service";
+import { TranslationCacheDataSource } from "./cache/translation_cache.datasource";
 import { TranslationCacheRepository } from "./cache/translation_cache.repository";
 import { CreateTranslationCache } from "./command/create_translation_cache.cmd";
 import { OverrideSourceArbHistory } from "./command/override_source_arb_history.cmd";
@@ -18,6 +19,7 @@ export class DependencyInjector {
   /**
    * DataSource
    */
+  private cacheDataSource: TranslationCacheDataSource;
   private paidTranslationDataSource: GoogleTranslationPaidDataSource;
   private freeTranslationDataSource: GoogleTranslationFreeDataSource;
 
@@ -48,11 +50,14 @@ export class DependencyInjector {
 
   constructor() {
     // data source
+    this.cacheDataSource = new TranslationCacheDataSource();
     this.paidTranslationDataSource = new GoogleTranslationPaidDataSource();
     this.freeTranslationDataSource = new GoogleTranslationFreeDataSource();
 
     // repository
-    this.cacheRepository = new TranslationCacheRepository();
+    this.cacheRepository = new TranslationCacheRepository({
+      cacheDataSource: this.cacheDataSource,
+    });
     this.translationRepository = new GoogleTranslationRepository({
       cacheRepository: this.cacheRepository,
       paidTranslationDataSource: this.paidTranslationDataSource,
@@ -99,5 +104,13 @@ export class DependencyInjector {
       configService: this.configService,
       languageService: this.languageService,
     });
+  }
+
+  public init(): Promise<void[]> {
+    return Promise.all([
+      this.configRepository.init(),
+      this.historyRepository.init(),
+      this.cacheDataSource.init(),
+    ]);
   }
 }

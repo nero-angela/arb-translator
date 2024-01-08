@@ -42,8 +42,6 @@ export class GoogleTranslationRepository implements TranslationRepository {
   ): Promise<Translation> {
     let nCache = 0;
     let nRequest = 0;
-    // reload cache
-    await this.cacheRepository.reload();
     const results = await Promise.all(
       queries.map(async (query) => {
         const cacheKey = new TranslationCacheKey(query, sourceLang, targetLang);

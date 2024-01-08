@@ -16,6 +16,11 @@ export class ConfigNotFoundException extends BaseException {}
 /**
  * MessageException
  */
+export class InitializeRequiredException extends MessageException {
+  constructor(className: string) {
+    super(`${className} class must call an init() function before use.`);
+  }
+}
 export class SourceArbFilePathRequiredException extends MessageException {
   constructor() {
     super(

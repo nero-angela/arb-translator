@@ -12,11 +12,11 @@ export class HistoryService {
     this.historyRepository = historyRepository;
   }
 
-  update(data: Record<string, string>) {
+  public update(data: Record<string, string>) {
     this.historyRepository.set(data);
   }
 
-  get(): Promise<History> {
+  public get(): History {
     return this.historyRepository.get();
   }
 }

@@ -1,9 +1,11 @@
 import * as fs from "fs";
 import { FileNotFoundException } from "../util/exceptions";
+import { InitRequired } from "../util/init_required";
 import { Workspace } from "../util/workspace";
 import { Cache, TranslationCacheKey } from "./translation_cache";
 
-export class TranslationCacheDataSource {
+export class TranslationCacheDataSource extends InitRequired {
+  protected className: string = "TranslationCacheDataSource";
   private cacheFilePath: string = Workspace.getArbPath("cache.json");
   private cache: Cache = {};
 
@@ -11,16 +13,18 @@ export class TranslationCacheDataSource {
     return fs.existsSync(this.cacheFilePath);
   }
 
-  public async reload(): Promise<void> {
+  public async init(): Promise<void> {
     if (!this.isCacheFileExist) {
       this.cache = {};
       return;
     }
     const jsonString = await fs.promises.readFile(this.cacheFilePath, "utf8");
     this.cache = JSON.parse(jsonString.trim() === "" ? "{}" : jsonString);
+    super.initialized();
   }
 
   public hasKey(cacheKey: TranslationCacheKey): boolean {
+    super.checkInit();
     const {
       sourceLanguageCode,
       targetLanguageCode,
@@ -34,6 +38,7 @@ export class TranslationCacheDataSource {
   }
 
   public get<T>(cacheKey: TranslationCacheKey): T | undefined {
+    super.checkInit();
     const {
       sourceLanguageCode,
       targetLanguageCode,
@@ -46,6 +51,7 @@ export class TranslationCacheDataSource {
   }
 
   public upsert(cacheKey: TranslationCacheKey, value: any): void {
+    super.checkInit();
     // create cache file
     if (!this.isCacheFileExist) {
       if (!Workspace.createPath(this.cacheFilePath)) {

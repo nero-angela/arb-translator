@@ -6,7 +6,6 @@ import {
   InvalidLanguageCodeException,
   SourceArbFilePathRequiredException,
 } from "../util/exceptions";
-import { Logger } from "../util/logger";
 import { CustomArbFileName, Language } from "./language";
 
 interface InitParams {
@@ -208,9 +207,6 @@ export class LanguageService {
     const index = customArbFileName.arbFileNameList.indexOf(fileName);
     if (index !== -1) {
       languageCode = customArbFileName.languageCodeList[index];
-      Logger.i(
-        `convert customArbFileName to Language : {${languageCode}: ${customArbFileName.arbFileNameList[index]}}`
-      );
       return languageCode;
     }
 
@@ -221,9 +217,6 @@ export class LanguageService {
       languageCode = fileName.startsWith(prefix)
         ? fileName?.split(prefix)[1]!
         : fileName;
-      Logger.i(
-        `convert filePath to Language : ${arbFilePath} -> ${languageCode}`
-      );
       return languageCode;
     } catch (e: any) {
       throw new InvalidArbFileNameException(arbFilePath);
@@ -254,7 +247,6 @@ export class LanguageService {
         arbFolderPath,
         arbFileName + (arbFileName.endsWith(ext) ? "" : ext)
       );
-      Logger.i(`[customArbFileName] convert ${languageCode} to ${arbFilePath}`);
       return arbFilePath;
     }
 
@@ -265,7 +257,6 @@ export class LanguageService {
       arbFolderPath,
       `${prefix + language.languageCode + ext}`
     );
-    Logger.i(`convert ${languageCode} to ${arbFilePath}`);
     return arbFilePath;
   }
 }

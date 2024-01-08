@@ -1,13 +1,21 @@
 import * as fs from "fs";
 
 import { Constant } from "../util/constant";
+import { InitRequired } from "../util/init_required";
 import { Workspace } from "../util/workspace";
 import { History } from "./history";
 
-export class HistoryRepository {
-  historyFilePath: string = Workspace.getArbPath("history.json");
+export class HistoryRepository extends InitRequired {
+  protected className: string = "HistoryRepository";
 
-  async get(): Promise<History> {
+  private defaultHistory: History = {
+    data: {},
+    keys: [],
+    values: [],
+  };
+  private history: History = this.defaultHistory;
+
+  public async init(): Promise<void> {
     if (!fs.existsSync(this.historyFilePath)) {
       Workspace.createPath(this.historyFilePath);
       fs.writeFileSync(
@@ -15,11 +23,6 @@ export class HistoryRepository {
         JSON.stringify({}, null, 2),
         "utf-8"
       );
-      return {
-        data: {},
-        keys: [],
-        values: [],
-      };
     } else {
       const jsonString = await fs.promises.readFile(
         this.historyFilePath,
@@ -27,15 +30,24 @@ export class HistoryRepository {
       );
       const result = JSON.parse(jsonString.trim() === "" ? "{}" : jsonString);
       const data = result.data;
-      return {
+      this.history = {
         data,
         keys: Object.keys(data),
         values: Object.values(data),
       };
     }
+    super.initialized();
   }
 
-  set(data: Record<string, string>) {
+  private historyFilePath: string = Workspace.getArbPath("history.json");
+
+  public get(): History {
+    super.checkInit();
+    return this.history;
+  }
+
+  public set(data: Record<string, string>) {
+    super.checkInit();
     fs.writeFileSync(
       this.historyFilePath,
       JSON.stringify(
@@ -48,5 +60,11 @@ export class HistoryRepository {
       ),
       "utf8"
     );
+
+    this.history = {
+      data,
+      keys: Object.keys(data),
+      values: Object.values(data),
+    };
   }
 }

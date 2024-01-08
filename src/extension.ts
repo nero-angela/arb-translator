@@ -10,9 +10,10 @@ export function activate(context: vscode.ExtensionContext) {
       `${app.name}.${command}`,
       async () => {
         try {
+          await app.init();
           await app.commands[command]();
         } catch (e) {
-          app.exceptionHandler(e);
+          app.onException(e);
         }
       }
     );

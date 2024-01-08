@@ -14,7 +14,7 @@ export class ConfigService {
   }
 
   get config(): Config {
-    return this.configRepository.get() ?? this.configRepository.emptyConfig;
+    return this.configRepository.get();
   }
 
   async update(data: Config): Promise<boolean> {

@@ -116,9 +116,6 @@ export class CreateTranslationCache {
     // read source arb file
     const sourceArb: Arb = await this.arbService.get(sourceArbFilePath);
 
-    // reload cache
-    await this.cacheRepository.reload();
-
     // loop target arb file
     let totalCreatedCache = 0;
     for (const targetArbFile of arbFileList) {

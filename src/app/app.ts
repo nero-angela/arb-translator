@@ -17,7 +17,8 @@ import { Toast } from "./util/toast";
 export interface App {
   name: string;
   commands: Record<string, () => void>;
-  exceptionHandler: (e: any) => void;
+  init: () => any;
+  onException: (e: any) => void;
 }
 
 export class ArbTranslator implements App {
@@ -45,7 +46,9 @@ export class ArbTranslator implements App {
       ),
   };
 
-  public exceptionHandler = (e: any) => {
+  public init = async () => this.di.init();
+
+  public onException = (e: any) => {
     Logger.e(e);
     if (e instanceof ConfigNotFoundException) {
       Dialog.showConfigRequiredDialog(async () => {
