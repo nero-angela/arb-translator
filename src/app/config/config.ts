@@ -10,3 +10,10 @@ export interface Config {
   googleAPIKey: string;
   targetLanguageCodeList: LanguageCode[];
 }
+export interface ConfigParams {
+  arbFilePrefix?: string;
+  customArbFileName?: Record<LanguageCode, ArbFileName>;
+  sourceArbFilePath?: ArbFilePath;
+  googleAPIKey?: string;
+  targetLanguageCodeList?: LanguageCode[];
+}

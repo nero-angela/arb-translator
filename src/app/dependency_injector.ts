@@ -2,6 +2,7 @@ import { ArbService } from "./arb/arb.service";
 import { TranslationCacheDataSource } from "./cache/translation_cache.datasource";
 import { TranslationCacheRepository } from "./cache/translation_cache.repository";
 import { CreateTranslationCache } from "./command/create_translation_cache.cmd";
+import { InitializeCmd } from "./command/initialize.cmd";
 import { OverrideSourceArbHistory } from "./command/override_source_arb_history.cmd";
 import { SelectTargetLanguageCode } from "./command/select_target_language_code.cmd";
 import { TranslateCmd } from "./command/translate.cmd";
@@ -35,7 +36,7 @@ export class DependencyInjector {
    * Service
    */
   private historyService: HistoryService;
-  public configService: ConfigService;
+  private configService: ConfigService;
   private languageService: LanguageService;
   private arbService: ArbService;
   private translationService: GoogleTranslationService;
@@ -43,6 +44,7 @@ export class DependencyInjector {
   /**
    * Command
    */
+  public initializeCmd: InitializeCmd;
   public translationCmd: TranslateCmd;
   public createTranslationCache: CreateTranslationCache;
   public overrideSourceArbHistory: OverrideSourceArbHistory;
@@ -82,6 +84,10 @@ export class DependencyInjector {
     });
 
     // cmd
+    this.initializeCmd = new InitializeCmd({
+      configService: this.configService,
+      arbService: this.arbService,
+    });
     this.translationCmd = new TranslateCmd({
       arbService: this.arbService,
       configService: this.configService,

@@ -1,22 +1,21 @@
 import * as vscode from "vscode";
 import { App, ArbTranslator } from "./app/app";
+import { Cmd } from "./app/command/cmd";
 
 export function activate(context: vscode.ExtensionContext) {
   const app: App = new ArbTranslator();
 
   // register command
-  for (const command of Object.keys(app.commands)) {
-    const disposable = vscode.commands.registerCommand(
-      `${app.name}.${command}`,
-      async () => {
-        try {
-          await app.init();
-          await app.commands[command]();
-        } catch (e) {
-          app.onException(e);
-        }
+  for (const cmdKey of Object.keys(app.commands)) {
+    const cmd: Cmd = <Cmd>cmdKey;
+    const disposable = vscode.commands.registerCommand(cmdKey, async () => {
+      try {
+        await app.init();
+        await app.commands[cmd]();
+      } catch (e) {
+        app.onException(e);
       }
-    );
+    });
     context.subscriptions.push(disposable);
   }
 }

@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import * as vscode from "vscode";
 import { Arb } from "../arb/arb";
 import { ArbService } from "../arb/arb.service";
 import { ConfigService } from "../config/config.service";
@@ -17,7 +16,6 @@ import {
   FileNotFoundException,
   SourceArbFilePathRequiredException,
   TranslateLanguagesRequiredException,
-  WorkspaceNotFoundException,
 } from "../util/exceptions";
 import { Toast } from "../util/toast";
 
@@ -52,26 +50,22 @@ export class TranslateCmd {
 
   async run(type: TranslationType) {
     // validation
-    this._checkValidation();
+    this._checkValidation(type);
 
     // translate
     await this._translate(type);
   }
 
-  private _checkValidation() {
-    // check workspace
-    if (!vscode.workspace.workspaceFolders) {
-      throw new WorkspaceNotFoundException();
-    }
-
+  private _checkValidation(type: TranslationType) {
     // check config
     const config = this.configService.config;
-    if (
-      config.sourceArbFilePath === undefined ||
-      config.targetLanguageCodeList === undefined ||
-      config.googleAPIKey === undefined
-    ) {
+    if (!config.sourceArbFilePath || !config.targetLanguageCodeList) {
       throw new ConfigNotFoundException();
+    }
+
+    // check google API key if type is paid
+    if (type === TranslationType.paid && !config.googleAPIKey) {
+      throw new APIKeyRequiredException();
     }
 
     // check source.arb file path
@@ -89,12 +83,6 @@ export class TranslateCmd {
     const selectedLanguages = this.configService.config.targetLanguageCodeList;
     if (selectedLanguages.length == 0) {
       throw new ConfigurationRequiredException();
-    }
-
-    // check API key
-    let apiKey = this.configService.config.googleAPIKey;
-    if (!apiKey) {
-      throw new APIKeyRequiredException();
     }
 
     // check config translate languages

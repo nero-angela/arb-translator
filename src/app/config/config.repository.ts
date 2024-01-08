@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 import { InitRequired } from "../util/init_required";
-import { Config } from "./config";
-import { Logger } from "../util/logger";
+import { Config, ConfigParams } from "./config";
 
 export class ConfigRepository extends InitRequired {
   public className: string = "ConfigRepository";
@@ -21,7 +20,10 @@ export class ConfigRepository extends InitRequired {
   private config: Config = this.defaultConfig;
 
   public init(): void {
-    this.config = this._workspace.get<Config>(this._key) ?? this.defaultConfig;
+    this.config = {
+      ...this.defaultConfig,
+      ...this._workspace.get<Config>(this._key),
+    };
     super.initialized();
   }
 
@@ -30,9 +32,22 @@ export class ConfigRepository extends InitRequired {
     return this.config;
   }
 
-  public set(value: Config): Thenable<void> {
+  public set({
+    arbFilePrefix,
+    customArbFileName,
+    sourceArbFilePath,
+    googleAPIKey,
+    targetLanguageCodeList,
+  }: ConfigParams): Thenable<void> {
     super.checkInit();
-    this.config = { ...value };
+    this.config = <Config>{
+      arbFilePrefix: arbFilePrefix ?? this.config.arbFilePrefix,
+      customArbFileName: customArbFileName ?? this.config.customArbFileName,
+      sourceArbFilePath: sourceArbFilePath ?? this.config.sourceArbFilePath,
+      googleAPIKey: googleAPIKey ?? this.config.googleAPIKey,
+      targetLanguageCodeList:
+        targetLanguageCodeList ?? this.config.targetLanguageCodeList,
+    };
     return this._workspace.update(this._key, this.config);
   }
 }

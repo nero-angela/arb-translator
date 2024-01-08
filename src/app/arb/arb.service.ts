@@ -1,5 +1,7 @@
+import * as vscode from "vscode";
 import { Language } from "../language/language";
 import { LanguageService } from "../language/language.service";
+import { WorkspaceNotFoundException } from "../util/exceptions";
 import { Arb } from "./arb";
 import { ArbRepository } from "./arb.repository";
 
@@ -13,6 +15,30 @@ export class ArbService {
 
   constructor({ languageService }: InitParams) {
     this.languageService = languageService;
+  }
+
+  /**
+   * Search arb file in workspace
+   * @returns
+   */
+  public async searchArbFiles(): Promise<string[]> {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders) {
+      throw new WorkspaceNotFoundException();
+    }
+
+    // search .arb file
+    const arbFilesInFolders: vscode.Uri[][] = await Promise.all(
+      workspaceFolders.map((folder) =>
+        vscode.workspace.findFiles(
+          new vscode.RelativePattern(folder, "**/*.arb")
+        )
+      )
+    );
+    const arbFiles: vscode.Uri[] = ([] as vscode.Uri[]).concat(
+      ...arbFilesInFolders
+    );
+    return arbFiles.map((file) => file.path);
   }
 
   /**

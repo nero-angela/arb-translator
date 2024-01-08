@@ -2,6 +2,7 @@ import * as fs from "fs";
 import path from "path";
 import { Language } from "../language/language";
 import { FileNotFoundException } from "../util/exceptions";
+import { JsonParser } from "../util/json_parser";
 import { Logger } from "../util/logger";
 
 export class ArbRepository {
@@ -34,7 +35,8 @@ export class ArbRepository {
     if (!fs.existsSync(filePath)) {
       throw new FileNotFoundException(filePath);
     }
-    return JSON.parse(await fs.promises.readFile(filePath, "utf8"));
+
+    return JsonParser.parse(filePath, {});
   }
 
   /**

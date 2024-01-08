@@ -1,5 +1,5 @@
 import { Toast } from "../util/toast";
-import { Config } from "./config";
+import { Config, ConfigParams } from "./config";
 import { ConfigRepository } from "./config.repository";
 
 interface InitParams {
@@ -17,22 +17,25 @@ export class ConfigService {
     return this.configRepository.get();
   }
 
-  async update(data: Config): Promise<boolean> {
+  async update({
+    arbFilePrefix,
+    customArbFileName,
+    sourceArbFilePath,
+    googleAPIKey,
+    targetLanguageCodeList,
+  }: ConfigParams): Promise<boolean> {
     try {
-      await this.configRepository.set(data);
+      await this.configRepository.set({
+        arbFilePrefix,
+        customArbFileName,
+        sourceArbFilePath,
+        googleAPIKey,
+        targetLanguageCodeList,
+      });
       return true;
     } catch (e) {
       Toast.e("Failed to update configure", e);
       return false;
     }
-  }
-
-  addRequiredParams(): Thenable<void> {
-    const config = this.config;
-    return this.configRepository.set({
-      sourceArbFilePath: config.sourceArbFilePath ?? "",
-      googleAPIKey: config.googleAPIKey ?? "",
-      targetLanguageCodeList: config.targetLanguageCodeList ?? [],
-    });
   }
 }

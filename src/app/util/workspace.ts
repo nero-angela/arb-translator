@@ -4,6 +4,21 @@ import * as vscode from "vscode";
 import { Constant } from "./constant";
 
 export class Workspace {
+  /**
+   * open .vscode/settings.json
+   */
+  public static open() {
+    const workspacePath = vscode.workspace.workspaceFolders![0].uri.path;
+    const workspaceSettingsPath = path.join(
+      workspacePath,
+      ".vscode",
+      "settings.json"
+    );
+    vscode.workspace
+      .openTextDocument(workspaceSettingsPath)
+      .then((document) => vscode.window.showTextDocument(document));
+  }
+
   public static getPath(...paths: string[]) {
     const workspacePath = vscode.workspace.workspaceFolders![0].uri.path;
     return path.join(workspacePath, ".vscode", ...paths);

@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import { FileNotFoundException } from "../util/exceptions";
 import { InitRequired } from "../util/init_required";
+import { JsonParser } from "../util/json_parser";
 import { Workspace } from "../util/workspace";
 import { Cache, TranslationCacheKey } from "./translation_cache";
 
@@ -18,8 +19,7 @@ export class TranslationCacheDataSource extends InitRequired {
       this.cache = {};
       return;
     }
-    const jsonString = await fs.promises.readFile(this.cacheFilePath, "utf8");
-    this.cache = JSON.parse(jsonString.trim() === "" ? "{}" : jsonString);
+    this.cache = await JsonParser.parse(this.cacheFilePath, {});
     super.initialized();
   }
 

@@ -1,27 +1,17 @@
 export class BaseException extends Error {}
-export class MessageException extends BaseException {
-  message: string;
-  constructor(message: string) {
-    super();
-    this.message = message;
-  }
-}
-/**
- * BaseException
- */
+
 export class ConfigurationRequiredException extends BaseException {}
+
 export class APIKeyRequiredException extends BaseException {}
+
 export class ConfigNotFoundException extends BaseException {}
 
-/**
- * MessageException
- */
-export class InitializeRequiredException extends MessageException {
+export class InitializeRequiredException extends BaseException {
   constructor(className: string) {
     super(`${className} class must call an init() function before use.`);
   }
 }
-export class SourceArbFilePathRequiredException extends MessageException {
+export class SourceArbFilePathRequiredException extends BaseException {
   constructor() {
     super(
       "Please add arbTranslator.config.sourceArbFilePath to the .vscode/settings.json file."
@@ -29,37 +19,51 @@ export class SourceArbFilePathRequiredException extends MessageException {
   }
 }
 
-export class FileNotFoundException extends MessageException {
+export class ArbFileNotFoundException extends BaseException {
+  constructor() {
+    super(
+      "The .arb file cannot be found in the workspace. Please create an .arb file."
+    );
+  }
+}
+
+export class FileNotFoundException extends BaseException {
   constructor(fileName: string) {
     super(`File ${fileName} not found.`);
   }
 }
 
-export class InvalidArbFileNameException extends MessageException {
+export class InvalidArbFileNameException extends BaseException {
   constructor(arbFileName: string) {
     super(`The language code of ${arbFileName} is not valid.`);
   }
 }
 
-export class InvalidLanguageCodeException extends MessageException {
+export class InvalidLanguageCodeException extends BaseException {
   constructor(languageCode: string) {
     super(`${languageCode} is invalid language code.`);
   }
 }
 
-export class TranslateLanguagesRequiredException extends MessageException {
+export class TranslateLanguagesRequiredException extends BaseException {
   constructor() {
     super(`Please add translateLanguage to the .vscode/settings.json file.`);
   }
 }
 
-export class WorkspaceNotFoundException extends MessageException {
+export class WorkspaceNotFoundException extends BaseException {
   constructor() {
-    super("There is no project workspace.");
+    super("No workspace is opened.");
   }
 }
 
-export class TranslationFailureException extends MessageException {
+export class TranslationFailureException extends BaseException {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+export class JsonParseException extends BaseException {
   constructor(message: string) {
     super(message);
   }

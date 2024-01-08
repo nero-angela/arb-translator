@@ -79,6 +79,10 @@
     },
     "commands": [
       {
+        "command": "arb-translator.initialize",
+        "title": "Arb Translator : Initialize"
+      },
+      {
         "command": "arb-translator.translatePaid",
         "title": "Arb Translator : Translate (paid)"
       },
@@ -97,10 +101,6 @@
       {
         "command": "arb-translator.selectTargetLanguageCode",
         "title": "Arb Translator : Select target language code"
-      },
-      {
-        "command": "arb-translator.selectTargetLanguageCodeWithArbFiles",
-        "title": "Arb Translator : Select target language code (by arb files)"
       }
     ]
   },
