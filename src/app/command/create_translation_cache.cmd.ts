@@ -48,12 +48,6 @@ export class CreateTranslationCache {
       );
     }
 
-    // override confirm
-    const isConfirm = await this.showOverrideConfirm(selectedArbFiles);
-    if (!isConfirm) {
-      return;
-    }
-
     // create translation cache
     const totalCreatedCache = await this.createTranslationCache(
       sourceArbFilePath,
@@ -93,20 +87,6 @@ export class CreateTranslationCache {
     } else {
       return selectedItems.map((item) => item.description!);
     }
-  }
-
-  private async showOverrideConfirm(arbFileList: string[]): Promise<boolean> {
-    const selectedItem = await vscode.window.showQuickPick(
-      [
-        { label: "Yes", description: "Overwrites the existing cache." },
-        { label: "No" },
-      ],
-      {
-        placeHolder: `Would you like to create a translation cache of the selected ${arbFileList.length} files?`,
-        canPickMany: false,
-      }
-    );
-    return selectedItem?.label === "Yes";
   }
 
   private async createTranslationCache(
