@@ -3,6 +3,6 @@ export enum Cmd {
   translatePaid = "arb-translator.translatePaid",
   translateFree = "arb-translator.translateFree",
   createTranslationCache = "arb-translator.createTranslationCache",
-  overrideSourceArbHistory = "arb-translator.overrideSourceArbHistory",
+  excludeTranslation = "arb-translator.excludeTranslation",
   selectTargetLanguageCode = "arb-translator.selectTargetLanguageCode",
 }

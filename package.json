@@ -95,8 +95,8 @@
         "title": "Arb Translator : Create translation cache from arb files"
       },
       {
-        "command": "arb-translator.overrideSourceArbHistory",
-        "title": "Arb Translator : Override source arb history"
+        "command": "arb-translator.excludeTranslation",
+        "title": "Arb Translator : Exclude translation"
       },
       {
         "command": "arb-translator.selectTargetLanguageCode",

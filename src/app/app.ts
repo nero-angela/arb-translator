@@ -39,8 +39,7 @@ export class ArbTranslator implements App {
       this.registry.translationCmd.run(TranslationType.free),
     [Cmd.createTranslationCache]: () =>
       this.registry.createTranslationCache.run(),
-    [Cmd.overrideSourceArbHistory]: () =>
-      this.registry.overrideSourceArbHistory.run(),
+    [Cmd.excludeTranslation]: () => this.registry.excludeTranslation.run(),
     [Cmd.selectTargetLanguageCode]: () =>
       this.registry.selectTargetLanguageCode.run(),
   };

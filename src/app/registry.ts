@@ -2,8 +2,8 @@ import { ArbService } from "./arb/arb.service";
 import { TranslationCacheDataSource } from "./cache/translation_cache.datasource";
 import { TranslationCacheRepository } from "./cache/translation_cache.repository";
 import { CreateTranslationCache } from "./command/create_translation_cache.cmd";
+import { ExcludeTranslation } from "./command/exclude_translation";
 import { InitializeCmd } from "./command/initialize.cmd";
-import { OverrideSourceArbHistory } from "./command/override_source_arb_history.cmd";
 import { SelectTargetLanguageCode } from "./command/select_target_language_code.cmd";
 import { TranslateCmd } from "./command/translate.cmd";
 import { ConfigRepository } from "./config/config.repository";
@@ -45,7 +45,7 @@ export class Registry {
   public initializeCmd: InitializeCmd;
   public translationCmd: TranslateCmd;
   public createTranslationCache: CreateTranslationCache;
-  public overrideSourceArbHistory: OverrideSourceArbHistory;
+  public excludeTranslation: ExcludeTranslation;
   public selectTargetLanguageCode: SelectTargetLanguageCode;
 
   constructor() {
@@ -97,7 +97,7 @@ export class Registry {
       configService: this.configService,
       cacheRepository: this.cacheRepository,
     });
-    this.overrideSourceArbHistory = new OverrideSourceArbHistory({
+    this.excludeTranslation = new ExcludeTranslation({
       arbService: this.arbService,
       configService: this.configService,
       historyService: this.historyService,
