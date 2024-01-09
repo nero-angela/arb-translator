@@ -33,9 +33,12 @@ export class SelectTargetLanguageCode {
     );
 
     // List of languages that will be selected by default
-    const selectedLanguageCodeList = this.selectTargetLanguageCodeWithArbFiles(
-      config.sourceArbFilePath
-    );
+    const selectedLanguageCodeList: LanguageCode[] =
+      await this.getDefaultTargetLanguageCode(
+        config.sourceArbFilePath,
+        config.targetLanguageCodeList
+      );
+
     if (supportLanguageList.length === 0) {
       const sourceArbName = path.basename(config.sourceArbFilePath);
       const arbPath = path.dirname(config.sourceArbFilePath);
@@ -62,8 +65,13 @@ export class SelectTargetLanguageCode {
       canPickMany: true,
     });
 
-    const targetLanguageCodeList =
-      selectedItems?.map((item) => item.description!) ?? [];
+    if (!selectedItems) {
+      return;
+    }
+
+    const targetLanguageCodeList = selectedItems?.map(
+      (item) => item.description!
+    );
 
     // update config
     this.configService.update({
@@ -95,9 +103,45 @@ export class SelectTargetLanguageCode {
   }
 
   /**
+   * Get list of language codes
+   * @param sourceArbFilePath
+   * @param configTargetLanguageCodeList
+   */
+  private async getDefaultTargetLanguageCode(
+    sourceArbFilePath: string,
+    configTargetLanguageCodeList: LanguageCode[]
+  ): Promise<LanguageCode[]> {
+    const languageCodesFromArbFiles: LanguageCode[] =
+      await this.selectTargetLanguageCodeWithArbFiles(sourceArbFilePath);
+
+    const notAddedLanguageCodesFromArbFiles = languageCodesFromArbFiles.filter(
+      (langCode) => {
+        return !configTargetLanguageCodeList.includes(langCode);
+      }
+    );
+    const totalNotAdded = notAddedLanguageCodesFromArbFiles.length;
+    if (totalNotAdded > 0) {
+      const yes = "yes";
+      const userAnswer = await vscode.window.showQuickPick(
+        <vscode.QuickPickItem[]>[{ label: yes }, { label: "no" }],
+        {
+          placeHolder: `Found ${totalNotAdded} arb files not added with targetLanguageCode. Do you want to add this files?`,
+          canPickMany: false,
+        }
+      );
+      if (userAnswer?.label === yes) {
+        return [
+          ...configTargetLanguageCodeList,
+          ...notAddedLanguageCodesFromArbFiles,
+        ];
+      }
+    }
+    return configTargetLanguageCodeList;
+  }
+
+  /**
    * Get list of language codes from arb files excluding languageCode of source arb
    * @param sourceArbFilePath
-   * @returns LanguageCode[]
    */
   private selectTargetLanguageCodeWithArbFiles(
     sourceArbFilePath: string
