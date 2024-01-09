@@ -37,15 +37,18 @@ export class ExcludeTranslation {
     // get changed items in source arb file
     const changes: HistoryChange[] = this.historyService.compare(sourceArb);
     if (changes.length === 0) {
-      Toast.i("There are no changes");
+      Toast.i("There are no changes in the sourceArb file.");
       return;
     }
 
     // select changes to exclude from translation
     const items: vscode.QuickPickItem[] = changes.map((change) => {
+      const isNewValue = change.historyValue === change.sourceValue;
       return {
         label: change.key,
-        description: change.sourceValue.toString(),
+        description: isNewValue
+          ? change.sourceValue
+          : `${change.historyValue} → ${change.sourceValue}`,
         picked: true,
       };
     });
@@ -68,7 +71,7 @@ export class ExcludeTranslation {
 
     this.historyService.update(historyData);
     Toast.i(
-      `${selectedItems.length} items excluded from translation completed.`
+      `${selectedItems.length} items excluded from translation completed. (If that key does not exist in the targetArb file, it will be translated.)`
     );
   }
 }

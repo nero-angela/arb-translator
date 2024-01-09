@@ -22,6 +22,9 @@ export class HistoryService {
     const history: History = this.historyRepository.get();
     const historyDiffList: HistoryChange[] = [];
     for (const key of sourceArb.keys) {
+      if (key.includes("@")) {
+        continue;
+      }
       const sourceValue: string = sourceArb.data[key];
       const historyValue: string | undefined = history.data[key];
       if (historyValue === sourceValue) {
