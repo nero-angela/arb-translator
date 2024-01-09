@@ -33,10 +33,8 @@ export class ArbTranslator implements App {
 
   public commands = {
     [Cmd.initialize]: () => this.registry.initializeCmd.run(),
-    [Cmd.translatePaid]: () =>
-      this.registry.translationCmd.run(TranslationType.paid),
-    [Cmd.translateFree]: () =>
-      this.registry.translationCmd.run(TranslationType.free),
+    [Cmd.translate]: () =>
+      this.registry.translationCmd.run(),
     [Cmd.createTranslationCache]: () =>
       this.registry.createTranslationCache.run(),
     [Cmd.excludeTranslation]: () => this.registry.excludeTranslation.run(),

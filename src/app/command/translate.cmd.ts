@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as vscode from "vscode";
 import { Arb } from "../arb/arb";
 import { ArbService } from "../arb/arb.service";
 import { ConfigService } from "../config/config.service";
@@ -48,15 +49,42 @@ export class TranslateCmd {
     this.translationService = translationService;
   }
 
-  async run(type: TranslationType) {
+  async run() {
+    // select translation type
+    const translationType: TranslationType | undefined =
+      await this.selectTranslationType();
+    if (!translationType) {
+      return;
+    }
+
     // validation
-    this._checkValidation(type);
+    this.checkValidation(translationType);
 
     // translate
-    await this._translate(type);
+    await this.translate(translationType);
   }
 
-  private _checkValidation(type: TranslationType) {
+  private async selectTranslationType(): Promise<TranslationType | undefined> {
+    // select translation type
+    const items: vscode.QuickPickItem[] = [
+      {
+        label: TranslationType.free,
+        description: "Limit to approximately 100 requests per hour",
+      },
+      { label: TranslationType.paid, description: "Google API key required" },
+    ];
+    const selectedItem = await vscode.window.showQuickPick(items, {
+      placeHolder: "Select changes to exclude from translation",
+      canPickMany: false,
+    });
+    if (selectedItem) {
+      return <TranslationType>selectedItem.label;
+    } else {
+      return undefined;
+    }
+  }
+
+  private checkValidation(type: TranslationType) {
     // check config
     const config = this.configService.config;
     if (!config.sourceArbFilePath || !config.targetLanguageCodeList) {
@@ -91,7 +119,7 @@ export class TranslateCmd {
     }
   }
 
-  async _translate(type: TranslationType) {
+  async translate(type: TranslationType) {
     const sourceArbFilePath = this.configService.config.sourceArbFilePath;
     const sourceArb: Arb = await this.arbService.get(sourceArbFilePath);
 

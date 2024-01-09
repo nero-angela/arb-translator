@@ -83,12 +83,8 @@
         "title": "Arb Translator : Initialize"
       },
       {
-        "command": "arb-translator.translatePaid",
-        "title": "Arb Translator : Translate (paid)"
-      },
-      {
-        "command": "arb-translator.translateFree",
-        "title": "Arb Translator : Translate (free)"
+        "command": "arb-translator.translate",
+        "title": "Arb Translator : Translate"
       },
       {
         "command": "arb-translator.createTranslationCache",

@@ -5,6 +5,6 @@ export interface TranslationResult {
 }
 
 export enum TranslationType {
-  paid = "paid",
-  free = "free",
+  paid = "Paid",
+  free = "Free",
 }
