@@ -165,6 +165,20 @@ export class LanguageService {
   ];
 
   /**
+   * check whether the language code is supported or not
+   * @param languageCode
+   * @throws InvalidLanguageCodeException
+   */
+  private checkIsSupportLanguageCode(languageCode: LanguageCode) {
+    const language = this.supportLanguages.find(
+      (language) => language.languageCode === languageCode
+    );
+    if (!language) {
+      throw new InvalidLanguageCodeException(languageCode);
+    }
+  }
+
+  /**
    * arbFilePath -> LanguageCode -> Language
    * @param arbFilePath
    * @returns Language
@@ -212,11 +226,12 @@ export class LanguageService {
 
     // arbFilePath -> LanguageCode
     try {
-      const prefix = config.arbFilePrefix ?? "";
       const fileName = arbFilePath.split("/").pop()!.split(".arb")[0];
-      languageCode = fileName.startsWith(prefix)
-        ? fileName?.split(prefix)[1]!
+      languageCode = config.arbFilePrefix
+        ? fileName?.split(config.arbFilePrefix)[1]!
         : fileName;
+
+      this.checkIsSupportLanguageCode(languageCode);
       return languageCode;
     } catch (e: any) {
       throw new InvalidArbFileNameException(arbFilePath);

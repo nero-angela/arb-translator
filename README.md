@@ -27,6 +27,9 @@ By adding it to the workspace (`.vscode/settings.json`), you can set it differen
 ### Example
 
 ## Command
+
+### Initialize
+
 ### Translate (paid)
 - Translate the source arb file using [Google Cloud Translation - Base(v2)](https://cloud.google.com/translate/docs/basic/translating-text).
 - Before you can start using the Cloud Translation API, you must have a project that has the Cloud Translation API enabled, and you must have the appropriate credentials. You can also install client libraries for common programming languages to help you make calls to the API. For more information, see the [Setup page](https://cloud.google.com/translate/docs/setup).
