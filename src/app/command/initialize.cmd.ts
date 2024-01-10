@@ -66,7 +66,7 @@ export class InitializeCmd {
 
     // targetLanguageCodeLilst
     if (targetLanguageCodeList.length === 0) {
-      await vscode.commands.executeCommand(Cmd.selectTargetLanguageCode);
+      await vscode.commands.executeCommand(Cmd.configureTargetLanguageCode);
     }
 
     // open workspace

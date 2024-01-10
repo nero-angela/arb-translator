@@ -4,7 +4,7 @@ import { TranslationCacheRepository } from "./cache/translation_cache.repository
 import { CreateTranslationCache } from "./command/create_translation_cache.cmd";
 import { ExcludeTranslation } from "./command/exclude_translation";
 import { InitializeCmd } from "./command/initialize.cmd";
-import { SelectTargetLanguageCode } from "./command/select_target_language_code.cmd";
+import { ConfigureTargetLanguageCode } from "./command/configure_target_language_code.cmd";
 import { TranslateCmd } from "./command/translate.cmd";
 import { ConfigRepository } from "./config/config.repository";
 import { ConfigService } from "./config/config.service";
@@ -46,7 +46,7 @@ export class Registry {
   public translationCmd: TranslateCmd;
   public createTranslationCache: CreateTranslationCache;
   public excludeTranslation: ExcludeTranslation;
-  public selectTargetLanguageCode: SelectTargetLanguageCode;
+  public selectTargetLanguageCode: ConfigureTargetLanguageCode;
 
   constructor() {
     // data source
@@ -102,7 +102,7 @@ export class Registry {
       configService: this.configService,
       historyService: this.historyService,
     });
-    this.selectTargetLanguageCode = new SelectTargetLanguageCode({
+    this.selectTargetLanguageCode = new ConfigureTargetLanguageCode({
       arbService: this.arbService,
       configService: this.configService,
       languageService: this.languageService,
