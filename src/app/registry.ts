@@ -1,10 +1,11 @@
 import { ArbService } from "./arb/arb.service";
+import { ArbStatisticService } from "./arb_statistic/arb_statistic.service";
 import { TranslationCacheDataSource } from "./cache/translation_cache.datasource";
 import { TranslationCacheRepository } from "./cache/translation_cache.repository";
+import { ConfigureTargetLanguageCode } from "./command/configure_target_language_code.cmd";
 import { CreateTranslationCache } from "./command/create_translation_cache.cmd";
 import { ExcludeTranslation } from "./command/exclude_translation";
 import { InitializeCmd } from "./command/initialize.cmd";
-import { ConfigureTargetLanguageCode } from "./command/configure_target_language_code.cmd";
 import { TranslateCmd } from "./command/translate.cmd";
 import { ConfigRepository } from "./config/config.repository";
 import { ConfigService } from "./config/config.service";
@@ -25,7 +26,7 @@ export class Registry {
   /**
    * Repository
    */
-  private cacheRepository: TranslationCacheRepository;
+  private translationCacheRepository: TranslationCacheRepository;
   private translationRepository: GoogleTranslationRepository;
   private historyRepository: HistoryRepository;
   private configRepository: ConfigRepository;
@@ -38,6 +39,7 @@ export class Registry {
   private languageService: LanguageService;
   private arbService: ArbService;
   private translationService: GoogleTranslationService;
+  private arbStatisticService: ArbStatisticService;
 
   /**
    * Command
@@ -54,11 +56,11 @@ export class Registry {
     this.translationDataSource = new GoogleTranslationDataSource();
 
     // repository
-    this.cacheRepository = new TranslationCacheRepository({
+    this.translationCacheRepository = new TranslationCacheRepository({
       cacheDataSource: this.cacheDataSource,
     });
     this.translationRepository = new GoogleTranslationRepository({
-      cacheRepository: this.cacheRepository,
+      translationCacheRepository: this.translationCacheRepository,
       translationDataSource: this.translationDataSource,
     });
     this.historyRepository = new HistoryRepository();
@@ -76,8 +78,13 @@ export class Registry {
     });
     this.arbService = new ArbService({ languageService: this.languageService });
     this.translationService = new GoogleTranslationService({
-      cacheRepository: this.cacheRepository,
+      translationCacheRepository: this.translationCacheRepository,
       translationRepository: this.translationRepository,
+    });
+    this.arbStatisticService = new ArbStatisticService({
+      translationCacheRepository: this.translationCacheRepository,
+      languageService: this.languageService,
+      arbService: this.arbService,
     });
 
     // cmd
@@ -91,11 +98,12 @@ export class Registry {
       historyService: this.historyService,
       languageService: this.languageService,
       translationService: this.translationService,
+      arbStatisticService: this.arbStatisticService,
     });
     this.createTranslationCache = new CreateTranslationCache({
       arbService: this.arbService,
       configService: this.configService,
-      cacheRepository: this.cacheRepository,
+      translationCacheRepository: this.translationCacheRepository,
     });
     this.excludeTranslation = new ExcludeTranslation({
       arbService: this.arbService,

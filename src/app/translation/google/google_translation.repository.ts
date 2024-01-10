@@ -12,7 +12,7 @@ interface EncodeResult {
 }
 
 interface InitParams {
-  cacheRepository: TranslationCacheRepository;
+  translationCacheRepository: TranslationCacheRepository;
   translationDataSource: TranslationDataSource;
 }
 

@@ -30,7 +30,7 @@ export class ConfigureTargetLanguageCode {
 
   public async run() {
     const config = this.configService.config;
-    const sourceArb = await this.arbService.get(config.sourceArbFilePath);
+    const sourceArb = await this.arbService.getArb(config.sourceArbFilePath);
 
     // select action
     const action: Action | undefined = await this.selectAction();

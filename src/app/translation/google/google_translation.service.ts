@@ -11,7 +11,7 @@ import {
 } from "../translation.service";
 
 interface InitParams {
-  cacheRepository: TranslationCacheRepository;
+  translationCacheRepository: TranslationCacheRepository;
   translationRepository: TranslationRepository;
 }
 interface TranslateParams {
@@ -22,11 +22,14 @@ interface TranslateParams {
 }
 
 export class GoogleTranslationService implements TranslationService {
-  private cacheRepository: TranslationCacheRepository;
+  private translationCacheRepository: TranslationCacheRepository;
   private translationRepository: TranslationRepository;
 
-  constructor({ cacheRepository, translationRepository }: InitParams) {
-    this.cacheRepository = cacheRepository;
+  constructor({
+    translationCacheRepository,
+    translationRepository,
+  }: InitParams) {
+    this.translationCacheRepository = translationCacheRepository;
     this.translationRepository = translationRepository;
   }
 
@@ -102,8 +105,13 @@ export class GoogleTranslationService implements TranslationService {
     let nRequest = 0;
     const results = await Promise.all(
       queries.map(async (query) => {
-        const cacheKey = new TranslationCacheKey(query, sourceLang, targetLang);
-        const cacheValue = this.cacheRepository.get<string>(cacheKey);
+        const cacheKey = new TranslationCacheKey({
+          sourceArbValue: query,
+          sourceLanguage: sourceLang,
+          targetLanguage: targetLang,
+        });
+        const cacheValue =
+          this.translationCacheRepository.get<string>(cacheKey);
         if (cacheValue) {
           // return cache
           nCache += 1;
@@ -114,7 +122,7 @@ export class GoogleTranslationService implements TranslationService {
           const translatedText = await onTranslate(query);
 
           // update cache
-          this.cacheRepository.upsert(cacheKey, translatedText);
+          this.translationCacheRepository.upsert(cacheKey, translatedText);
           return translatedText;
         }
       })

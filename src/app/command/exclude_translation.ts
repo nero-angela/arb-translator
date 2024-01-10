@@ -32,7 +32,7 @@ export class ExcludeTranslation {
     }
 
     // get source arb
-    const sourceArb: Arb = await this.arbService.get(sourceArbFilePath);
+    const sourceArb: Arb = await this.arbService.getArb(sourceArbFilePath);
 
     // get changed items in source arb file
     const changes: HistoryChange[] = this.historyService.compare(sourceArb);

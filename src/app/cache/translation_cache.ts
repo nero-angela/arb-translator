@@ -21,11 +21,15 @@ export class TranslationCacheKey {
     return this.targetLanguage.languageCode;
   }
 
-  constructor(
-    sourceArbValue: string,
-    sourceLanguage: Language,
-    targetLanguage: Language
-  ) {
+  constructor({
+    sourceArbValue,
+    sourceLanguage,
+    targetLanguage,
+  }: {
+    sourceArbValue: string;
+    sourceLanguage: Language;
+    targetLanguage: Language;
+  }) {
     this.sourceLanguage = sourceLanguage;
     this.targetLanguage = targetLanguage;
     this.sourceArbValueSHA1 = Crypto.generateSHA1(sourceArbValue);

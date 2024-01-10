@@ -57,7 +57,7 @@ export class ArbService {
    * @returns Promise<Arb>
    * @throws FileNotFoundException
    */
-  public async get(arbFilePath: string): Promise<Arb> {
+  public async getArb(arbFilePath: string): Promise<Arb> {
     const language =
       this.languageService.getLanguageFromArbFilePath(arbFilePath);
     const data = await this.arbRepository.read(arbFilePath);

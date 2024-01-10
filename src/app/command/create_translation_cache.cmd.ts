@@ -11,18 +11,22 @@ import { Toast } from "../util/toast";
 interface InitParams {
   arbService: ArbService;
   configService: ConfigService;
-  cacheRepository: TranslationCacheRepository;
+  translationCacheRepository: TranslationCacheRepository;
 }
 
 export class CreateTranslationCache {
   private arbService: ArbService;
   private configService: ConfigService;
-  private cacheRepository: TranslationCacheRepository;
+  private translationCacheRepository: TranslationCacheRepository;
 
-  constructor({ arbService, configService, cacheRepository }: InitParams) {
+  constructor({
+    arbService,
+    configService,
+    translationCacheRepository,
+  }: InitParams) {
     this.arbService = arbService;
     this.configService = configService;
-    this.cacheRepository = cacheRepository;
+    this.translationCacheRepository = translationCacheRepository;
   }
 
   public async run() {
@@ -94,13 +98,13 @@ export class CreateTranslationCache {
     arbFileList: string[]
   ): Promise<number> {
     // read source arb file
-    const sourceArb: Arb = await this.arbService.get(sourceArbFilePath);
+    const sourceArb: Arb = await this.arbService.getArb(sourceArbFilePath);
 
     // loop target arb file
     let totalCreatedCache = 0;
     for (const targetArbFile of arbFileList) {
       // read target arb file
-      const targetArb: Arb = await this.arbService.get(targetArbFile);
+      const targetArb: Arb = await this.arbService.getArb(targetArbFile);
 
       // loop source arb keys
       for (const sourceArbKey of sourceArb.keys) {
@@ -116,12 +120,12 @@ export class CreateTranslationCache {
         // upsert cache
         const sourceArbValue = sourceArb.data[sourceArbKey];
         const targetArbValue = targetArb.data[sourceArbKey];
-        const cacheKey = new TranslationCacheKey(
+        const cacheKey = new TranslationCacheKey({
           sourceArbValue,
-          sourceArb.language,
-          targetArb.language
-        );
-        this.cacheRepository.upsert(cacheKey, targetArbValue);
+          sourceLanguage: sourceArb.language,
+          targetLanguage: targetArb.language,
+        });
+        this.translationCacheRepository.upsert(cacheKey, targetArbValue);
         totalCreatedCache += 1;
       }
     }

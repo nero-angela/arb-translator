@@ -1,7 +1,10 @@
 import * as fs from "fs";
+import path from "path";
 import * as vscode from "vscode";
 import { Arb } from "../arb/arb";
 import { ArbService } from "../arb/arb.service";
+import { ArbStatistic } from "../arb_statistic/arb_statistic";
+import { ArbStatisticService } from "../arb_statistic/arb_statistic.service";
 import { ConfigService } from "../config/config.service";
 import { History } from "../history/history";
 import { HistoryService } from "../history/history.service";
@@ -26,6 +29,7 @@ interface InitParams {
   historyService: HistoryService;
   languageService: LanguageService;
   translationService: TranslationService;
+  arbStatisticService: ArbStatisticService;
 }
 
 export class TranslateCmd {
@@ -34,6 +38,7 @@ export class TranslateCmd {
   private historyService: HistoryService;
   private languageService: LanguageService;
   private translationService: TranslationService;
+  private arbStatisticService: ArbStatisticService;
 
   constructor({
     arbService,
@@ -41,29 +46,106 @@ export class TranslateCmd {
     historyService,
     languageService,
     translationService,
+    arbStatisticService,
   }: InitParams) {
     this.arbService = arbService;
     this.configService = configService;
     this.historyService = historyService;
     this.languageService = languageService;
     this.translationService = translationService;
+    this.arbStatisticService = arbStatisticService;
   }
 
   async run() {
+    // validation
+    this.checkValidation();
+
+    // load source arb
+    const sourceArb: Arb = await this.arbService.getArb(
+      this.configService.config.sourceArbFilePath
+    );
+
+    // no data in source arb file
+    if (sourceArb.keys.length === 0) {
+      Toast.i(`There is no data to translate : ${sourceArb.filePath}`);
+      return;
+    }
+
+    // get history
+    const history: History = this.historyService.get();
+
+    // list of languages to be translated
+    const targetLanguages: Language[] =
+      this.configService.config.targetLanguageCodeList.map((languageCode) => {
+        return this.languageService.getLanguageByLanguageCode(languageCode);
+      });
+
+    // get statistic
+    const arbStatistic = await this.arbStatisticService.getArbStatistic(
+      sourceArb,
+      targetLanguages,
+      history
+    );
+    const selectedTargetLanguages = await this.selectTargetLanguages(
+      arbStatistic
+    );
+    if (selectedTargetLanguages.length === 0) {
+      return;
+    }
+
     // select translation type
-    const translationType: TranslationType | undefined =
-      await this.selectTranslationType();
+    const translationType = await this.selectTranslationType();
     if (!translationType) {
       return;
     }
 
-    // validation
-    this.checkValidation(translationType);
-
     // translate
-    await this.translate(translationType);
+    await this.translate({
+      translationType,
+      sourceArb,
+      history,
+      targetLanguages: selectedTargetLanguages,
+    });
   }
 
+  private async selectTargetLanguages(
+    arbStatistic: ArbStatistic
+  ): Promise<Language[]> {
+    const keys = Object.keys(arbStatistic);
+    const selectedTargetlanguages = await vscode.window.showQuickPick(
+      keys.map((key) => {
+        const s = arbStatistic[key];
+        const label = path.basename(s.filePath);
+        const language = s.language;
+        const description = s.isTranslationRequired
+          ? Object.entries({
+              ...s.action,
+              ...s.api,
+              retain: 0,
+            })
+              .filter(([key, value]) => value > 0)
+              .map(([key, value]) => `${key}: ${value}`)
+              .join(", ")
+          : "No changes";
+        return {
+          label,
+          description,
+          picked: s.isTranslationRequired,
+          language,
+        };
+      }),
+      {
+        placeHolder: "Please select the file you want to translate.",
+        canPickMany: true,
+      }
+    );
+    return selectedTargetlanguages?.map((item) => item.language) ?? [];
+  }
+
+  /**
+   * Select translation type
+   * @throws APIKeyRequiredException
+   */
   private async selectTranslationType(): Promise<TranslationType | undefined> {
     // select translation type
     const items: vscode.QuickPickItem[] = [
@@ -77,23 +159,27 @@ export class TranslateCmd {
       placeHolder: "Select changes to exclude from translation",
       canPickMany: false,
     });
-    if (selectedItem) {
-      return <TranslationType>selectedItem.label;
-    } else {
+    if (!selectedItem) {
       return undefined;
     }
+
+    const type = <TranslationType>selectedItem.label;
+
+    // check google API key if type is paid
+    if (
+      type === TranslationType.paid &&
+      !this.configService.config.googleAPIKey
+    ) {
+      throw new APIKeyRequiredException();
+    }
+    return type;
   }
 
-  private checkValidation(type: TranslationType) {
+  private checkValidation(): void {
     // check config
     const config = this.configService.config;
     if (!config.sourceArbFilePath || !config.targetLanguageCodeList) {
       throw new ConfigNotFoundException();
-    }
-
-    // check google API key if type is paid
-    if (type === TranslationType.paid && !config.googleAPIKey) {
-      throw new APIKeyRequiredException();
     }
 
     // check source.arb file path
@@ -119,24 +205,17 @@ export class TranslateCmd {
     }
   }
 
-  async translate(type: TranslationType) {
-    const sourceArbFilePath = this.configService.config.sourceArbFilePath;
-    const sourceArb: Arb = await this.arbService.get(sourceArbFilePath);
-
-    if (sourceArb.keys.length === 0) {
-      // no data in source arb file
-      Toast.i(`There is no data to translate : ${sourceArb.filePath}`);
-      return;
-    }
-
-    // list of languages to be translated
-    const targetLanguages: Language[] =
-      this.configService.config.targetLanguageCodeList.map((languageCode) => {
-        return this.languageService.getLanguageByLanguageCode(languageCode);
-      });
-
-    // get history
-    const history: History = this.historyService.get();
+  async translate({
+    translationType,
+    sourceArb,
+    history,
+    targetLanguages,
+  }: {
+    translationType: TranslationType;
+    sourceArb: Arb;
+    history: History;
+    targetLanguages: Language[];
+  }) {
     const translateStatisticList: TranslationStatistic[] = [];
     for (const targetLanguage of targetLanguages) {
       if (targetLanguage.languageCode === sourceArb.language.languageCode) {
@@ -152,7 +231,7 @@ export class TranslateCmd {
       this.arbService.createIfNotExist(targetArbFilePath, targetLanguage);
 
       // get targetArb file
-      const targetArb: Arb = await this.arbService.get(targetArbFilePath);
+      const targetArb: Arb = await this.arbService.getArb(targetArbFilePath);
 
       // translation target classification
       const nextTargetArbData: Record<string, string> = {};
@@ -195,7 +274,7 @@ export class TranslateCmd {
       if (nWillTranslate > 0) {
         // translate
         const translateResult =
-          type === TranslationType.paid
+          translationType === TranslationType.paid
             ? await this.translationService.paidTranslate({
                 apiKey: this.configService.config.googleAPIKey,
                 queries: willTranslateValues,
@@ -219,7 +298,7 @@ export class TranslateCmd {
       const targetArbFileName = targetArb.filePath.split("/").pop();
       translateStatisticList.push(translateStatistic);
       Toast.i(
-        `🟢 ${targetArbFileName} translated. (${type.toString()} ${
+        `🟢 ${targetArbFileName} translated. (${translationType.toString()} ${
           translateStatistic.log
         })`
       );
@@ -236,7 +315,7 @@ export class TranslateCmd {
     Toast.i(
       `Total ${
         targetLanguages.length
-      } languages translated. (${type.toString()} ${
+      } languages translated. (${translationType.toString()} ${
         totalTranslateStatistic.log
       })`
     );
