@@ -87,10 +87,6 @@
         "title": "Arb Translator : Translate"
       },
       {
-        "command": "arb-translator.createTranslationCache",
-        "title": "Arb Translator : Create translation cache from arb files"
-      },
-      {
         "command": "arb-translator.excludeTranslation",
         "title": "Arb Translator : Exclude translation"
       },

@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 import { Cmd } from "./command/cmd";
 import { Registry } from "./registry";
-import { TranslationType } from "./translation/translation";
 import { Constant } from "./util/constant";
 import { Dialog } from "./util/dialog";
 import {
@@ -33,10 +32,7 @@ export class ArbTranslator implements App {
 
   public commands = {
     [Cmd.initialize]: () => this.registry.initializeCmd.run(),
-    [Cmd.translate]: () =>
-      this.registry.translationCmd.run(),
-    [Cmd.createTranslationCache]: () =>
-      this.registry.createTranslationCache.run(),
+    [Cmd.translate]: () => this.registry.translationCmd.run(),
     [Cmd.excludeTranslation]: () => this.registry.excludeTranslation.run(),
     [Cmd.selectTargetLanguageCode]: () =>
       this.registry.selectTargetLanguageCode.run(),
