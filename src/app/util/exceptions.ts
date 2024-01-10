@@ -1,10 +1,18 @@
+import { Cmd, cmdName } from "../command/cmd";
+
 export class BaseException extends Error {}
 
 export class ConfigurationRequiredException extends BaseException {}
 
 export class APIKeyRequiredException extends BaseException {}
 
-export class ConfigNotFoundException extends BaseException {}
+export class ConfigNotFoundException extends BaseException {
+  constructor() {
+    super(
+      `Run the "${cmdName[Cmd.initialize]}" command to add required settings.`
+    );
+  }
+}
 
 export class InitializeRequiredException extends BaseException {
   constructor(className: string) {

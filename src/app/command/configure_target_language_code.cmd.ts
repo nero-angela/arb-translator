@@ -8,8 +8,8 @@ import { LanguageService } from "../language/language.service";
 import { Toast } from "../util/toast";
 
 enum Action {
-  select = "select",
-  load = "load",
+  select = "Select",
+  load = "Load",
 }
 
 interface InitParams {
@@ -75,16 +75,15 @@ export class ConfigureTargetLanguageCode {
       <vscode.QuickPickItem[]>[
         {
           label: Action.select.toString(),
-          description: "Select the language code yourself.",
+          description: "Select directly from language list.",
         },
         {
           label: Action.load.toString(),
-          description:
-            "Loads langugageCode from arb files and replaces this setting.",
+          description: "Load languages from arb files.",
         },
       ],
       {
-        placeHolder: "Please select how to configure the target language code.",
+        placeHolder: "Please select a list of language to translate to.",
       }
     );
     if (!select) return undefined;

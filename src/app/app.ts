@@ -5,13 +5,11 @@ import { Constant } from "./util/constant";
 import { Dialog } from "./util/dialog";
 import {
   APIKeyRequiredException,
-  ConfigNotFoundException,
   ConfigurationRequiredException,
   WorkspaceNotFoundException,
 } from "./util/exceptions";
 import { Logger } from "./util/logger";
 import { Toast } from "./util/toast";
-import { Workspace } from "./util/workspace";
 
 export interface App {
   name: string;
@@ -50,12 +48,7 @@ export class ArbTranslator implements App {
 
   public onException = (e: any) => {
     Logger.e(e);
-    if (e instanceof ConfigNotFoundException) {
-      Dialog.showConfigRequiredDialog(async () => {
-        Workspace.open();
-        Dialog.showConfigDescriptionDialog();
-      });
-    } else if (e instanceof ConfigurationRequiredException) {
+    if (e instanceof ConfigurationRequiredException) {
       Dialog.showTargetLanguageCodeListRequiredDialog();
     } else if (e instanceof APIKeyRequiredException) {
       Dialog.showAPIKeyRequiredDialog();
