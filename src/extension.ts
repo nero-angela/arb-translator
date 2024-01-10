@@ -13,7 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
         await app.init();
         await app.commands[cmd]();
       } catch (e) {
-        app.onException(e);
+        await app.onException(e);
       }
     });
     context.subscriptions.push(disposable);

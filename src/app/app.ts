@@ -5,6 +5,7 @@ import { Constant } from "./util/constant";
 import { Dialog } from "./util/dialog";
 import {
   APIKeyRequiredException,
+  ConfigNotFoundException,
   ConfigurationRequiredException,
   WorkspaceNotFoundException,
 } from "./util/exceptions";
@@ -46,14 +47,16 @@ export class ArbTranslator implements App {
     await this.registry.init();
   };
 
-  public onException = (e: any) => {
-    Logger.e(e);
-    if (e instanceof ConfigurationRequiredException) {
+  public onException = async (e: any) => {
+    if (e instanceof ConfigNotFoundException) {
+      await vscode.commands.executeCommand(Cmd.initialize);
+    } else if (e instanceof ConfigurationRequiredException) {
       Dialog.showTargetLanguageCodeListRequiredDialog();
     } else if (e instanceof APIKeyRequiredException) {
       Dialog.showAPIKeyRequiredDialog();
     } else {
       Toast.e(e.message);
     }
+    Logger.e(e);
   };
 }

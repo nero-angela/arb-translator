@@ -72,14 +72,14 @@ export class ConfigureTargetLanguageCode {
    */
   private async selectAction(): Promise<Action | undefined> {
     const select = await vscode.window.showQuickPick(
-      <vscode.QuickPickItem[]>[
+      [
         {
-          label: Action.select.toString(),
-          description: "Select directly from language list.",
+          label: "Select directly from language list.",
+          action: Action.select.toString(),
         },
         {
-          label: Action.load.toString(),
-          description: "Load languages from arb files.",
+          label: "Load languages from arb files.",
+          action: Action.load.toString(),
         },
       ],
       {
@@ -87,7 +87,7 @@ export class ConfigureTargetLanguageCode {
       }
     );
     if (!select) return undefined;
-    return <Action>select.label;
+    return <Action>select.action;
   }
 
   /**
