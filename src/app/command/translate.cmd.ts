@@ -11,6 +11,7 @@ import { LanguageService } from "../language/language.service";
 import { TranslationType } from "../translation/translation";
 import { TranslationService } from "../translation/translation.service";
 import { TranslationStatistic } from "../translation/translation.statistic";
+import { Dialog } from "../util/dialog";
 import {
   APIKeyRequiredException,
   ConfigNotFoundException,
@@ -106,7 +107,12 @@ export class TranslateCmd {
     });
 
     // validate translation
-    await vscode.commands.executeCommand(Cmd.validateTranslation);
+    const isPreceedValidation = await Dialog.showConfirmDialog({
+      title: "Would you like to validate the translation?",
+    });
+    if (isPreceedValidation) {
+      await vscode.commands.executeCommand(Cmd.validateTranslation);
+    }
   }
 
   /**
