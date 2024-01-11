@@ -1,11 +1,11 @@
 import * as fs from "fs";
+import { BaseInitRequired } from "../util/base/base_init_required";
 import { FileNotFoundException } from "../util/exceptions";
-import { InitRequired } from "../util/init_required";
 import { JsonParser } from "../util/json_parser";
 import { Workspace } from "../util/workspace";
 import { Cache, TranslationCacheKey } from "./translation_cache";
 
-export class TranslationCacheDataSource extends InitRequired {
+export class TranslationCacheDataSource extends BaseInitRequired {
   protected className: string = "TranslationCacheDataSource";
   private cacheFilePath: string = Workspace.getArbPath("cache.json");
   private cache: Cache = {};

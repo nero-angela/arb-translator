@@ -14,8 +14,9 @@ import { Toast } from "./util/toast";
 
 export interface App {
   name: string;
-  commands: Record<Cmd, () => void>;
+  commands: Record<Cmd, (context: vscode.ExtensionContext) => void>;
   init: () => any;
+  disposed: () => void;
   onException: (e: any) => void;
 }
 
@@ -35,6 +36,7 @@ export class ArbTranslator implements App {
     [Cmd.excludeTranslation]: () => this.registry.excludeTranslation.run(),
     [Cmd.configureTargetLanguageCode]: () =>
       this.registry.selectTargetLanguageCode.run(),
+    [Cmd.validateTranslation]: () => this.registry.fixTranslator.run(),
   };
 
   public init = async () => {
@@ -45,6 +47,10 @@ export class ArbTranslator implements App {
 
     // initialize
     await this.registry.init();
+  };
+
+  public disposed = () => {
+    this.registry.disposed();
   };
 
   public onException = async (e: any) => {

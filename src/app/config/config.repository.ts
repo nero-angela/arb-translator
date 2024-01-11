@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
-import { InitRequired } from "../util/init_required";
+import { BaseInitRequired } from "../util/base/base_init_required";
 import { Config, ConfigParams } from "./config";
 
-export class ConfigRepository extends InitRequired {
+export class ConfigRepository extends BaseInitRequired {
   public className: string = "ConfigRepository";
 
   // Create new every time because of cache

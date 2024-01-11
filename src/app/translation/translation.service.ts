@@ -15,6 +15,12 @@ export interface FreeTranslateServiceParams {
 }
 
 export interface TranslationService {
+  getTranslateWebsiteUrl(
+    sourceLanguage: Language,
+    targetLanguage: Language,
+    text: string
+  ): string;
+
   paidTranslate({
     apiKey,
     queries,

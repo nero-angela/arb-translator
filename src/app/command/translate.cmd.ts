@@ -22,6 +22,7 @@ import {
   TranslateLanguagesRequiredException,
 } from "../util/exceptions";
 import { Toast } from "../util/toast";
+import { Cmd } from "./cmd";
 
 interface InitParams {
   arbService: ArbService;
@@ -106,6 +107,9 @@ export class TranslateCmd {
       history,
       targetLanguages: selectedTargetLanguages,
     });
+
+    // validate translation
+    await vscode.commands.executeCommand(Cmd.validateTranslation);
   }
 
   private async selectTargetLanguages(

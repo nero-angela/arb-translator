@@ -1,12 +1,12 @@
 import * as fs from "fs";
 
+import { BaseInitRequired } from "../util/base/base_init_required";
 import { Constant } from "../util/constant";
-import { InitRequired } from "../util/init_required";
 import { JsonParser } from "../util/json_parser";
 import { Workspace } from "../util/workspace";
 import { History } from "./history";
 
-export class HistoryRepository extends InitRequired {
+export class HistoryRepository extends BaseInitRequired {
   protected className: string = "HistoryRepository";
 
   private defaultHistory: History = {

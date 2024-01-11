@@ -2,8 +2,9 @@ import * as vscode from "vscode";
 import { App, ArbTranslator } from "./app/app";
 import { Cmd } from "./app/command/cmd";
 
+const app: App = new ArbTranslator();
+
 export function activate(context: vscode.ExtensionContext) {
-  const app: App = new ArbTranslator();
 
   // register command
   for (const cmdKey of Object.keys(app.commands)) {
@@ -11,7 +12,7 @@ export function activate(context: vscode.ExtensionContext) {
     const disposable = vscode.commands.registerCommand(cmdKey, async () => {
       try {
         await app.init();
-        await app.commands[cmd]();
+        await app.commands[cmd](context);
       } catch (e) {
         await app.onException(e);
       }
@@ -20,4 +21,6 @@ export function activate(context: vscode.ExtensionContext) {
   }
 }
 
-export function deactivate() {}
+export function deactivate() {
+  app.disposed()
+}

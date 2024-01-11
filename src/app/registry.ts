@@ -1,5 +1,8 @@
+import * as vscode from "vscode";
 import { ArbService } from "./arb/arb.service";
 import { ArbStatisticService } from "./arb_statistic/arb_statistic.service";
+import { ArbValidationRepository } from "./arb_validation/arb_validation.repository";
+import { ArbValidationService } from "./arb_validation/arb_validation.service";
 import { TranslationCacheDataSource } from "./cache/translation_cache.datasource";
 import { TranslationCacheRepository } from "./cache/translation_cache.repository";
 import { ConfigureTargetLanguageCode } from "./command/configure_target_language_code.cmd";
@@ -7,6 +10,7 @@ import { CreateTranslationCache } from "./command/create_translation_cache.cmd";
 import { ExcludeTranslation } from "./command/exclude_translation";
 import { InitializeCmd } from "./command/initialize.cmd";
 import { TranslateCmd } from "./command/translate.cmd";
+import { ValidateTranslation } from "./command/validate_translation.cmd";
 import { ConfigRepository } from "./config/config.repository";
 import { ConfigService } from "./config/config.service";
 import { HistoryRepository } from "./history/history.repository";
@@ -28,6 +32,7 @@ export class Registry {
    */
   private translationCacheRepository: TranslationCacheRepository;
   private translationRepository: GoogleTranslationRepository;
+  private arbValidationRepository: ArbValidationRepository;
   private historyRepository: HistoryRepository;
   private configRepository: ConfigRepository;
 
@@ -40,6 +45,7 @@ export class Registry {
   private arbService: ArbService;
   private translationService: GoogleTranslationService;
   private arbStatisticService: ArbStatisticService;
+  private arbValidationService: ArbValidationService;
 
   /**
    * Command
@@ -49,6 +55,7 @@ export class Registry {
   public createTranslationCache: CreateTranslationCache;
   public excludeTranslation: ExcludeTranslation;
   public selectTargetLanguageCode: ConfigureTargetLanguageCode;
+  public fixTranslator: ValidateTranslation;
 
   constructor() {
     // data source
@@ -63,6 +70,7 @@ export class Registry {
       translationCacheRepository: this.translationCacheRepository,
       translationDataSource: this.translationDataSource,
     });
+    this.arbValidationRepository = new ArbValidationRepository();
     this.historyRepository = new HistoryRepository();
     this.configRepository = new ConfigRepository();
 
@@ -85,6 +93,12 @@ export class Registry {
       translationCacheRepository: this.translationCacheRepository,
       languageService: this.languageService,
       arbService: this.arbService,
+    });
+    this.arbValidationService = new ArbValidationService({
+      arbService: this.arbService,
+      languageService: this.languageService,
+      translationService: this.translationService,
+      arbValidationRepository: this.arbValidationRepository,
     });
 
     // cmd
@@ -115,6 +129,12 @@ export class Registry {
       configService: this.configService,
       languageService: this.languageService,
     });
+    this.fixTranslator = new ValidateTranslation({
+      arbValidationService: this.arbValidationService,
+      languageService: this.languageService,
+      configService: this.configService,
+      arbService: this.arbService,
+    });
   }
 
   public init(): Promise<void[]> {
@@ -123,5 +143,9 @@ export class Registry {
       this.historyRepository.init(),
       this.cacheDataSource.init(),
     ]);
+  }
+
+  public disposed() {
+    this.arbValidationRepository.disposed();
   }
 }

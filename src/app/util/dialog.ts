@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { showHomepage, showLink } from "./link";
+import { Link } from "./link";
 
 export class Dialog {
   public static showTargetLanguageCodeListRequiredDialog() {
@@ -10,7 +10,7 @@ export class Dialog {
       )
       .then(async (answer) => {
         if (answer === "Link") {
-          showHomepage();
+          Link.showHomePage();
         }
       });
   }
@@ -22,8 +22,26 @@ export class Dialog {
       )
       .then(async (answer) => {
         if (answer === "Open document") {
-          showLink("https://cloud.google.com/translate/docs/setup");
+          Link.show("https://cloud.google.com/translate/docs/setup");
         }
       });
+  }
+
+  public static async showConfirmDialog({
+    title,
+    confirmText,
+    cancelText,
+  }: {
+    title: string;
+    confirmText?: string;
+    cancelText?: string;
+  }): Promise<boolean> {
+    const select = await vscode.window.showQuickPick(
+      [{ label: confirmText ?? "Yes" }, { label: cancelText ?? "No" }],
+      {
+        placeHolder: title,
+      }
+    );
+    return select?.label === (confirmText ?? "Yes");
   }
 }

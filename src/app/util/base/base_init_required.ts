@@ -1,6 +1,6 @@
-import { InitializeRequiredException } from "./exceptions";
+import { InitializeRequiredException } from "../exceptions";
 
-export abstract class InitRequired {
+export abstract class BaseInitRequired {
   private isInit: boolean = false;
   protected abstract className: string;
 
