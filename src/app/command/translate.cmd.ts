@@ -1,9 +1,7 @@
 import * as fs from "fs";
-import path from "path";
 import * as vscode from "vscode";
 import { Arb } from "../arb/arb";
 import { ArbService } from "../arb/arb.service";
-import { ArbStatistic } from "../arb_statistic/arb_statistic";
 import { ArbStatisticService } from "../arb_statistic/arb_statistic.service";
 import { ConfigService } from "../config/config.service";
 import { History } from "../history/history";
@@ -81,15 +79,14 @@ export class TranslateCmd {
         return this.languageService.getLanguageByLanguageCode(languageCode);
       });
 
-    // get statistic
-    const arbStatistic = await this.arbStatisticService.getArbStatistic(
-      sourceArb,
-      targetLanguages,
-      history
-    );
-    const selectedTargetLanguages = await this.selectTargetLanguages(
-      arbStatistic
-    );
+    // show translation preview and select languages to translate
+    const selectedTargetLanguages =
+      await this.arbStatisticService.showTranslationPreview(
+        "Please select the file you want to translate.",
+        sourceArb,
+        targetLanguages,
+        history
+      );
     if (selectedTargetLanguages.length === 0) {
       return;
     }
@@ -110,40 +107,6 @@ export class TranslateCmd {
 
     // validate translation
     await vscode.commands.executeCommand(Cmd.validateTranslation);
-  }
-
-  private async selectTargetLanguages(
-    arbStatistic: ArbStatistic
-  ): Promise<Language[]> {
-    const keys = Object.keys(arbStatistic);
-    const selectedTargetlanguages = await vscode.window.showQuickPick(
-      keys.map((key) => {
-        const s = arbStatistic[key];
-        const label = path.basename(s.filePath);
-        const language = s.language;
-        const description = s.isTranslationRequired
-          ? Object.entries({
-              ...s.action,
-              ...s.api,
-              retain: 0,
-            })
-              .filter(([key, value]) => value > 0)
-              .map(([key, value]) => `${key}: ${value}`)
-              .join(", ")
-          : "No changes";
-        return {
-          label,
-          description,
-          picked: s.isTranslationRequired,
-          language,
-        };
-      }),
-      {
-        placeHolder: "Please select the file you want to translate.",
-        canPickMany: true,
-      }
-    );
-    return selectedTargetlanguages?.map((item) => item.language) ?? [];
   }
 
   /**

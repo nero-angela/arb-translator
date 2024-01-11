@@ -1,4 +1,6 @@
 import * as fs from "fs";
+import path from "path";
+import * as vscode from "vscode";
 import { Arb } from "../arb/arb";
 import { ArbService } from "../arb/arb.service";
 import { TranslationCacheKey } from "../cache/translation_cache";
@@ -29,7 +31,49 @@ export class ArbStatisticService {
     this.arbService = arbService;
   }
 
-  public async getArbStatistic(
+  public async showTranslationPreview(
+    placeHolder: string,
+    sourceArb: Arb,
+    targetLanguages: Language[],
+    history: History
+  ): Promise<Language[]> {
+    const arbStatistic: ArbStatistic = await this.getArbStatistic(
+      sourceArb,
+      targetLanguages,
+      history
+    );
+    const keys = Object.keys(arbStatistic);
+    const selectedTargetlanguages = await vscode.window.showQuickPick(
+      keys.map((key) => {
+        const s = arbStatistic[key];
+        const label = path.basename(s.filePath);
+        const language = s.language;
+        const description = s.isTranslationRequired
+          ? Object.entries({
+              ...s.action,
+              ...s.api,
+              retain: 0,
+            })
+              .filter(([key, value]) => value > 0)
+              .map(([key, value]) => `${key}: ${value}`)
+              .join(", ")
+          : "No changes";
+        return {
+          label,
+          description,
+          picked: s.isTranslationRequired,
+          language,
+        };
+      }),
+      {
+        placeHolder: placeHolder,
+        canPickMany: true,
+      }
+    );
+    return selectedTargetlanguages?.map((item) => item.language) ?? [];
+  }
+
+  private async getArbStatistic(
     sourceArb: Arb,
     targetLanguages: Language[],
     history: History

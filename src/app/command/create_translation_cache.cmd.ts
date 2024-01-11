@@ -14,7 +14,7 @@ interface InitParams {
   translationCacheRepository: TranslationCacheRepository;
 }
 
-export class CreateTranslationCache {
+export class CreateTranslationCacheCmd {
   private arbService: ArbService;
   private configService: ConfigService;
   private translationCacheRepository: TranslationCacheRepository;

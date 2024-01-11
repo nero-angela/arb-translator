@@ -32,11 +32,12 @@ export class ArbTranslator implements App {
 
   public commands = {
     [Cmd.initialize]: () => this.registry.initializeCmd.run(),
-    [Cmd.translate]: () => this.registry.translationCmd.run(),
-    [Cmd.excludeTranslation]: () => this.registry.excludeTranslation.run(),
+    [Cmd.translate]: () => this.registry.translateCmd.run(),
+    [Cmd.translationPreview]: () => this.registry.translationPreviewCmd.run(),
+    [Cmd.excludeTranslation]: () => this.registry.excludeTranslationCmd.run(),
     [Cmd.configureTargetLanguageCode]: () =>
-      this.registry.selectTargetLanguageCode.run(),
-    [Cmd.validateTranslation]: () => this.registry.fixTranslator.run(),
+      this.registry.selectTargetLanguageCodeCmd.run(),
+    [Cmd.validateTranslation]: () => this.registry.validateTranslationCmd.run(),
   };
 
   public init = async () => {
