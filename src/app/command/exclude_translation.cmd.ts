@@ -13,7 +13,7 @@ interface InitParams {
   historyService: HistoryService;
 }
 
-export class ExcludeTranslation {
+export class ExcludeTranslationCmd {
   private arbService: ArbService;
   private configService: ConfigService;
   private historyService: HistoryService;

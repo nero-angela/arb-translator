@@ -1,5 +1,3 @@
-// import * as vscode from "vscode";
-
 import { Arb } from "../arb/arb";
 import { ArbService } from "../arb/arb.service";
 import { ArbValidationService } from "../arb_validation/arb_validation.service";
@@ -15,7 +13,7 @@ interface InitParams {
   arbService: ArbService;
 }
 
-export class ValidateTranslationCmd {
+export class ValidatePreviewCmd {
   private arbValidationService: ArbValidationService;
   private languageService: LanguageService;
   private configService: ConfigService;

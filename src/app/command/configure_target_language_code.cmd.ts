@@ -18,7 +18,7 @@ interface InitParams {
   languageService: LanguageService;
 }
 
-export class ConfigureTargetLanguageCode {
+export class ConfigureTargetLanguageCodeCmd {
   private arbService: ArbService;
   private configService: ConfigService;
   private languageService: LanguageService;

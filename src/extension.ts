@@ -5,7 +5,6 @@ import { Cmd } from "./app/command/cmd";
 const app: App = new ArbTranslator();
 
 export function activate(context: vscode.ExtensionContext) {
-
   // register command
   for (const cmdKey of Object.keys(app.commands)) {
     const cmd: Cmd = <Cmd>cmdKey;
@@ -22,5 +21,5 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
-  app.disposed()
+  app.disposed();
 }

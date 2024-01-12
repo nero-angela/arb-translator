@@ -18,7 +18,7 @@ interface InitParams {
   arbStatisticService: ArbStatisticService;
 }
 
-export class TranslationPreview {
+export class TranslationPreviewCmd {
   private arbService: ArbService;
   private configService: ConfigService;
   private historyService: HistoryService;
