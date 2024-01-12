@@ -1,7 +1,7 @@
 export interface ArbValidationData {
   value: string;
   nParams: number;
-  nBrackets: number;
+  nParentheses: number;
 }
 
 export interface ArbValidation {

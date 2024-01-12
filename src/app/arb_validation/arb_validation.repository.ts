@@ -60,13 +60,13 @@ export class ArbValidationRepository extends BaseDisposable {
   }
 
   /**
-   * Incorrect number of parameters or brackets
+   * Incorrect number of parameters or parentheses
    * @param sourceArb
    * @param targetArb
    * @param key
    * @param sourceArbValidationData
    */
-  public async invalidNumberOfParamsOrBrackets(
+  public async invalidNumberOfParamsOrParentheses(
     sourceArb: Arb,
     targetArb: Arb,
     key: string,
@@ -133,10 +133,10 @@ export class ArbValidationRepository extends BaseDisposable {
             const isParamsValid =
               this.getTotalParams(updatedTargetData[key]) ===
               sourceArbValidationData.nParams;
-            const isBracketsValid =
-              this.getTotalBrackets(updatedTargetData[key]) ===
-              sourceArbValidationData.nBrackets;
-            if (isParamsValid && isBracketsValid) {
+            const isParenthesesValid =
+              this.getTotalParentheses(updatedTargetData[key]) ===
+              sourceArbValidationData.nParentheses;
+            if (isParamsValid && isParenthesesValid) {
               removeHighlight();
             }
           }
@@ -151,7 +151,7 @@ export class ArbValidationRepository extends BaseDisposable {
     return (value.match(/\{.*?\}/g) || []).length;
   }
 
-  private getTotalBrackets(value: string): number {
+  private getTotalParentheses(value: string): number {
     return (value.match(/[(){}[\]]/g) || []).length;
   }
 
@@ -165,7 +165,7 @@ export class ArbValidationRepository extends BaseDisposable {
       parmsValidation[key] = {
         value,
         nParams: this.getTotalParams(value),
-        nBrackets: this.getTotalBrackets(value),
+        nParentheses: this.getTotalParentheses(value),
       };
     }
     return parmsValidation;

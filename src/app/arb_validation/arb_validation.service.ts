@@ -84,14 +84,15 @@ export class ArbValidationService {
 
         const isParamsInvalid =
           sourceTotalParams !== targetValidation[key].nParams;
-        const isBracketsInvalid =
-          sourceValidation[key].nBrackets !== targetValidation[key].nBrackets;
-        if (isParamsInvalid || isBracketsInvalid) {
-          // Incorrect number of parameters or brackets
-          const title = `${targetFileName} : incorrect number of parameters or brackets.`;
+        const isBParenthesesInvalid =
+          sourceValidation[key].nParentheses !==
+          targetValidation[key].nParentheses;
+        if (isParamsInvalid || isBParenthesesInvalid) {
+          // Incorrect number of parameters or Parentheses
+          const title = `${targetFileName} : incorrect number of parameters or parentheses.`;
 
           Toast.e(title);
-          await this.arbValidationRepository.invalidNumberOfParamsOrBrackets(
+          await this.arbValidationRepository.invalidNumberOfParamsOrParentheses(
             sourceArb,
             targetArb,
             key,
