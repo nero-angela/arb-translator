@@ -120,7 +120,6 @@ export class Registry {
       configService: this.configService,
       historyService: this.historyService,
       languageService: this.languageService,
-      translationService: this.translationService,
       arbStatisticService: this.arbStatisticService,
     });
     this.createTranslationCacheCmd = new CreateTranslationCacheCmd({

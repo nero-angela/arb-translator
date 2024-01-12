@@ -6,7 +6,6 @@ import { History } from "../history/history";
 import { HistoryService } from "../history/history.service";
 import { Language } from "../language/language";
 import { LanguageService } from "../language/language.service";
-import { TranslationService } from "../translation/translation.service";
 import { Toast } from "../util/toast";
 
 interface InitParams {
@@ -14,7 +13,6 @@ interface InitParams {
   configService: ConfigService;
   historyService: HistoryService;
   languageService: LanguageService;
-  translationService: TranslationService;
   arbStatisticService: ArbStatisticService;
 }
 
@@ -23,7 +21,6 @@ export class TranslationPreviewCmd {
   private configService: ConfigService;
   private historyService: HistoryService;
   private languageService: LanguageService;
-  private translationService: TranslationService;
   private arbStatisticService: ArbStatisticService;
 
   constructor({
@@ -31,14 +28,12 @@ export class TranslationPreviewCmd {
     configService,
     historyService,
     languageService,
-    translationService,
     arbStatisticService,
   }: InitParams) {
     this.arbService = arbService;
     this.configService = configService;
     this.historyService = historyService;
     this.languageService = languageService;
-    this.translationService = translationService;
     this.arbStatisticService = arbStatisticService;
   }
 
