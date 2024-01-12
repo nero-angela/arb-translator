@@ -8,6 +8,7 @@ import { TranslationService } from "../translation/translation.service";
 import { Dialog } from "../util/dialog";
 import { Link } from "../util/link";
 import { Toast } from "../util/toast";
+import { InvalidType, ValidationResult } from "./arb_validation";
 import { ArbValidationRepository } from "./arb_validation.repository";
 
 interface InitParams {
@@ -38,11 +39,65 @@ export class ArbValidationService {
     sourceArb: Arb,
     targetLanguages: Language[]
   ): Promise<boolean> {
+    const generator = this.validationResultGenerator(
+      sourceArb,
+      targetLanguages
+    );
+    const generatedValidationResult = await generator.next();
+    const validationResult: ValidationResult | undefined =
+      generatedValidationResult.value;
+    if (!validationResult) {
+      return true;
+    }
+
+    const targetFileName = path.basename(validationResult.targetArb.filePath);
+    switch (validationResult.invalidType) {
+      case InvalidType.keyNotFound:
+        // Key does not exist
+        const keyNotFoundTitle = `${targetFileName} : "${validationResult.key}" key does not exist`;
+        Toast.e(keyNotFoundTitle);
+        await this.arbValidationRepository.keyRequired(
+          sourceArb,
+          validationResult.targetArb,
+          validationResult.key
+        );
+        await this.openTranslationWebsite(
+          keyNotFoundTitle,
+          sourceArb.language,
+          validationResult.targetArb.language,
+          sourceArb.data[validationResult.key]
+        );
+        break;
+      case InvalidType.invalidParameters || InvalidType.invalidParentheses:
+        const invalidTitle = `${targetFileName} : incorrect number of parameters or parentheses.`;
+
+        Toast.e(invalidTitle);
+        await this.arbValidationRepository.invalidNumberOfParamsOrParentheses(
+          sourceArb,
+          validationResult.targetArb,
+          validationResult.key,
+          validationResult.sourceValidationData
+        );
+        await this.openTranslationWebsite(
+          invalidTitle,
+          sourceArb.language,
+          validationResult.targetArb.language,
+          validationResult.sourceArb.data[validationResult.key]
+        );
+        break;
+    }
+    return false;
+  }
+
+  private async *validationResultGenerator(
+    sourceArb: Arb,
+    targetLanguages: Language[]
+  ): AsyncGenerator<ValidationResult, undefined, ValidationResult> {
     // get source ParamsValidation
     const sourceValidation =
       this.arbValidationRepository.getParamsValidation(sourceArb);
     const sourceValidationKeys = Object.keys(sourceValidation);
-    if (sourceValidationKeys.length === 0) return true;
+    if (sourceValidationKeys.length === 0) return;
 
     for (const targetLanguage of targetLanguages) {
       if (targetLanguage.languageCode === sourceArb.language.languageCode)
@@ -65,51 +120,36 @@ export class ArbValidationService {
         const sourceTotalParams = sourceValidation[key].nParams;
 
         if (!targetValidationKeys.includes(key)) {
-          // Key does not exist
-          const title = `${targetFileName} : "${key}" key does not exist`;
-          Toast.e(title);
-          await this.arbValidationRepository.keyRequired(
+          yield <ValidationResult>{
+            sourceValidationData: sourceValidation[key],
+            invalidType: InvalidType.keyNotFound,
             sourceArb,
             targetArb,
-            key
-          );
-          await this.openTranslationWebsite(
-            title,
-            sourceArb.language,
-            targetArb.language,
-            sourceArb.data[key]
-          );
-          return false;
+            key,
+          };
+          continue;
         }
 
         const isParamsInvalid =
           sourceTotalParams !== targetValidation[key].nParams;
-        const isBParenthesesInvalid =
+        const isParenthesesInvalid =
           sourceValidation[key].nParentheses !==
           targetValidation[key].nParentheses;
-        if (isParamsInvalid || isBParenthesesInvalid) {
+        if (isParamsInvalid || isParenthesesInvalid) {
           // Incorrect number of parameters or Parentheses
-          const title = `${targetFileName} : incorrect number of parameters or parentheses.`;
-
-          Toast.e(title);
-          await this.arbValidationRepository.invalidNumberOfParamsOrParentheses(
+          yield <ValidationResult>{
+            sourceValidationData: sourceValidation[key],
+            invalidType: isParamsInvalid
+              ? InvalidType.invalidParameters
+              : InvalidType.invalidParentheses,
             sourceArb,
             targetArb,
             key,
-            sourceValidation[key]
-          );
-          await this.openTranslationWebsite(
-            title,
-            sourceArb.language,
-            targetArb.language,
-            sourceArb.data[key]
-          );
-          return false;
+          };
+          continue;
         }
       }
     }
-
-    return true;
   }
 
   private async openTranslationWebsite(
