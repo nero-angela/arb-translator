@@ -2,6 +2,18 @@
 
 All notable changes to the "arb-translator" extension will be documented in this file.
 
+## [1.0.0] - 24.01.12
+
+### Added
+- Add `Initialize` command.
+- Add `Translate` command.
+- Add `Translation Preview` command.
+- Add `Validate Translation` command.
+- Add `Exclude Translation` command.
+- Add `Configure Target Language Code` command.
+- Add `customArbFileName` setting to customize arb file name.
+- Add translation caching feature.
+
 ## [0.1.15] - 24.01.03
 
 ### Updated
