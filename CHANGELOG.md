@@ -2,6 +2,17 @@
 
 All notable changes to the "arb-translator" extension will be documented in this file.
 
+## [1.1.0] - 24.01.12
+
+### Added
+- Add validation result preview.
+
+### Updated
+- Update quick pick UI.
+
+### Fixed
+- Fix the highlight remaining issue.
+
 ## [1.0.0] - 24.01.12
 
 ### Added
