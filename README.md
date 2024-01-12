@@ -1,188 +1,133 @@
 # Arb Translator
 It is an extension that translates [ARB(Application Resource Bundle)](https://github.com/google/app-resource-bundle/wiki/ApplicationResourceBundleSpecification) files using Google Translator.
 
-## Features
-- Use Google Translator to translate arb files. (if the key contains `@`, it will not be translated.)
-- Translate only newly added or changed keys from the source file.
+## How to start
+The starting method differs depending on whether you already have an arb file translated or not.
+
+### If there is no translated arb file
+1. Prepare an arb file that will be the source of translation.
+1. Run `Arb Translator : Initialize`.
+1. Select source arb file.
+1. Select `Select directly from language list.`.
+1. Select the languages you want to translate to.
+1. Run `Arb Translator : Translate`.
+
+<img src="https://github.com/nero-angela/arb-translator/assets/26322627/0e65908d-f4de-4924-aaab-fa1454831f20" alt="arb translator initialize gif"/>
+
+
+### If there are translated arb files
+1. Run `Arb Translator : Initialize`.
+1. Select source arb file.
+1. Select `Load languages from arb files.`
+1. Run `Arb Translator: Exclude Translation` command to avoid duplicate translation of already translated values.
+
+<img src="https://github.com/nero-angela/arb-translator/assets/26322627/6858cfe2-4985-4116-a148-c19b678d02e2" alt="arb translator migration gif](https://github.com/nero-angela/arb-translator/assets/26322627/b94b1f99-a37c-4f20-9ad0-e7dfa258898d)" />
+
+## Terms
+- `arb` : Application Resource Bundle (abbr. ARB) is a JSON-based localization resource format.
+- `languageCode` : This is a unique language identifier. Please refer to [the link](https://gist.github.com/nero-angela/37984030bcc5dd0e62dc3143bb8c053d) for a full list of supported languages.
+- `sourceArb` : ARB file as translation source.
+- `targetArb` : ARB file as a result of translating sourceArb into each language.
+- `history` : A history of the last translated sourceArb to track changes to the sourceArb file.
+- `cache` : This is a file that caches Google Translate results.
 
 ## Settings
+Settings are required to use the extension, and you can easily add required settings by executing the `Arb Translator : Initialize` command.
 
-- `arbFilePrefix` : Arb common string to prepend to file name. (e.g. intl_ : intl_ko.arb, intl_hi.arb...)
-- `sourceArbFilePath` : Absolute path to the source arb file you want to translate.
-- `googleAPIKey` : This is the Google API key, and is required when executing the Translate (paid) command.
-- `targetLanguageCodeList` : This is a list of target languages to translate to. Please refer to the link for the supported list.
-```
-{
-  "arbTranslator.config": {
-    "arbFilePrefix": "intl_",
-    "sourceArbFilePath": "/project/intl_en.arb",
-    "googleAPIKey": "AIzaSyDScrmhd8I6A33RaVHOS-HN-AOh_DT_faI",
-    "targetLanguageCodeList": ["ko", "zh_CN"],
+Because settings may differ for each project, adding settings to the project workspace(`.vscode/settings.json`) is recommended.
+  ```
+  {
+    "arbTranslator.config": {
+      "arbFilePrefix": "intl_",
+      "sourceArbFilePath": "/project/intl_en.arb",
+      "googleAPIKey": "YOUR_GOOGLE_API_KEY",
+      "targetLanguageCodeList": ["ko", "zh_CN", "fr"],
+      "customArbFileName": {
+        "ko", "zh_CN"
+      },
+      "customArbFileName": {
+        "zh_CN": "intl_zh_Hant"
+      }
+    }
   }
-}
-```
-By adding it to the workspace (`.vscode/settings.json`), you can set it differently for each project.
+  ```
+- **Required Settings**
+  - `sourceArbFilePath` : Absolute path to the source arb file you want to translate.
+  - `targetLanguageCodeList` : List of languageCode you want to translate. You can add the desired languageCode with the `Arb Translator : Select target language code` command.
+
+- **Optional Settings**
+  - `arbFilePrefix` : Arb common string to prepend to file name. (e.g. `intl_` : `intl_ko.arb`, `intl_hi.arb`, `intl_fr.arb`)
+  - `googleAPIKey` : This is a Google API key and is required when using the paid translation function.
+  - `customArbFileName` : You can customize the arb file name for languageCode in the format `{LanguageCode: CUSTOM_NAME}` and arbFilePrefix is not applied.
 
 
-### Example
+# Command
 
-## Command
+## Initialize
+- Command to add settings necessary for translation.
+- To run this command, you need an arb file that will be the translation source.
 
-### Initialize
+## Translate
+- Command to translate source arb file into target arb file using Google Translator.
+- **Option1) Free Translation**
+  - Translate with free Google Translate API.
+  - An API key is not required, but the number of requests per hour is limited to approximately 100.
+- **Option2) Paid Translation**
+  - Translate the source arb file using [Google Cloud Translation - Base(v2)](https://cloud.google.com/translate/docs/basic/translating-text).
+  - A Google API Key is required. Please refer to [the link](https://cloud.google.com/translate/docs/setup) for information on how to obtain the key.
 
-### Translate (paid)
-- Translate the source arb file using [Google Cloud Translation - Base(v2)](https://cloud.google.com/translate/docs/basic/translating-text).
-- Before you can start using the Cloud Translation API, you must have a project that has the Cloud Translation API enabled, and you must have the appropriate credentials. You can also install client libraries for common programming languages to help you make calls to the API. For more information, see the [Setup page](https://cloud.google.com/translate/docs/setup).
+- **Translation rules** : Translate the `value` contained in the `key` from the `sourceArb` file according to the following conditions.
+  - if the `key` contains `@`, it will not be translated.
+  - If the `key` does not exist in the `targetArb` file, preceed with translation.
+  - If the `values` retrieved from the `history` and `sourceArb` files using the `key` are different, it is determined that there has been a change and translation is performed.
+  - If the `value` in the `history` file and the `value` in `sourceArb` are different, replaces the `value` of the entire `targetArb` with the translation result.
+    - `.vscode/arb-translator/history.json` : A history of the last translated sourceArb to track changes to the `sourceArb` file.
+      ```
+      {
+        "data": {
+          "@@locale": "en",
+          "helloWorld": "hello world"
+          "happyNewYear": "Happy new year",
+        }
+      }
+      ```
+  - Google Translator's results are stored in a cache file, and the cache is returned when the same request comes in.
+    - `.vscode/arb-translator/cache.json` : This is a file that caches Google Translate results.
+      ```
+      {
+        "source languageCode": {
+          "target languageCode": {
+            "SHA-1 of source value" : "translated text"
+          }
+        }
+      }
+      ```
 
-### Translate (free)
-- Translate the source arb file using the free Google Translate API.
-- An API key is not required, but the number of requests per hour is limited to approximately 100.
+## Translation Preview
+- Command to track changes in each arb file and show the number of API calls and cached data during translation.
+<img alt="result image of translation preview command" src="https://github.com/nero-angela/arb-translator/assets/26322627/a5801e3b-93cb-421a-845a-5fac59a30f56">
+- Preview data
+  - `create` : Number of data requiring translation.
+  - `update` : Number of data that needs re-translation because the value has changed.
+  - `nCache` : Number of caches recycled during translation.
+  - `nAPI` : Number of API calls when translating.
 
-### Create translation cache from arb files
+## Validate Translation
+- Command to verify translation results.
+- Validation items
+  - `key` : whether key exists or not.
+  - `Parameters` : Whether the number of parameters is the same.
+  - `Parentheses`: Whether the number of parentheses(round, curly, and square) is the same.
 
-### Override source arb history
+## Exclude Translation
+- Command to use when there are changes in the `sourceArb` file, but you do not want to translate them again.
+- Overwrites the changed `value` of `sourceArb` with `history` so that the value is not translated.
+- However, if the `key` does not exist in the `targetArb` file, translation is performed.
 
-## Requirements
-
-Since this extension program uses Google Translator, please refer to the [link](https://cloud.google.com/translate/docs/setup) and proceed with the API setting and API Key issuance process.
-
-## How to use
-![arb translator demo](https://github.com/nero-angela/arb-translator/assets/26322627/bf4893a9-60af-499b-881e-3b8a06ca1a03)
-
-
-## Support Language
-| Name | LanguageCode |
-|:-:|:-:|
-| Afrikaans | af |
-| Albanian | sq |
-| Amharic | am |
-| Arabic | ar |
-| Armenian | hy |
-| Assamese | as |
-| Aymara | ay |
-| Azerbaijani | az |
-| Bambara | bm |
-| Basque | eu |
-| Belarusian | be |
-| Bengali | bn |
-| Bhojpuri | bho |
-| Bosnian | bs |
-| Bulgarian | bg |
-| Catalan | ca |
-| Cebuano | ceb |
-| ChineseSimplified | zh_CN |
-| ChineseTraditional | zh_TW |
-| Corsican | co |
-| Croatian | hr |
-| Czech | cs |
-| Danish | da |
-| Dhivehi | dv |
-| Dogri | doi |
-| Dutch | nl |
-| English | en |
-| Esperanto | eo |
-| Estonian | et |
-| Ewe | ee |
-| Finnish | fi |
-| French | fr |
-| Frisian | fy |
-| Galician | gl |
-| Georgian | ka |
-| German | de |
-| Greek | el |
-| Guarani | gn |
-| Gujarati | gu |
-| HaitianCreole | ht |
-| Hausa | ha |
-| Hawaiian | haw |
-| Hebrew | he |
-| Hindi | hi |
-| Hmong | hmn |
-| Hungarian | hu |
-| Icelandic | is |
-| Igbo | ig |
-| Ilocano | ilo |
-| Indonesian | id |
-| Irish | ga |
-| Italian | it |
-| Japanese | ja |
-| Javanese | jw |
-| Kannada | kn |
-| Kazakh | kk |
-| Khmer | km |
-| Kinyarwanda | rw |
-| Konkani | gom |
-| Korean | ko |
-| Krio | kri |
-| Kurdish | ku |
-| Kurdish | ckb |
-| Kyrgyz | ky |
-| Lao | lo |
-| Latin | la |
-| Latvian | lv |
-| Lingala | ln |
-| Lithuanian | lt |
-| Luganda | lg |
-| Luxembourgish | lb |
-| Macedonian | mk |
-| Maithili | mai |
-| Malagasy | mg |
-| Malay | ms |
-| Malayalam | ml |
-| Maltese | mt |
-| Maori | mi |
-| Marathi | mr |
-| Meiteilon | mni |
-| Mizo | lus |
-| Mongolian | mn |
-| Myanmar | my |
-| Nepali | ne |
-| Norwegian | no |
-| Nyanja | ny |
-| Odia | or |
-| Oromo | om |
-| Pashto | ps |
-| Persian | fa |
-| Polish | pl |
-| Portuguese | pt |
-| Punjabi | pa |
-| Quechua | qu |
-| Romanian | ro |
-| Russian | ru |
-| Samoan | sm |
-| Sanskrit | sa |
-| ScotsGaelic | gd |
-| Sepedi | nso |
-| Serbian | sr |
-| Sesotho | st |
-| Shona | sn |
-| Sindhi | sd |
-| Sinhala | si |
-| Slovak | sk |
-| Slovenian | sl |
-| Somali | so |
-| Spanish | es |
-| Sundanese | su |
-| Swahili | sw |
-| Swedish | sv |
-| Tagalog | tl |
-| Tajik | tg |
-| Tamil | ta |
-| Tatar | tt |
-| Telugu | te |
-| Thai | th |
-| Tigrinya | ti |
-| Tsonga | ts |
-| Turkish | tr |
-| Turkmen | tk |
-| Twi | ak |
-| Ukrainian | uk |
-| Urdu | ur |
-| Uyghur | ug |
-| Uzbek | uz |
-| Vietnamese | vi |
-| Welsh | cy |
-| Xhosa | xh |
-| Yiddish | yi |
-| Yoruba | yo |
-| Zulu | zu |
+## Configure Target Language Code
+- Command to configure the language code to be translated.
+- This is a command that configures the language code to be translated.
+- **Option1) select**
+  - Select directly from the list of supported languages. The language entered in the `targetLanguageCodeList` setting is selected by default.
+- **Option2) load**
+  - The language code extracted from other arb files in the same folder as `sourceArb` is overwritten in the `targetLanguageCodeList` setting.
