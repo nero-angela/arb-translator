@@ -4,7 +4,7 @@
   "license": "SEE LICENSE IN LICENSE",
   "displayName": "ARB Translator",
   "description": "Translates ARB files to Google Translator.",
-  "version": "0.1.15",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.84.0"
   },
@@ -27,22 +27,80 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "ArbTranslator",
+      "properties": {
+        "arbTranslator.config": {
+          "type": "object",
+          "properties": {
+            "arbPrefix": {
+              "type": "string",
+              "default": "",
+              "description": "arb file prefix (e.g. if you have intl_en.arb file, prefix is \"intl_\")"
+            },
+            "sourceArbFilePath": {
+              "type": "string",
+              "default": "",
+              "description": "Source arb file you want to translate"
+            },
+            "googleAPIKey": {
+              "type": "string",
+              "default": "",
+              "markdownDescription": "Enter the Google API key. Please please refer to the [link](https://cloud.google.com/translate/docs/setup) and proceed with the API setting and API Key issuance process. (e.g., 1111111-2222-3333-4444-555555555555:aa)"
+            },
+            "historyFilePath": {
+              "type": "string",
+              "default": "",
+              "description": "Path to save the last translated source arb file history (for tracking changes)"
+            },
+            "selectedLanguages": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Language name"
+                  },
+                  "arb": {
+                    "type": "string",
+                    "default": "",
+                    "description": "arb file name"
+                  }
+                }
+              },
+              "description": "TODO : gist 링크 연결해서 샘플 보여주기"
+            }
+          }
+        }
+      }
+    },
     "commands": [
       {
+        "command": "arb-translator.initialize",
+        "title": "Arb Translator : Initialize"
+      },
+      {
         "command": "arb-translator.translate",
-        "title": "arb translator : translate"
+        "title": "Arb Translator : Translate"
       },
       {
-        "command": "arb-translator.updateSourceArbPath",
-        "title": "arb translator : update source arb path"
+        "command": "arb-translator.translationPreview",
+        "title": "Arb Translator : Translation Preview"
       },
       {
-        "command": "arb-translator.updateAPIKey",
-        "title": "arb translator : update Google API key"
+        "command": "arb-translator.excludeTranslation",
+        "title": "Arb Translator : Exclude Translation"
       },
       {
-        "command": "arb-translator.configure",
-        "title": "arb translator : configure"
+        "command": "arb-translator.configureTargetLanguageCode",
+        "title": "Arb Translator : Configure Target Language Code"
+      },
+      {
+        "command": "arb-translator.validateTranslation",
+        "title": "Arb Translator : Validate Translation"
       }
     ]
   },

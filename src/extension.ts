@@ -1,30 +1,26 @@
 import * as vscode from "vscode";
-import { Command } from "./app/command/command";
-import { GoogleTranslator } from "./app/translator/google_translator";
-import { Config } from "./app/util/config";
-import { Logger } from "./app/util/logger";
+import { App, ArbTranslator } from "./app/app";
+import { Cmd } from "./app/command/cmd";
+
+const app: App = new ArbTranslator();
 
 export function activate(context: vscode.ExtensionContext) {
-  const name = "arb-translator";
-  Logger.i(`Init ${name}.`);
-  const config = new Config(name, context);
-  const translator = new GoogleTranslator();
-  const command = new Command(config, translator);
 
-  [
-    vscode.commands.registerCommand(`${name}.translate`, () =>
-      command.translate(context)
-    ),
-    vscode.commands.registerCommand(`${name}.updateSourceArbPath`, () =>
-      command.updateSourceArbPath(context)
-    ),
-    vscode.commands.registerCommand(`${name}.updateAPIKey`, () =>
-      command.updateAPIKey(context)
-    ),
-    vscode.commands.registerCommand(`${name}.configure`, () =>
-      command.configure(context)
-    ),
-  ].map((disposable) => context.subscriptions.push(disposable));
+  // register command
+  for (const cmdKey of Object.keys(app.commands)) {
+    const cmd: Cmd = <Cmd>cmdKey;
+    const disposable = vscode.commands.registerCommand(cmdKey, async () => {
+      try {
+        await app.init();
+        await app.commands[cmd](context);
+      } catch (e) {
+        await app.onException(e);
+      }
+    });
+    context.subscriptions.push(disposable);
+  }
 }
 
-export function deactivate() {}
+export function deactivate() {
+  app.disposed()
+}
