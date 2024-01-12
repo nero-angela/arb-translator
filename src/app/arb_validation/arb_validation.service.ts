@@ -63,7 +63,7 @@ export class ArbValidationService {
       case InvalidType.keyNotFound:
         // Key does not exist
         const keyNotFoundTitle = `${targetFileName} : "${validationResult.key}" key does not exist`;
-        Toast.e(keyNotFoundTitle);
+        Toast.i(keyNotFoundTitle);
         await this.arbValidationRepository.keyRequired(
           sourceArb,
           validationResult.targetArb,
@@ -79,7 +79,7 @@ export class ArbValidationService {
       case InvalidType.invalidParameters || InvalidType.invalidParentheses:
         const invalidTitle = `${targetFileName} : incorrect number of parameters or parentheses.`;
 
-        Toast.e(invalidTitle);
+        Toast.i(invalidTitle);
         await this.arbValidationRepository.invalidNumberOfParamsOrParentheses(
           sourceArb,
           validationResult.targetArb,

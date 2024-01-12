@@ -1,10 +1,5 @@
 import * as vscode from "vscode";
 
-export enum HighlightType {
-  red = "Red",
-  green = "Green",
-}
-
 export class Editor {
   public static async open(
     filePath: string,
@@ -33,33 +28,5 @@ export class Editor {
     } else {
       return undefined;
     }
-  }
-
-  public static highlight(
-    editor: vscode.TextEditor,
-    type: HighlightType,
-    line: number
-  ): {
-    range: vscode.Range;
-    decorationType: vscode.TextEditorDecorationType;
-  } {
-    const decorationType = vscode.window.createTextEditorDecorationType({
-      backgroundColor:
-        type === HighlightType.red
-          ? "rgba(255, 0, 0, 0.15)"
-          : "rgba(0, 255, 0, 0.15)",
-      isWholeLine: true,
-    });
-    const range = editor.document.lineAt(line).range;
-    editor.setDecorations(decorationType, [range]);
-    editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
-    return { range, decorationType };
-  }
-
-  public static clearHighlight(
-    editor: vscode.TextEditor,
-    decorationType: vscode.TextEditorDecorationType
-  ) {
-    editor.setDecorations(decorationType, []);
   }
 }
