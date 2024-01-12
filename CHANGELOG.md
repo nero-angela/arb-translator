@@ -2,6 +2,14 @@
 
 All notable changes to the "arb-translator" extension will be documented in this file.
 
+## [1.1.1] - 24.01.12
+
+### Updated
+- Update preview picker UI.
+
+### Fixed
+- Fix `Validation Translation` command broken issue.
+
 ## [1.1.0] - 24.01.12
 
 ### Added
