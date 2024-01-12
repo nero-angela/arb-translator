@@ -73,9 +73,12 @@ export class ValidateTranslationCmd {
       [InvalidType.invalidParameters]: "Invalid Parameters",
       [InvalidType.invalidParentheses]: "Invalid Parentheses",
     };
-    const selectItem = await Dialog.showSectionedPicker({
+    const selectItem = await Dialog.showSectionedPicker<
+      ValidationResult,
+      ValidationResult
+    >({
       sectionLabelList: Object.values(sectionMap),
-      dataList: validationResultList,
+      itemList: validationResultList,
       canPickMany: false,
       itemBuilder: (validationResult) => {
         const targetFileName = path.basename(
@@ -91,6 +94,7 @@ export class ValidateTranslationCmd {
             detail,
             description,
           },
+          data: validationResult,
         };
       },
     });

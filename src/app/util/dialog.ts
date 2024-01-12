@@ -45,24 +45,24 @@ export class Dialog {
     return select?.label === (confirmText ?? "Yes");
   }
 
-  public static async showSectionedPicker<T>({
+  public static async showSectionedPicker<I, D>({
     sectionLabelList,
-    dataList,
+    itemList,
     itemBuilder,
     title,
     placeHolder,
     canPickMany,
   }: {
     sectionLabelList: SectionLabel[];
-    dataList: T[];
-    itemBuilder: (data: T) => SectionedPickerItem;
+    itemList: I[];
+    itemBuilder: (item: I) => SectionedPickerItem<D>;
     title?: string;
     placeHolder?: string;
     canPickMany: boolean;
-  }): Promise<T[] | undefined> {
+  }): Promise<D[] | undefined> {
     // create section
     const sectionMap: {
-      [key: SectionLabel]: PickItem<T>[];
+      [key: SectionLabel]: PickItem<D>[];
     } = {};
     for (const sectionLabel of sectionLabelList) {
       sectionMap[sectionLabel] = [
@@ -74,11 +74,11 @@ export class Dialog {
     }
 
     // build items
-    for (const data of dataList) {
-      const result = itemBuilder(data);
+    for (const item of itemList) {
+      const result = itemBuilder(item);
       sectionMap[result.section].push({
         ...result.item,
-        data,
+        data: result.data,
       });
     }
 
@@ -94,7 +94,7 @@ export class Dialog {
       Object.values(sectionMap).flat(),
       {
         title,
-        placeHolder: placeHolder ?? `Total ${dataList.length}`,
+        placeHolder: placeHolder ?? `Total ${itemList.length}`,
         canPickMany: canPickMany,
       }
     );
@@ -102,18 +102,19 @@ export class Dialog {
       return selectedItemOrItems;
     } else {
       return (canPickMany ? selectedItemOrItems : [selectedItemOrItems]).map(
-        (item: PickItem<T>) => item.data
+        (item: PickItem<I>) => item.data
       );
     }
   }
 }
 
 type SectionLabel = string;
-type SectionedPickerItem = {
+type SectionedPickerItem<D> = {
   section: SectionLabel;
   item: vscode.QuickPickItem;
+  data: D;
 };
 
-interface PickItem<T> extends vscode.QuickPickItem {
-  data?: T;
+interface PickItem<D> extends vscode.QuickPickItem {
+  data?: D;
 }

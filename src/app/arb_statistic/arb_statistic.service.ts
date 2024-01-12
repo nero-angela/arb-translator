@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import path from "path";
-import * as vscode from "vscode";
 import { Arb } from "../arb/arb";
 import { ArbService } from "../arb/arb.service";
 import { TranslationCacheKey } from "../cache/translation_cache";
@@ -8,6 +7,7 @@ import { TranslationCacheRepository } from "../cache/translation_cache.repositor
 import { History } from "../history/history";
 import { Language } from "../language/language";
 import { LanguageService } from "../language/language.service";
+import { Dialog } from "../util/dialog";
 import { APIStatistic, ActionStatistic, ArbStatistic } from "./arb_statistic";
 
 interface InitParams {
@@ -43,60 +43,44 @@ export class ArbStatisticService {
       history
     );
 
-    const translationRequiredItems = [
-      {
-        label: "Translation Required",
-        kind: vscode.QuickPickItemKind.Separator,
-      },
-    ];
-    const noChangesItems = [
-      {
-        label: "No Changes",
-        kind: vscode.QuickPickItemKind.Separator,
-      },
-    ];
+    const translationRequiredItems = "Translation Required";
+    const noChangesItems = "No Changes";
+
+    const sectionLabelList = [translationRequiredItems, noChangesItems];
     const keys = Object.keys(arbStatistic);
-    let totalTranslationRequiredItems = 0;
-    let totalNoChangesItems = 0;
-    for (const key of keys) {
-      const s = arbStatistic[key];
-      const label = path.basename(s.filePath);
-      const language = s.language;
-      const detail = s.isTranslationRequired
-        ? Object.entries({
-            ...s.action,
-            ...s.api,
-            retain: 0,
-          })
-            .filter(([key, value]) => value > 0)
-            .map(([key, value]) => `${key}: ${value}`)
-            .join(", ")
-        : "No changes";
-      const item = <any>{
-        label,
-        detail,
-        picked: s.isTranslationRequired,
-        language,
-      };
-      if (s.isTranslationRequired) {
-        totalTranslationRequiredItems += 1;
-        translationRequiredItems.push(item);
-      } else {
-        totalNoChangesItems += 1;
-        noChangesItems.push(item);
-      }
-    }
-    translationRequiredItems[0].label = `${translationRequiredItems[0].label} (${totalTranslationRequiredItems})`;
-    noChangesItems[0].label = `${noChangesItems[0].label} (${totalNoChangesItems})`;
-    const selectedTargetlanguages = await vscode.window.showQuickPick(
-      [...translationRequiredItems, ...noChangesItems],
-      {
-        title: title,
-        placeHolder: `Total ${keys.length}`,
-        canPickMany: true,
-      }
-    );
-    return selectedTargetlanguages?.map((item: any) => item.language) ?? [];
+    const selectItem = await Dialog.showSectionedPicker<string, Language>({
+      sectionLabelList,
+      itemList: keys,
+      canPickMany: true,
+      itemBuilder: (key) => {
+        const s = arbStatistic[key];
+        const label = path.basename(s.filePath);
+        const language = s.language;
+        const section = s.isTranslationRequired
+          ? translationRequiredItems
+          : noChangesItems;
+        const detail = s.isTranslationRequired
+          ? Object.entries({
+              ...s.action,
+              ...s.api,
+              retain: 0,
+            })
+              .filter(([, value]) => value > 0)
+              .map(([key, value]) => `${key}: ${value}`)
+              .join(", ")
+          : noChangesItems;
+        return {
+          section,
+          item: {
+            label,
+            detail,
+            picked: s.isTranslationRequired,
+          },
+          data: language,
+        };
+      },
+    });
+    return selectItem ?? [];
   }
 
   private async getArbStatistic(
