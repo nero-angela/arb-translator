@@ -103,15 +103,6 @@ Because settings may differ for each project, adding settings to the project wor
       }
       ```
 
-## Translation Preview
-- Command to track changes in each arb file and show the number of API calls and cached data during translation.
-<img alt="result image of translation preview command" src="https://github.com/nero-angela/arb-translator/assets/26322627/a5801e3b-93cb-421a-845a-5fac59a30f56">
-- Preview data
-  - `create` : Number of data requiring translation.
-  - `update` : Number of data that needs re-translation because the value has changed.
-  - `nCache` : Number of caches recycled during translation.
-  - `nAPI` : Number of API calls when translating.
-
 ## Validate Translation
 - Command to verify translation results.
 - Validation items

@@ -42,35 +42,61 @@ export class ArbStatisticService {
       targetLanguages,
       history
     );
+
+    const translationRequiredItems = [
+      {
+        label: "Translation Required",
+        kind: vscode.QuickPickItemKind.Separator,
+      },
+    ];
+    const noChangesItems = [
+      {
+        label: "No Changes",
+        kind: vscode.QuickPickItemKind.Separator,
+      },
+    ];
     const keys = Object.keys(arbStatistic);
+    let totalTranslationRequiredItems = 0;
+    let totalNoChangesItems = 0;
+    for (const key of keys) {
+      const s = arbStatistic[key];
+      const label = path.basename(s.filePath);
+      const language = s.language;
+      const detail = s.isTranslationRequired
+        ? Object.entries({
+            ...s.action,
+            ...s.api,
+            retain: 0,
+          })
+            .filter(([key, value]) => value > 0)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join(", ")
+        : "No changes";
+      const item = <any>{
+        label,
+        detail,
+        picked: s.isTranslationRequired,
+        language,
+      };
+      if (s.isTranslationRequired) {
+        totalTranslationRequiredItems += 1;
+        translationRequiredItems.push(item);
+      } else {
+        totalNoChangesItems += 1;
+        noChangesItems.push(item);
+      }
+    }
+    translationRequiredItems[0].label = `${translationRequiredItems[0].label} (${totalTranslationRequiredItems})`;
+    noChangesItems[0].label = `${noChangesItems[0].label} (${totalNoChangesItems})`;
     const selectedTargetlanguages = await vscode.window.showQuickPick(
-      keys.map((key) => {
-        const s = arbStatistic[key];
-        const label = path.basename(s.filePath);
-        const language = s.language;
-        const detail = s.isTranslationRequired
-          ? Object.entries({
-              ...s.action,
-              ...s.api,
-              retain: 0,
-            })
-              .filter(([key, value]) => value > 0)
-              .map(([key, value]) => `${key}: ${value}`)
-              .join(", ")
-          : "No changes";
-        return {
-          label,
-          detail,
-          picked: s.isTranslationRequired,
-          language,
-        };
-      }),
+      [...translationRequiredItems, ...noChangesItems],
       {
         title: title,
+        placeHolder: `Total ${keys.length}`,
         canPickMany: true,
       }
     );
-    return selectedTargetlanguages?.map((item) => item.language) ?? [];
+    return selectedTargetlanguages?.map((item: any) => item.language) ?? [];
   }
 
   private async getArbStatistic(

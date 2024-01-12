@@ -87,10 +87,6 @@
         "title": "Arb Translator : Translate"
       },
       {
-        "command": "arb-translator.translationPreview",
-        "title": "Arb Translator : Translation Preview"
-      },
-      {
         "command": "arb-translator.excludeTranslation",
         "title": "Arb Translator : Exclude Translation"
       },
