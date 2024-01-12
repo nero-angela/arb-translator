@@ -35,21 +35,29 @@ export class ArbValidationService {
     this.arbValidationRepository = arbValidationRepository;
   }
 
-  public async validate(
+  public async getValidationResultList(
     sourceArb: Arb,
     targetLanguages: Language[]
-  ): Promise<boolean> {
-    const generator = this.validationResultGenerator(
+  ): Promise<ValidationResult[]> {
+    const generator = await this.generateValidationResult(
       sourceArb,
       targetLanguages
     );
-    const generatedValidationResult = await generator.next();
-    const validationResult: ValidationResult | undefined =
-      generatedValidationResult.value;
-    if (!validationResult) {
-      return true;
+
+    const validationResults: ValidationResult[] = [];
+    while (true) {
+      const validationResultIterator = await generator.next();
+      if (!validationResultIterator.value) {
+        break;
+      }
+      validationResults.push(validationResultIterator.value);
     }
 
+    return validationResults;
+  }
+
+  public async validate(validationResult: ValidationResult): Promise<boolean> {
+    const sourceArb = validationResult.sourceArb;
     const targetFileName = path.basename(validationResult.targetArb.filePath);
     switch (validationResult.invalidType) {
       case InvalidType.keyNotFound:
@@ -89,15 +97,14 @@ export class ArbValidationService {
     return false;
   }
 
-  private async *validationResultGenerator(
+  private async *generateValidationResult(
     sourceArb: Arb,
     targetLanguages: Language[]
   ): AsyncGenerator<ValidationResult, undefined, ValidationResult> {
     // get source ParamsValidation
     const sourceValidation =
       this.arbValidationRepository.getParamsValidation(sourceArb);
-    const sourceValidationKeys = Object.keys(sourceValidation);
-    if (sourceValidationKeys.length === 0) return;
+    if (Object.keys(sourceValidation).length === 0) return;
 
     for (const targetLanguage of targetLanguages) {
       if (targetLanguage.languageCode === sourceArb.language.languageCode)
@@ -113,42 +120,14 @@ export class ArbValidationService {
       const targetArb: Arb = await this.arbService.getArb(targetArbFilePath);
       const targetValidation =
         this.arbValidationRepository.getParamsValidation(targetArb);
-      const targetValidationKeys = Object.keys(targetValidation);
-      const targetFileName = path.basename(targetArbFilePath);
 
-      for (const key of sourceValidationKeys) {
-        const sourceTotalParams = sourceValidation[key].nParams;
-
-        if (!targetValidationKeys.includes(key)) {
-          yield <ValidationResult>{
-            sourceValidationData: sourceValidation[key],
-            invalidType: InvalidType.keyNotFound,
-            sourceArb,
-            targetArb,
-            key,
-          };
-          continue;
-        }
-
-        const isParamsInvalid =
-          sourceTotalParams !== targetValidation[key].nParams;
-        const isParenthesesInvalid =
-          sourceValidation[key].nParentheses !==
-          targetValidation[key].nParentheses;
-        if (isParamsInvalid || isParenthesesInvalid) {
-          // Incorrect number of parameters or Parentheses
-          yield <ValidationResult>{
-            sourceValidationData: sourceValidation[key],
-            invalidType: isParamsInvalid
-              ? InvalidType.invalidParameters
-              : InvalidType.invalidParentheses,
-            sourceArb,
-            targetArb,
-            key,
-          };
-          continue;
-        }
-      }
+      // generate validation result
+      yield* this.arbValidationRepository.generateValidationResult(
+        sourceArb,
+        sourceValidation,
+        targetArb,
+        targetValidation
+      );
     }
   }
 

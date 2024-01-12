@@ -2,9 +2,58 @@ import * as vscode from "vscode";
 import { Arb } from "../arb/arb";
 import { BaseDisposable } from "../util/base/base_disposable";
 import { Editor, HighlightType } from "../util/editor";
-import { ArbValidation, ArbValidationData } from "./arb_validation";
+import {
+  ArbValidation,
+  ArbValidationData,
+  InvalidType,
+  ValidationResult,
+} from "./arb_validation";
 
 export class ArbValidationRepository extends BaseDisposable {
+  public async *generateValidationResult(
+    sourceArb: Arb,
+    sourceValidation: ArbValidation,
+    targetArb: Arb,
+    targetValidation: ArbValidation
+  ): AsyncGenerator<ValidationResult, undefined, ValidationResult> {
+    const sourceValidationKeys = Object.keys(sourceValidation);
+    const targetValidationKeys = Object.keys(targetValidation);
+
+    for (const key of sourceValidationKeys) {
+      const sourceTotalParams = sourceValidation[key].nParams;
+
+      if (!targetValidationKeys.includes(key)) {
+        yield <ValidationResult>{
+          sourceValidationData: sourceValidation[key],
+          invalidType: InvalidType.keyNotFound,
+          sourceArb,
+          targetArb,
+          key,
+        };
+        continue;
+      }
+
+      const isParamsInvalid =
+        sourceTotalParams !== targetValidation[key].nParams;
+      const isParenthesesInvalid =
+        sourceValidation[key].nParentheses !==
+        targetValidation[key].nParentheses;
+      if (isParamsInvalid || isParenthesesInvalid) {
+        // Incorrect number of parameters or Parentheses
+        yield <ValidationResult>{
+          sourceValidationData: sourceValidation[key],
+          invalidType: isParamsInvalid
+            ? InvalidType.invalidParameters
+            : InvalidType.invalidParentheses,
+          sourceArb,
+          targetArb,
+          key,
+        };
+        continue;
+      }
+    }
+  }
+
   /**
    * There is no corresponding key in targetArb file
    * @param sourceArb

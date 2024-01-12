@@ -11,9 +11,9 @@ export interface ArbValidation {
 }
 
 export enum InvalidType {
-  keyNotFound,
-  invalidParameters,
-  invalidParentheses,
+  keyNotFound = "Key does not exist",
+  invalidParameters = "Incorrect number of parameters",
+  invalidParentheses = "Incorrect number of parentheses",
 }
 
 export interface ValidationResult {
