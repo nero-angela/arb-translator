@@ -4,13 +4,13 @@ import { ArbValidationRepository } from "./arb_validation/arb_validation.reposit
 import { ArbValidationService } from "./arb_validation/arb_validation.service";
 import { TranslationCacheDataSource } from "./cache/translation_cache.datasource";
 import { TranslationCacheRepository } from "./cache/translation_cache.repository";
-import { ConfigureTargetLanguageCode as ConfigureTargetLanguageCodeCmd } from "./command/configure_target_language_code.cmd";
+import { ConfigureTargetLanguageCodeCmd } from "./command/configure_target_language_code.cmd";
 import { CreateTranslationCacheCmd } from "./command/create_translation_cache.cmd";
-import { ExcludeTranslation as ExcludeTranslationCmd } from "./command/exclude_translation.cmd";
+import { ExcludeTranslationCmd } from "./command/exclude_translation.cmd";
 import { InitializeCmd } from "./command/initialize.cmd";
 import { TranslateCmd } from "./command/translate.cmd";
-import { TranslationPreview as TranslationPreviewCmd } from "./command/translation_preview.cmd";
-import { ValidateTranslation as ValidateTranslationCmd } from "./command/validate_translation.cmd";
+import { TranslationPreviewCmd } from "./command/translation_preview.cmd";
+import { ValidateTranslationCmd } from "./command/validate_translation.cmd";
 import { ConfigRepository } from "./config/config.repository";
 import { ConfigService } from "./config/config.service";
 import { HistoryRepository } from "./history/history.repository";
@@ -120,7 +120,6 @@ export class Registry {
       configService: this.configService,
       historyService: this.historyService,
       languageService: this.languageService,
-      translationService: this.translationService,
       arbStatisticService: this.arbStatisticService,
     });
     this.createTranslationCacheCmd = new CreateTranslationCacheCmd({

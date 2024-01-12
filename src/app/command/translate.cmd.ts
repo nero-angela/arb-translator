@@ -108,7 +108,7 @@ export class TranslateCmd {
 
     // validate translation
     const isPreceedValidation = await Dialog.showConfirmDialog({
-      title: "Would you like to validate the translation?",
+      title: "Would you like to validate the translation results?",
     });
     if (isPreceedValidation) {
       await vscode.commands.executeCommand(Cmd.validateTranslation);
@@ -129,7 +129,7 @@ export class TranslateCmd {
       { label: TranslationType.paid, description: "Google API key required" },
     ];
     const selectedItem = await vscode.window.showQuickPick(items, {
-      placeHolder: "Select changes to exclude from translation",
+      title: "Please select a translation method.",
       canPickMany: false,
     });
     if (!selectedItem) {

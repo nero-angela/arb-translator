@@ -82,7 +82,7 @@ export class CreateTranslationCacheCmd {
     });
 
     const selectedItems = await vscode.window.showQuickPick(items, {
-      placeHolder: "Select arb files to create translation cache.",
+      title: "Select arb files to create translation cache.",
       canPickMany: true,
     });
 

@@ -1,7 +1,8 @@
-// import * as vscode from "vscode";
-
+import path from "path";
+import * as vscode from "vscode";
 import { Arb } from "../arb/arb";
 import { ArbService } from "../arb/arb.service";
+import { ValidationResult } from "../arb_validation/arb_validation";
 import { ArbValidationService } from "../arb_validation/arb_validation.service";
 import { ConfigService } from "../config/config.service";
 import { Language } from "../language/language";
@@ -15,7 +16,7 @@ interface InitParams {
   arbService: ArbService;
 }
 
-export class ValidateTranslation {
+export class ValidateTranslationCmd {
   private arbValidationService: ArbValidationService;
   private languageService: LanguageService;
   private configService: ConfigService;
@@ -44,12 +45,45 @@ export class ValidateTranslation {
         return this.languageService.getLanguageByLanguageCode(languageCode);
       });
 
-    const isValid = await this.arbValidationService.validate(
-      sourceArb,
-      targetLanguages
-    );
-    if (isValid) {
-      Toast.i("🟢 The translation has been successfully completed.");
+    const validationResultList =
+      await this.arbValidationService.getValidationResultList(
+        sourceArb,
+        targetLanguages
+      );
+    if (validationResultList.length === 0) {
+      return Toast.i("🟢 The translation has been successfully completed.");
     }
+
+    const validationResult = await this.selectValidationResult(
+      validationResultList
+    );
+    if (!validationResult) return;
+
+    await this.arbValidationService.validate(validationResult);
+  }
+
+  private async selectValidationResult(
+    validationResultList: ValidationResult[]
+  ): Promise<ValidationResult | undefined> {
+    const selectItem = await vscode.window.showQuickPick(
+      validationResultList.map((validationResult) => {
+        const targetFileName = path.basename(
+          validationResult.targetArb.filePath
+        );
+        const label = targetFileName;
+        const detail = `${validationResult.invalidType}`;
+        const description = validationResult.key;
+        return {
+          label,
+          detail,
+          description,
+          validationResult,
+        };
+      }),
+      {
+        title: "Select the file you want to fix.",
+      }
+    );
+    return selectItem?.validationResult ?? undefined;
   }
 }

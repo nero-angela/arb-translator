@@ -18,7 +18,7 @@ interface InitParams {
   languageService: LanguageService;
 }
 
-export class ConfigureTargetLanguageCode {
+export class ConfigureTargetLanguageCodeCmd {
   private arbService: ArbService;
   private configService: ConfigService;
   private languageService: LanguageService;
@@ -83,7 +83,7 @@ export class ConfigureTargetLanguageCode {
         },
       ],
       {
-        placeHolder: "Please select a list of language to translate to.",
+        title: "Please select a list of language to translate to.",
       }
     );
     if (!select) return undefined;
@@ -116,7 +116,7 @@ export class ConfigureTargetLanguageCode {
 
     // select pick items
     const selectedItems = await vscode.window.showQuickPick(pickItems, {
-      placeHolder: `Please select the language code of the language you wish to translate`,
+      title: `Please select the language code of the language you wish to translate`,
       canPickMany: true,
     });
 

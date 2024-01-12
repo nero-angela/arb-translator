@@ -13,7 +13,7 @@ interface InitParams {
   historyService: HistoryService;
 }
 
-export class ExcludeTranslation {
+export class ExcludeTranslationCmd {
   private arbService: ArbService;
   private configService: ConfigService;
   private historyService: HistoryService;
@@ -54,7 +54,7 @@ export class ExcludeTranslation {
     });
     const selectedItems =
       (await vscode.window.showQuickPick(items, {
-        placeHolder: "Select changes to exclude from translation",
+        title: "Select changes to exclude from translation",
         canPickMany: true,
       })) ?? [];
     if (selectedItems.length === 0) {

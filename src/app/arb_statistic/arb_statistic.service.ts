@@ -32,7 +32,7 @@ export class ArbStatisticService {
   }
 
   public async showTranslationPreview(
-    placeHolder: string,
+    title: string,
     sourceArb: Arb,
     targetLanguages: Language[],
     history: History
@@ -48,7 +48,7 @@ export class ArbStatisticService {
         const s = arbStatistic[key];
         const label = path.basename(s.filePath);
         const language = s.language;
-        const description = s.isTranslationRequired
+        const detail = s.isTranslationRequired
           ? Object.entries({
               ...s.action,
               ...s.api,
@@ -60,13 +60,13 @@ export class ArbStatisticService {
           : "No changes";
         return {
           label,
-          description,
+          detail,
           picked: s.isTranslationRequired,
           language,
         };
       }),
       {
-        placeHolder: placeHolder,
+        title: title,
         canPickMany: true,
       }
     );

@@ -1,10 +1,60 @@
 import * as vscode from "vscode";
 import { Arb } from "../arb/arb";
 import { BaseDisposable } from "../util/base/base_disposable";
-import { Editor, HighlightType } from "../util/editor";
-import { ArbValidation, ArbValidationData } from "./arb_validation";
+import { Editor } from "../util/editor";
+import { Highlight, HighlightType } from "../util/highlight";
+import {
+  ArbValidation,
+  ArbValidationData,
+  InvalidType,
+  ValidationResult,
+} from "./arb_validation";
 
 export class ArbValidationRepository extends BaseDisposable {
+  public async *generateValidationResult(
+    sourceArb: Arb,
+    sourceValidation: ArbValidation,
+    targetArb: Arb,
+    targetValidation: ArbValidation
+  ): AsyncGenerator<ValidationResult, undefined, ValidationResult> {
+    const sourceValidationKeys = Object.keys(sourceValidation);
+    const targetValidationKeys = Object.keys(targetValidation);
+
+    for (const key of sourceValidationKeys) {
+      const sourceTotalParams = sourceValidation[key].nParams;
+
+      if (!targetValidationKeys.includes(key)) {
+        yield <ValidationResult>{
+          sourceValidationData: sourceValidation[key],
+          invalidType: InvalidType.keyNotFound,
+          sourceArb,
+          targetArb,
+          key,
+        };
+        continue;
+      }
+
+      const isParamsInvalid =
+        sourceTotalParams !== targetValidation[key].nParams;
+      const isParenthesesInvalid =
+        sourceValidation[key].nParentheses !==
+        targetValidation[key].nParentheses;
+      if (isParamsInvalid || isParenthesesInvalid) {
+        // Incorrect number of parameters or Parentheses
+        yield <ValidationResult>{
+          sourceValidationData: sourceValidation[key],
+          invalidType: isParamsInvalid
+            ? InvalidType.invalidParameters
+            : InvalidType.invalidParentheses,
+          sourceArb,
+          targetArb,
+          key,
+        };
+        continue;
+      }
+    }
+  }
+
   /**
    * There is no corresponding key in targetArb file
    * @param sourceArb
@@ -14,29 +64,33 @@ export class ArbValidationRepository extends BaseDisposable {
    */
   public async keyRequired(sourceArb: Arb, targetArb: Arb, key: string) {
     try {
-      // source
+      // clear remain decorations
+      Highlight.clear();
+
+      // open document
       const { editor: sourceEditor, document: sourceDocument } =
         await Editor.open(sourceArb.filePath, vscode.ViewColumn.One);
+      const { editor: targetEditor, document: targetDocument } =
+        await Editor.open(targetArb.filePath, vscode.ViewColumn.Two);
+
+      // search key
       const sourceKeyPosition = Editor.search(sourceEditor, key);
-      const {
-        range: sourceHighlightedRange,
-        decorationType: sourceDecorationType,
-      } = Editor.highlight(
+
+      // highlight
+      const sourceHighlightedRange = Highlight.add(
         sourceEditor,
         HighlightType.green,
         sourceKeyPosition!.line
       );
 
       // target
-      const { editor: targetEditor, document: targetDocument } =
-        await Editor.open(targetArb.filePath, vscode.ViewColumn.Two);
       targetEditor.revealRange(
         sourceHighlightedRange,
         vscode.TextEditorRevealType.InCenter
       );
 
       const removeHighlight = () => {
-        Editor.clearHighlight(sourceEditor, sourceDecorationType);
+        Highlight.clear();
         this.disposed();
       };
 
@@ -73,31 +127,26 @@ export class ArbValidationRepository extends BaseDisposable {
     sourceArbValidationData: ArbValidationData
   ) {
     try {
-      // source
+      // clear remain decorations
+      Highlight.clear();
+
+      // open document
       const { editor: sourceEditor, document: sourceDocument } =
         await Editor.open(sourceArb.filePath, vscode.ViewColumn.One);
-      const sourceKeyPosition = Editor.search(sourceEditor, key);
-      const {
-        range: sourceHighlightedRange,
-        decorationType: sourceDecorationType,
-      } = Editor.highlight(
-        sourceEditor,
-        HighlightType.green,
-        sourceKeyPosition!.line
-      );
-
-      // target
       const { editor: targetEditor, document: targetDocument } =
         await Editor.open(targetArb.filePath, vscode.ViewColumn.Two);
+
+      // search key
+      const sourceKeyPosition = Editor.search(sourceEditor, key);
       const targetKeyPosition = Editor.search(targetEditor, key);
       if (!targetKeyPosition) {
         return;
       }
-      const { decorationType: targetDecorationType } = Editor.highlight(
-        targetEditor,
-        HighlightType.red,
-        targetKeyPosition.line
-      );
+
+      // highlight
+      Highlight.add(sourceEditor, HighlightType.green, sourceKeyPosition!.line);
+
+      Highlight.add(targetEditor, HighlightType.red, targetKeyPosition.line);
 
       // select target value
       const targetValue = targetArb.data[key];
@@ -108,8 +157,7 @@ export class ArbValidationRepository extends BaseDisposable {
       );
 
       const removeHighlight = () => {
-        Editor.clearHighlight(sourceEditor, sourceDecorationType);
-        Editor.clearHighlight(targetEditor, targetDecorationType);
+        Highlight.clear();
         this.disposed();
       };
 
