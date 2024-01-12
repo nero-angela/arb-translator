@@ -62,24 +62,24 @@ export class ArbValidationService {
     switch (validationResult.invalidType) {
       case InvalidType.keyNotFound:
         // Key does not exist
-        const keyNotFoundTitle = `${targetFileName} : "${validationResult.key}" key does not exist`;
-        Toast.i(keyNotFoundTitle);
+        Toast.i(
+          `${targetFileName} : "${validationResult.key}" key does not exist`
+        );
         await this.arbValidationRepository.keyRequired(
           sourceArb,
           validationResult.targetArb,
           validationResult.key
         );
         await this.openTranslationWebsite(
-          keyNotFoundTitle,
           sourceArb.language,
           validationResult.targetArb.language,
           sourceArb.data[validationResult.key]
         );
         break;
       case InvalidType.invalidParameters || InvalidType.invalidParentheses:
-        const invalidTitle = `${targetFileName} : incorrect number of parameters or parentheses.`;
-
-        Toast.i(invalidTitle);
+        Toast.i(
+          `${targetFileName} : incorrect number of parameters or parentheses.`
+        );
         await this.arbValidationRepository.invalidNumberOfParamsOrParentheses(
           sourceArb,
           validationResult.targetArb,
@@ -87,7 +87,6 @@ export class ArbValidationService {
           validationResult.sourceValidationData
         );
         await this.openTranslationWebsite(
-          invalidTitle,
           sourceArb.language,
           validationResult.targetArb.language,
           validationResult.sourceArb.data[validationResult.key]
@@ -132,15 +131,12 @@ export class ArbValidationService {
   }
 
   private async openTranslationWebsite(
-    title: string,
     sourceLanguage: Language,
     targetLanguage: Language,
     text: string
   ) {
     const isShow = await Dialog.showConfirmDialog({
-      title: title,
-      confirmText: "Open the Google Translate website",
-      cancelText: "Cancel",
+      title: "Do you want to open the Google Translate website?",
     });
     if (!isShow) return;
 

@@ -32,7 +32,7 @@ export class ArbStatisticService {
   }
 
   public async showTranslationPreview(
-    placeHolder: string,
+    title: string,
     sourceArb: Arb,
     targetLanguages: Language[],
     history: History
@@ -66,7 +66,7 @@ export class ArbStatisticService {
         };
       }),
       {
-        placeHolder: placeHolder,
+        title: title,
         canPickMany: true,
       }
     );

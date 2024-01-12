@@ -81,8 +81,7 @@ export class ValidateTranslationCmd {
         };
       }),
       {
-        placeHolder: "Select the file you want to fix.",
-        canPickMany: false,
+        title: "Select the file you want to fix.",
       }
     );
     return selectItem?.validationResult ?? undefined;

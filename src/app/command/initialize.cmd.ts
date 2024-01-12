@@ -43,12 +43,11 @@ export class InitializeCmd {
           label: arbFile,
         };
       });
-      const placeHolder =
+      const title =
         "Please select the source arb file that will be the source of translation.";
-      Toast.i(placeHolder);
+      Toast.i(title);
       const selectedItem = await vscode.window.showQuickPick(selectItems, {
-        placeHolder,
-        canPickMany: false,
+        title,
       });
       if (!selectedItem) {
         return;

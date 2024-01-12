@@ -54,7 +54,7 @@ export class ExcludeTranslationCmd {
     });
     const selectedItems =
       (await vscode.window.showQuickPick(items, {
-        placeHolder: "Select changes to exclude from translation",
+        title: "Select changes to exclude from translation",
         canPickMany: true,
       })) ?? [];
     if (selectedItems.length === 0) {

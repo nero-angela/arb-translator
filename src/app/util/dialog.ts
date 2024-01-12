@@ -39,7 +39,7 @@ export class Dialog {
     const select = await vscode.window.showQuickPick(
       [{ label: confirmText ?? "Yes" }, { label: cancelText ?? "No" }],
       {
-        placeHolder: title,
+        title,
       }
     );
     return select?.label === (confirmText ?? "Yes");
