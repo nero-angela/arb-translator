@@ -82,6 +82,7 @@ export class ValidateTranslationCmd {
       }),
       {
         title: "Select the file you want to fix.",
+        placeHolder: `Total ${validationResultList.length}`,
       }
     );
     return selectItem?.validationResult ?? undefined;
