@@ -110,8 +110,14 @@ export class GoogleTranslationRepository implements TranslationRepository {
       });
     }
 
-    // replace &#39; to '
+    // replace URL encoded strings
     decodedText.replaceAll("&#39;", "'");
+
+    // replace punctuation marks
+    decodedText.replaceAll("（", "(");
+    decodedText.replaceAll("）", ")");
+    decodedText.replaceAll("！", "!");
+    decodedText.replaceAll("？", "?");
 
     return decodedText;
   }
