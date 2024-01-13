@@ -112,6 +112,7 @@
     "publish": "npm run package && vsce publish"
   },
   "devDependencies": {
+    "@types/he": "^1.2.3",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
     "@types/vscode": "^1.84.0",

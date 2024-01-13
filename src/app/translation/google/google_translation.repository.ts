@@ -1,3 +1,4 @@
+import * as he from "he";
 import { TranslationCacheRepository } from "../../cache/translation_cache.repository";
 import { TranslationFailureException } from "../../util/exceptions";
 import { TranslationDataSource } from "../translation.datasource";
@@ -110,8 +111,8 @@ export class GoogleTranslationRepository implements TranslationRepository {
       });
     }
 
-    // replace URL encoded strings
-    decodedText.replaceAll("&#39;", "'");
+    // decode html entity (e.g. &#39; -> ' / &gt; -> >)
+    decodedText = he.decode(decodedText);
 
     // replace punctuation marks
     decodedText.replaceAll("（", "(");
