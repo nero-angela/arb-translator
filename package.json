@@ -106,8 +106,9 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
+    "lint:watch": "esw --color -w src --ext ts",
     "test": "vscode-test",
-    "package": "rm -r out & vsce package",
+    "package": "npm run lint && (rm -r out || true) && vsce package",
     "publish": "npm run package && vsce publish"
   },
   "devDependencies": {
@@ -119,6 +120,7 @@
     "@vscode/test-cli": "^0.0.4",
     "@vscode/test-electron": "^2.3.8",
     "eslint": "^8.54.0",
+    "eslint-watch": "^8.0.0",
     "typescript": "^5.3.2"
   },
   "dependencies": {
