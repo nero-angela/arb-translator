@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import path from "path";
-import * as vscode from "vscode";
 import { Arb } from "../arb/arb";
 import { ArbService } from "../arb/arb.service";
 import { TranslationCacheKey } from "../cache/translation_cache";
@@ -8,6 +7,7 @@ import { TranslationCacheRepository } from "../cache/translation_cache.repositor
 import { History } from "../history/history";
 import { Language } from "../language/language";
 import { LanguageService } from "../language/language.service";
+import { Dialog } from "../util/dialog";
 import { APIStatistic, ActionStatistic, ArbStatistic } from "./arb_statistic";
 
 interface InitParams {
@@ -42,35 +42,45 @@ export class ArbStatisticService {
       targetLanguages,
       history
     );
+
+    const translationRequiredItems = "Translation Required";
+    const noChangesItems = "No Changes";
+
+    const sectionLabelList = [translationRequiredItems, noChangesItems];
     const keys = Object.keys(arbStatistic);
-    const selectedTargetlanguages = await vscode.window.showQuickPick(
-      keys.map((key) => {
+    const selectItem = await Dialog.showSectionedPicker<string, Language>({
+      sectionLabelList,
+      itemList: keys,
+      canPickMany: true,
+      itemBuilder: (key) => {
         const s = arbStatistic[key];
         const label = path.basename(s.filePath);
         const language = s.language;
+        const section = s.isTranslationRequired
+          ? translationRequiredItems
+          : noChangesItems;
         const detail = s.isTranslationRequired
           ? Object.entries({
               ...s.action,
               ...s.api,
               retain: 0,
             })
-              .filter(([key, value]) => value > 0)
+              .filter(([, value]) => value > 0)
               .map(([key, value]) => `${key}: ${value}`)
               .join(", ")
-          : "No changes";
+          : noChangesItems;
         return {
-          label,
-          detail,
-          picked: s.isTranslationRequired,
-          language,
+          section,
+          item: {
+            label,
+            detail,
+            picked: s.isTranslationRequired,
+          },
+          data: language,
         };
-      }),
-      {
-        title: title,
-        canPickMany: true,
-      }
-    );
-    return selectedTargetlanguages?.map((item) => item.language) ?? [];
+      },
+    });
+    return selectItem ?? [];
   }
 
   private async getArbStatistic(

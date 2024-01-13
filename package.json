@@ -4,7 +4,7 @@
   "license": "SEE LICENSE IN LICENSE",
   "displayName": "ARB Translator",
   "description": "Translates ARB files to Google Translator.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "engines": {
     "vscode": "^1.84.0"
   },
@@ -85,10 +85,6 @@
       {
         "command": "arb-translator.translate",
         "title": "Arb Translator : Translate"
-      },
-      {
-        "command": "arb-translator.translationPreview",
-        "title": "Arb Translator : Translation Preview"
       },
       {
         "command": "arb-translator.excludeTranslation",

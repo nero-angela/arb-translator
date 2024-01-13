@@ -1,12 +1,15 @@
 import path from "path";
-import * as vscode from "vscode";
 import { Arb } from "../arb/arb";
 import { ArbService } from "../arb/arb.service";
-import { ValidationResult } from "../arb_validation/arb_validation";
+import {
+  InvalidType,
+  ValidationResult,
+} from "../arb_validation/arb_validation";
 import { ArbValidationService } from "../arb_validation/arb_validation.service";
 import { ConfigService } from "../config/config.service";
 import { Language } from "../language/language";
 import { LanguageService } from "../language/language.service";
+import { Dialog } from "../util/dialog";
 import { Toast } from "../util/toast";
 
 interface InitParams {
@@ -65,8 +68,19 @@ export class ValidateTranslationCmd {
   private async selectValidationResult(
     validationResultList: ValidationResult[]
   ): Promise<ValidationResult | undefined> {
-    const selectItem = await vscode.window.showQuickPick(
-      validationResultList.map((validationResult) => {
+    const sectionMap = {
+      [InvalidType.keyNotFound]: "Key Not Found",
+      [InvalidType.invalidParameters]: "Invalid Parameters",
+      [InvalidType.invalidParentheses]: "Invalid Parentheses",
+    };
+    const selectItem = await Dialog.showSectionedPicker<
+      ValidationResult,
+      ValidationResult
+    >({
+      sectionLabelList: Object.values(sectionMap),
+      itemList: validationResultList,
+      canPickMany: false,
+      itemBuilder: (validationResult) => {
         const targetFileName = path.basename(
           validationResult.targetArb.filePath
         );
@@ -74,16 +88,17 @@ export class ValidateTranslationCmd {
         const detail = `${validationResult.invalidType}`;
         const description = validationResult.key;
         return {
-          label,
-          detail,
-          description,
-          validationResult,
+          section: sectionMap[validationResult.invalidType],
+          item: {
+            label,
+            detail,
+            description,
+          },
+          data: validationResult,
         };
-      }),
-      {
-        title: "Select the file you want to fix.",
-      }
-    );
-    return selectItem?.validationResult ?? undefined;
+      },
+    });
+    if (!selectItem) return selectItem;
+    return selectItem[0];
   }
 }

@@ -76,10 +76,13 @@ export class ArbValidationService {
           sourceArb.data[validationResult.key]
         );
         break;
-      case InvalidType.invalidParameters || InvalidType.invalidParentheses:
-        Toast.i(
-          `${targetFileName} : incorrect number of parameters or parentheses.`
-        );
+      case InvalidType.invalidParameters:
+      case InvalidType.invalidParentheses:
+        const typeName =
+          validationResult.invalidType === InvalidType.invalidParameters
+            ? "parameters"
+            : "parentheses";
+        Toast.i(`${targetFileName} : incorrect number of ${typeName}.`);
         await this.arbValidationRepository.invalidNumberOfParamsOrParentheses(
           sourceArb,
           validationResult.targetArb,

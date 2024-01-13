@@ -33,7 +33,6 @@ export class ArbTranslator implements App {
   public commands = {
     [Cmd.initialize]: () => this.registry.initializeCmd.run(),
     [Cmd.translate]: () => this.registry.translateCmd.run(),
-    [Cmd.translationPreview]: () => this.registry.translationPreviewCmd.run(),
     [Cmd.excludeTranslation]: () => this.registry.excludeTranslationCmd.run(),
     [Cmd.configureTargetLanguageCode]: () =>
       this.registry.selectTargetLanguageCodeCmd.run(),

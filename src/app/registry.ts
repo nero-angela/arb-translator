@@ -9,7 +9,6 @@ import { CreateTranslationCacheCmd } from "./command/create_translation_cache.cm
 import { ExcludeTranslationCmd } from "./command/exclude_translation.cmd";
 import { InitializeCmd } from "./command/initialize.cmd";
 import { TranslateCmd } from "./command/translate.cmd";
-import { TranslationPreviewCmd } from "./command/translation_preview.cmd";
 import { ValidateTranslationCmd } from "./command/validate_translation.cmd";
 import { ConfigRepository } from "./config/config.repository";
 import { ConfigService } from "./config/config.service";
@@ -52,7 +51,6 @@ export class Registry {
    */
   public initializeCmd: InitializeCmd;
   public translateCmd: TranslateCmd;
-  public translationPreviewCmd: TranslationPreviewCmd;
   public createTranslationCacheCmd: CreateTranslationCacheCmd;
   public excludeTranslationCmd: ExcludeTranslationCmd;
   public selectTargetLanguageCodeCmd: ConfigureTargetLanguageCodeCmd;
@@ -113,13 +111,6 @@ export class Registry {
       historyService: this.historyService,
       languageService: this.languageService,
       translationService: this.translationService,
-      arbStatisticService: this.arbStatisticService,
-    });
-    this.translationPreviewCmd = new TranslationPreviewCmd({
-      arbService: this.arbService,
-      configService: this.configService,
-      historyService: this.historyService,
-      languageService: this.languageService,
       arbStatisticService: this.arbStatisticService,
     });
     this.createTranslationCacheCmd = new CreateTranslationCacheCmd({
