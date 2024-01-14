@@ -106,9 +106,10 @@ Because settings may differ for each project, adding settings to the project wor
 ## Validate Translation
 - Command to verify translation results.
 - Validation items
-  - `key` : whether key exists or not.
+  - `key` : Whether key exists or not.
   - `Parameters` : Whether the number of parameters is the same.
   - `Parentheses`: Whether the number of parentheses(round, curly, and square) is the same.
+  - `HTML entities` : Whether to decode HTML entities.
 
 ## Exclude Translation
 - Command to use when there are changes in the `sourceArb` file, but you do not want to translate them again.
@@ -122,3 +123,11 @@ Because settings may differ for each project, adding settings to the project wor
   - Select directly from the list of supported languages. The language entered in the `targetLanguageCodeList` setting is selected by default.
 - **Option2) load**
   - The language code extracted from other arb files in the same folder as `sourceArb` is overwritten in the `targetLanguageCodeList` setting.
+
+## Decode All HTML Entities
+- Command to decode all HTML entities.
+
+  |Undecoded HTML entity|Decoded HTML entity|
+  |:-:|:-:|
+  |`&quot;`|`"`|
+  |`&gt;`|`>`|
