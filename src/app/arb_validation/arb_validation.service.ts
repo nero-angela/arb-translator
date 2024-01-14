@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as he from "he";
 import path from "path";
 import { Arb } from "../arb/arb";
 import { ArbService } from "../arb/arb.service";
@@ -57,43 +58,36 @@ export class ArbValidationService {
   }
 
   public async validate(validationResult: ValidationResult): Promise<boolean> {
-    const sourceArb = validationResult.sourceArb;
-    const targetFileName = path.basename(validationResult.targetArb.filePath);
+    const { sourceArb, targetArb, invalidType, key } = validationResult;
+    const targetFileName = path.basename(targetArb.filePath);
+    // toast
+    Toast.i(`${targetFileName} : ${invalidType}.`);
+
+    // highlight
+    await this.arbValidationRepository.highlight(
+      sourceArb,
+      validationResult.targetArb,
+      validationResult.key
+    );
+
     switch (validationResult.invalidType) {
       case InvalidType.keyNotFound:
-        // Key does not exist
-        Toast.i(
-          `${targetFileName} : "${validationResult.key}" key does not exist`
-        );
-        await this.arbValidationRepository.keyRequired(
-          sourceArb,
-          validationResult.targetArb,
-          validationResult.key
-        );
+      case InvalidType.invalidParameters:
+      case InvalidType.invalidParentheses:
+        // open translation website
         await this.openTranslationWebsite(
           sourceArb.language,
           validationResult.targetArb.language,
           sourceArb.data[validationResult.key]
         );
         break;
-      case InvalidType.invalidParameters:
-      case InvalidType.invalidParentheses:
-        const typeName =
-          validationResult.invalidType === InvalidType.invalidParameters
-            ? "parameters"
-            : "parentheses";
-        Toast.i(`${targetFileName} : incorrect number of ${typeName}.`);
-        await this.arbValidationRepository.invalidNumberOfParamsOrParentheses(
-          sourceArb,
-          validationResult.targetArb,
-          validationResult.key,
-          validationResult.sourceValidationData
-        );
-        await this.openTranslationWebsite(
-          sourceArb.language,
-          validationResult.targetArb.language,
-          validationResult.sourceArb.data[validationResult.key]
-        );
+      case InvalidType.undecodedHtmlEntityExists:
+        // decode html entity
+        const decodedValue = await this.decodeHtmlEntity(targetArb.data[key]);
+        if (decodedValue) {
+          targetArb.data[key] = decodedValue;
+          await this.arbService.upsert(targetArb.filePath, targetArb.data);
+        }
         break;
     }
     return false;
@@ -106,17 +100,22 @@ export class ArbValidationService {
     // get source ParamsValidation
     const sourceValidation =
       this.arbValidationRepository.getParamsValidation(sourceArb);
-    if (Object.keys(sourceValidation).length === 0) return;
+    if (Object.keys(sourceValidation).length === 0) {
+      return;
+    }
 
     for (const targetLanguage of targetLanguages) {
-      if (targetLanguage.languageCode === sourceArb.language.languageCode)
+      if (targetLanguage.languageCode === sourceArb.language.languageCode) {
         continue;
+      }
 
       const targetArbFilePath =
         this.languageService.getArbFilePathFromLanguageCode(
           targetLanguage.languageCode
         );
-      if (!fs.existsSync(targetArbFilePath)) continue;
+      if (!fs.existsSync(targetArbFilePath)) {
+        continue;
+      }
 
       // get targetArb
       const targetArb: Arb = await this.arbService.getArb(targetArbFilePath);
@@ -141,7 +140,9 @@ export class ArbValidationService {
     const isShow = await Dialog.showConfirmDialog({
       title: "Do you want to open the Google Translate website?",
     });
-    if (!isShow) return;
+    if (!isShow) {
+      return;
+    }
 
     const url = this.translationService.getTranslateWebsiteUrl(
       sourceLanguage,
@@ -149,5 +150,16 @@ export class ArbValidationService {
       text
     );
     Link.show(url);
+  }
+
+  private async decodeHtmlEntity(text: string): Promise<string | undefined> {
+    const decodedText = he.decode(text);
+    const isDecode = await Dialog.showConfirmDialog({
+      title: "Do you want to decode HTML entities?",
+    });
+    if (!isDecode) {
+      return;
+    }
+    return decodedText;
   }
 }

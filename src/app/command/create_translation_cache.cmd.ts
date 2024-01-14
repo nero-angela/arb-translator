@@ -73,7 +73,7 @@ export class CreateTranslationCacheCmd {
   private async selectArbFilesToCreateTranslationCache(
     arbFileList: string[]
   ): Promise<string[]> {
-    if (arbFileList.length == 0) {
+    if (arbFileList.length === 0) {
       return [];
     }
 

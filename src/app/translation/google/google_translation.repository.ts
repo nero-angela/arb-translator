@@ -100,27 +100,27 @@ export class GoogleTranslationRepository implements TranslationRepository {
    * @returns string
    */
   private decodeText(dictionary: Record<string, string>, text: string): string {
-    let decodedText: string = text;
+    let result: string = text;
     const dictKeys = Object.keys(dictionary);
 
     // restore {params}
     for (const i in dictKeys) {
       const key = dictKeys[i];
-      decodedText = decodedText.replace(key, (match) => {
+      result = result.replace(key, (match) => {
         return dictionary[match] || match;
       });
     }
 
     // decode html entity (e.g. &#39; -> ' / &gt; -> >)
-    decodedText = he.decode(decodedText);
+    result = he.decode(result);
 
     // replace punctuation marks
-    decodedText.replaceAll("（", "(");
-    decodedText.replaceAll("）", ")");
-    decodedText.replaceAll("！", "!");
-    decodedText.replaceAll("？", "?");
+    result.replaceAll("（", "(");
+    result.replaceAll("）", ")");
+    result.replaceAll("！", "!");
+    result.replaceAll("？", "?");
 
-    return decodedText;
+    return result;
   }
 
   /**

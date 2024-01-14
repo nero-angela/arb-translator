@@ -23,6 +23,7 @@ export class ArbValidationRepository extends BaseDisposable {
     for (const key of sourceValidationKeys) {
       const sourceTotalParams = sourceValidation[key].nParams;
 
+      // key not found
       if (!targetValidationKeys.includes(key)) {
         yield <ValidationResult>{
           sourceValidationData: sourceValidation[key],
@@ -34,97 +35,55 @@ export class ArbValidationRepository extends BaseDisposable {
         continue;
       }
 
-      const isParamsInvalid =
-        sourceTotalParams !== targetValidation[key].nParams;
-      const isParenthesesInvalid =
-        sourceValidation[key].nParentheses !==
-        targetValidation[key].nParentheses;
-      if (isParamsInvalid || isParenthesesInvalid) {
-        // Incorrect number of parameters or Parentheses
+      // undecoded html entity exists
+      if (targetValidation[key].nHtmlEntities > 0) {
         yield <ValidationResult>{
           sourceValidationData: sourceValidation[key],
-          invalidType: isParamsInvalid
-            ? InvalidType.invalidParameters
-            : InvalidType.invalidParentheses,
+          invalidType: InvalidType.undecodedHtmlEntityExists,
           sourceArb,
           targetArb,
           key,
         };
-        continue;
+      }
+
+      // incorrect number of parameters
+      if (sourceTotalParams !== targetValidation[key].nParams) {
+        yield <ValidationResult>{
+          sourceValidationData: sourceValidation[key],
+          invalidType: InvalidType.invalidParameters,
+          sourceArb,
+          targetArb,
+          key,
+        };
+      }
+
+      // incorrect number of parentheses
+      if (
+        sourceValidation[key].nParentheses !==
+        targetValidation[key].nParentheses
+      ) {
+        yield <ValidationResult>{
+          sourceValidationData: sourceValidation[key],
+          invalidType: InvalidType.invalidParentheses,
+          sourceArb,
+          targetArb,
+          key,
+        };
       }
     }
   }
 
   /**
-   * There is no corresponding key in targetArb file
-   * @param sourceArb
-   * @param targetArb
-   * @param key
-   * @param isHighlight
-   */
-  public async keyRequired(sourceArb: Arb, targetArb: Arb, key: string) {
-    try {
-      // clear remain decorations
-      Highlight.clear();
-
-      // open document
-      const { editor: sourceEditor, document: sourceDocument } =
-        await Editor.open(sourceArb.filePath, vscode.ViewColumn.One);
-      const { editor: targetEditor, document: targetDocument } =
-        await Editor.open(targetArb.filePath, vscode.ViewColumn.Two);
-
-      // search key
-      const sourceKeyPosition = Editor.search(sourceEditor, key);
-
-      // highlight
-      const sourceHighlightedRange = Highlight.add(
-        sourceEditor,
-        HighlightType.green,
-        sourceKeyPosition!.line
-      );
-
-      // target
-      targetEditor.revealRange(
-        sourceHighlightedRange,
-        vscode.TextEditorRevealType.InCenter
-      );
-
-      const removeHighlight = () => {
-        Highlight.clear();
-        this.disposed();
-      };
-
-      this.pushDisposable(
-        vscode.workspace.onDidChangeTextDocument((event) => {
-          if (event.document === sourceDocument) {
-            removeHighlight();
-          } else if (event.document === targetDocument) {
-            const isTargetHasKey = Object.keys(
-              JSON.parse(event.document.getText())
-            ).includes(key);
-            if (isTargetHasKey) {
-              removeHighlight();
-            }
-          }
-        })
-      );
-    } catch (e) {
-      throw e;
-    }
-  }
-
-  /**
-   * Incorrect number of parameters or parentheses
+   * Highlight problematic areas in the source and target arb files
    * @param sourceArb
    * @param targetArb
    * @param key
    * @param sourceArbValidationData
    */
-  public async invalidNumberOfParamsOrParentheses(
+  public async highlight(
     sourceArb: Arb,
     targetArb: Arb,
     key: string,
-    sourceArbValidationData: ArbValidationData
   ) {
     try {
       // clear remain decorations
@@ -137,24 +96,35 @@ export class ArbValidationRepository extends BaseDisposable {
         await Editor.open(targetArb.filePath, vscode.ViewColumn.Two);
 
       // search key
-      const sourceKeyPosition = Editor.search(sourceEditor, key);
-      const targetKeyPosition = Editor.search(targetEditor, key);
-      if (!targetKeyPosition) {
-        return;
-      }
+      const sourceKeyPosition = Editor.search(sourceEditor, `"${key}"`);
+      const targetKeyPosition = Editor.search(targetEditor, `"${key}"`);
 
       // highlight
-      Highlight.add(sourceEditor, HighlightType.green, sourceKeyPosition!.line);
-
-      Highlight.add(targetEditor, HighlightType.red, targetKeyPosition.line);
-
-      // select target value
-      const targetValue = targetArb.data[key];
-      const targetValueStartIdx = targetDocument.getText().indexOf(targetValue);
-      targetEditor.selection = new vscode.Selection(
-        targetDocument.positionAt(targetValueStartIdx),
-        targetDocument.positionAt(targetValueStartIdx + targetValue.length)
+      const sourceHighlightedRange = Highlight.add(
+        sourceEditor,
+        HighlightType.green,
+        sourceKeyPosition!.line
       );
+      if (targetKeyPosition) {
+        // If the key exists in the target arb file
+        Highlight.add(targetEditor, HighlightType.red, targetKeyPosition.line);
+
+        // select target value
+        const targetValue = targetArb.data[key];
+        const targetValueStartIdx = targetDocument
+          .getText()
+          .indexOf(targetValue);
+        targetEditor.selection = new vscode.Selection(
+          targetDocument.positionAt(targetValueStartIdx),
+          targetDocument.positionAt(targetValueStartIdx + targetValue.length)
+        );
+      } else {
+        // If the key does't exist in the target arb file
+        targetEditor.revealRange(
+          sourceHighlightedRange,
+          vscode.TextEditorRevealType.InCenter
+        );
+      }
 
       const removeHighlight = () => {
         Highlight.clear();
@@ -172,20 +142,10 @@ export class ArbValidationRepository extends BaseDisposable {
               return;
             }
             prevTargetJson = targetJson;
-            const updatedTargetData = JSON.parse(targetJson);
-            const isTargetHasKey = Object.keys(updatedTargetData).includes(key);
-            if (!isTargetHasKey) {
-              removeHighlight();
-              return;
-            }
-            const isParamsValid =
-              this.getTotalParams(updatedTargetData[key]) ===
-              sourceArbValidationData.nParams;
-            const isParenthesesValid =
-              this.getTotalParentheses(updatedTargetData[key]) ===
-              sourceArbValidationData.nParentheses;
-            if (isParamsValid && isParenthesesValid) {
-              removeHighlight();
+            const updatedTargetData: Record<string, string> =
+              JSON.parse(targetJson);
+            if (this.isValid(sourceArb.data, updatedTargetData, key)) {
+              return removeHighlight();
             }
           }
         })
@@ -200,7 +160,40 @@ export class ArbValidationRepository extends BaseDisposable {
   }
 
   private getTotalParentheses(value: string): number {
-    return (value.match(/[(){}[\]]/g) || []).length;
+    return (value.match(/[(){}\[\]⌜⌟『』<>《》〔〕〘〙【】〖〗⦅⦆]/g) || [])
+      .length;
+  }
+
+  private getTotalHtmlEntites(value: string): number {
+    return (value.match(/&[a-zA-Z]+;/g) || []).length;
+  }
+
+  private isValid(
+    sourceData: Record<string, string>,
+    targetData: Record<string, string>,
+    key: string
+  ): boolean {
+    const sourceValue = sourceData[key];
+    const targetValue = targetData[key];
+    if (!targetValue) {
+      return false;
+    } else if (
+      this.getTotalParams(sourceValue) !== this.getTotalParams(targetValue)
+    ) {
+      return false;
+    } else if (
+      this.getTotalParentheses(sourceValue) !==
+      this.getTotalParentheses(targetValue)
+    ) {
+      return false;
+    } else if (
+      this.getTotalHtmlEntites(sourceValue) !==
+      this.getTotalHtmlEntites(targetValue)
+    ) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   public getParamsValidation(arb: Arb): ArbValidation {
@@ -214,6 +207,7 @@ export class ArbValidationRepository extends BaseDisposable {
         value,
         nParams: this.getTotalParams(value),
         nParentheses: this.getTotalParentheses(value),
+        nHtmlEntities: this.getTotalHtmlEntites(value),
       };
     }
     return parmsValidation;
