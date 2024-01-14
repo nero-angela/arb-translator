@@ -16,11 +16,7 @@
 	},
 	"include": [
 		"./src/**/*.ts",
-		"./src/**/*.html",
-		"./src/**/*.css",
-		"./src/**/*.js",
-		"./src"
-, "html"	],
+	],
 	"exclude": [
 		"node_modules",
 		".vscode",

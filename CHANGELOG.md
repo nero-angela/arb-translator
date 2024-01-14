@@ -2,6 +2,14 @@
 
 All notable changes to the "arb-translator" extension will be documented in this file.
 
+## [1.2.1] - 24.01.14
+
+### Removed
+- Remove unused HTML files.
+
+### Fixed
+- Fix command not found issue by adding a dependency.
+
 ## [1.2.0] - 24.01.14
 
 ### Added
