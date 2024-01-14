@@ -83,14 +83,27 @@ export class ArbValidationService {
         break;
       case InvalidType.undecodedHtmlEntityExists:
         // decode html entity
-        const decodedValue = await this.decodeHtmlEntity(targetArb.data[key]);
-        if (decodedValue) {
-          targetArb.data[key] = decodedValue;
-          await this.arbService.upsert(targetArb.filePath, targetArb.data);
+        const isDecode = await Dialog.showConfirmDialog({
+          title: "Do you want to decode HTML entities?",
+        });
+        if (isDecode) {
+          this.decodeHtmlEntities(targetArb, [key]);
         }
         break;
     }
     return false;
+  }
+
+  public async decodeHtmlEntities(targetArb: Arb, keyList: string[]) {
+    const decodedData: Record<string, string> = { ...targetArb.data };
+    for (const key of keyList) {
+      const text: string | undefined = targetArb.data[key];
+      if (text) {
+        const decodedText = he.decode(text);
+        decodedData[key] = decodedText;
+      }
+    }
+    await this.arbService.upsert(targetArb.filePath, decodedData);
   }
 
   private async *generateValidationResult(
@@ -150,16 +163,5 @@ export class ArbValidationService {
       text
     );
     Link.show(url);
-  }
-
-  private async decodeHtmlEntity(text: string): Promise<string | undefined> {
-    const decodedText = he.decode(text);
-    const isDecode = await Dialog.showConfirmDialog({
-      title: "Do you want to decode HTML entities?",
-    });
-    if (!isDecode) {
-      return;
-    }
-    return decodedText;
   }
 }

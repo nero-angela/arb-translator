@@ -37,6 +37,8 @@ export class ArbTranslator implements App {
     [Cmd.configureTargetLanguageCode]: () =>
       this.registry.selectTargetLanguageCodeCmd.run(),
     [Cmd.validateTranslation]: () => this.registry.validateTranslationCmd.run(),
+    [Cmd.decodeAllHtmlEntities]: () =>
+      this.registry.decodeAllHtmlEntitiesCmd.run(),
   };
 
   public init = async () => {

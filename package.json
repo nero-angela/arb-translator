@@ -97,6 +97,10 @@
       {
         "command": "arb-translator.validateTranslation",
         "title": "Arb Translator : Validate Translation"
+      },
+      {
+        "command": "arb-translator.decodeAllHtmlEntities",
+        "title": "Arb Translator : Decode All HTML Entities"
       }
     ]
   },
