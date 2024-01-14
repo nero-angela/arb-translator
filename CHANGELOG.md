@@ -2,6 +2,13 @@
 
 All notable changes to the "arb-translator" extension will be documented in this file.
 
+## [1.2.0] - 24.01.14
+
+### Added
+- Add `Decode All HTML Entities` command.
+- Add a check for the decoding HTML entities to the `Validate Translation` command.
+- Add eslint-watch.
+
 ## [1.1.1] - 24.01.12
 
 ### Updated

@@ -31,13 +31,32 @@ export class Dialog {
     title,
     confirmText,
     cancelText,
+    confirmDesc,
+    cancelDesc,
+    confirmDetail,
+    cancelDetail,
   }: {
     title: string;
     confirmText?: string;
     cancelText?: string;
+    confirmDesc?: string;
+    cancelDesc?: string;
+    confirmDetail?: string;
+    cancelDetail?: string;
   }): Promise<boolean> {
     const select = await vscode.window.showQuickPick(
-      [{ label: confirmText ?? "Yes" }, { label: cancelText ?? "No" }],
+      <vscode.QuickPickItem[]>[
+        {
+          label: confirmText ?? "Yes",
+          description: confirmDesc,
+          detail: confirmDetail,
+        },
+        {
+          label: cancelText ?? "No",
+          description: cancelDesc,
+          detail: cancelDetail,
+        },
+      ],
       {
         title,
       }

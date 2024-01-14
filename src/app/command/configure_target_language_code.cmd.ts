@@ -34,7 +34,7 @@ export class ConfigureTargetLanguageCodeCmd {
 
     // select action
     const action: Action | undefined = await this.selectAction();
-    if (!action) return;
+    if (!action) {return;}
 
     let newLanguageCodeList: LanguageCode[] | undefined;
     switch (action) {
@@ -86,7 +86,7 @@ export class ConfigureTargetLanguageCodeCmd {
         title: "Please select a list of language to translate to.",
       }
     );
-    if (!select) return undefined;
+    if (!select) {return undefined;}
     return <Action>select.action;
   }
 

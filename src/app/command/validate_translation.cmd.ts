@@ -60,7 +60,9 @@ export class ValidateTranslationCmd {
     const validationResult = await this.selectValidationResult(
       validationResultList
     );
-    if (!validationResult) return;
+    if (!validationResult) {
+      return;
+    }
 
     await this.arbValidationService.validate(validationResult);
   }
@@ -69,9 +71,10 @@ export class ValidateTranslationCmd {
     validationResultList: ValidationResult[]
   ): Promise<ValidationResult | undefined> {
     const sectionMap = {
-      [InvalidType.keyNotFound]: "Key Not Found",
-      [InvalidType.invalidParameters]: "Invalid Parameters",
-      [InvalidType.invalidParentheses]: "Invalid Parentheses",
+      [InvalidType.keyNotFound]: `${InvalidType.keyNotFound}`,
+      [InvalidType.invalidParameters]: `${InvalidType.invalidParameters}`,
+      [InvalidType.invalidParentheses]: `${InvalidType.invalidParentheses}`,
+      [InvalidType.undecodedHtmlEntityExists]: `${InvalidType.undecodedHtmlEntityExists}`,
     };
     const selectItem = await Dialog.showSectionedPicker<
       ValidationResult,
@@ -98,7 +101,9 @@ export class ValidateTranslationCmd {
         };
       },
     });
-    if (!selectItem) return selectItem;
+    if (!selectItem) {
+      return selectItem;
+    }
     return selectItem[0];
   }
 }

@@ -4,6 +4,7 @@ export enum Cmd {
   excludeTranslation = "arb-translator.excludeTranslation",
   configureTargetLanguageCode = "arb-translator.configureTargetLanguageCode",
   validateTranslation = "arb-translator.validateTranslation",
+  decodeAllHtmlEntities = "arb-translator.decodeAllHtmlEntities",
 }
 
 export const cmdName: Record<Cmd, string> = {
@@ -13,4 +14,5 @@ export const cmdName: Record<Cmd, string> = {
   [Cmd.excludeTranslation]: "Arb Translator : Exclude Translation",
   [Cmd.configureTargetLanguageCode]:
     "Arb Translator : Configure Target Language Code",
+  [Cmd.decodeAllHtmlEntities]: "Arb Translator : Decode All HTML Entities",
 };

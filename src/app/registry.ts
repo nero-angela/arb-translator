@@ -6,6 +6,7 @@ import { TranslationCacheDataSource } from "./cache/translation_cache.datasource
 import { TranslationCacheRepository } from "./cache/translation_cache.repository";
 import { ConfigureTargetLanguageCodeCmd } from "./command/configure_target_language_code.cmd";
 import { CreateTranslationCacheCmd } from "./command/create_translation_cache.cmd";
+import { DecodeAllHtmlEntitiesCmd } from "./command/decode_all_html_entities.cmd";
 import { ExcludeTranslationCmd } from "./command/exclude_translation.cmd";
 import { InitializeCmd } from "./command/initialize.cmd";
 import { TranslateCmd } from "./command/translate.cmd";
@@ -55,6 +56,7 @@ export class Registry {
   public excludeTranslationCmd: ExcludeTranslationCmd;
   public selectTargetLanguageCodeCmd: ConfigureTargetLanguageCodeCmd;
   public validateTranslationCmd: ValidateTranslationCmd;
+  public decodeAllHtmlEntitiesCmd: DecodeAllHtmlEntitiesCmd;
 
   constructor() {
     // data source
@@ -129,6 +131,12 @@ export class Registry {
       languageService: this.languageService,
     });
     this.validateTranslationCmd = new ValidateTranslationCmd({
+      arbValidationService: this.arbValidationService,
+      languageService: this.languageService,
+      configService: this.configService,
+      arbService: this.arbService,
+    });
+    this.decodeAllHtmlEntitiesCmd = new DecodeAllHtmlEntitiesCmd({
       arbValidationService: this.arbValidationService,
       languageService: this.languageService,
       configService: this.configService,

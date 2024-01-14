@@ -168,7 +168,7 @@ export class TranslateCmd {
 
     // check selected languages
     const selectedLanguages = this.configService.config.targetLanguageCodeList;
-    if (selectedLanguages.length == 0) {
+    if (selectedLanguages.length === 0) {
       throw new ConfigurationRequiredException();
     }
 
@@ -235,8 +235,11 @@ export class TranslateCmd {
 
         // create & update
         // remove deleted items by adding only the key of sourceArbFile
-        if (isKeyInTargetArb) translateStatistic.data.nUpdate += 1;
-        else translateStatistic.data.nCreate += 1;
+        if (isKeyInTargetArb) {
+          translateStatistic.data.nUpdate += 1;
+        } else {
+          translateStatistic.data.nCreate += 1;
+        }
         nextTargetArbData[sourceArbKey] = "will be translated";
         willTranslateData[sourceArbKey] = sourceArb.data[sourceArbKey];
       }

@@ -1,3 +1,4 @@
+import * as he from "he";
 import { TranslationCacheRepository } from "../../cache/translation_cache.repository";
 import { TranslationFailureException } from "../../util/exceptions";
 import { TranslationDataSource } from "../translation.datasource";
@@ -99,21 +100,27 @@ export class GoogleTranslationRepository implements TranslationRepository {
    * @returns string
    */
   private decodeText(dictionary: Record<string, string>, text: string): string {
-    let decodedText: string = text;
+    let result: string = text;
     const dictKeys = Object.keys(dictionary);
 
     // restore {params}
     for (const i in dictKeys) {
       const key = dictKeys[i];
-      decodedText = decodedText.replace(key, (match) => {
+      result = result.replace(key, (match) => {
         return dictionary[match] || match;
       });
     }
 
-    // replace &#39; to '
-    decodedText.replaceAll("&#39;", "'");
+    // decode html entity (e.g. &#39; -> ' / &gt; -> >)
+    result = he.decode(result);
 
-    return decodedText;
+    // replace punctuation marks
+    result.replaceAll("（", "(");
+    result.replaceAll("）", ")");
+    result.replaceAll("！", "!");
+    result.replaceAll("？", "?");
+
+    return result;
   }
 
   /**
