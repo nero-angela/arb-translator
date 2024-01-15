@@ -11,7 +11,6 @@ export interface Language {
   languageCode: string;
 }
 
-
 export interface CustomArbFileName {
   data: Record<LanguageCode, ArbFileName>;
   languageCodeList: LanguageCode[];

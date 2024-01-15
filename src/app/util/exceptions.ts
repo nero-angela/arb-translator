@@ -6,6 +6,14 @@ export class ConfigurationRequiredException extends BaseException {}
 
 export class APIKeyRequiredException extends BaseException {}
 
+export class GoogleSheetConfigRequiredException extends BaseException {
+  constructor() {
+    super(
+      `Please add "googleSheet.id" and "googleSheet.name" to the settings.`
+    );
+  }
+}
+
 export class ConfigNotFoundException extends BaseException {
   constructor() {
     super(

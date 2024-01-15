@@ -14,6 +14,9 @@ import { UploadToGoogleSheetCmd } from "./command/upload_to_google_sheet.cmd";
 import { ValidateTranslationCmd } from "./command/validate_translation.cmd";
 import { ConfigRepository } from "./config/config.repository";
 import { ConfigService } from "./config/config.service";
+import { GoogleAuthService } from "./google_sheet/google_auth.service";
+import { GoogleSheetRepository } from "./google_sheet/google_sheet.repository";
+import { GoogleSheetService } from "./google_sheet/google_sheet.service";
 import { HistoryRepository } from "./history/history.repository";
 import { HistoryService } from "./history/history.service";
 import { LanguageService } from "./language/language.service";
@@ -36,6 +39,7 @@ export class Registry {
   private arbValidationRepository: ArbValidationRepository;
   private historyRepository: HistoryRepository;
   private configRepository: ConfigRepository;
+  private googleSheetRepository: GoogleSheetRepository;
 
   /**
    * Service
@@ -47,6 +51,8 @@ export class Registry {
   private translationService: GoogleTranslationService;
   private arbStatisticService: ArbStatisticService;
   private arbValidationService: ArbValidationService;
+  private googleAuthService: GoogleAuthService;
+  private googleSheetService: GoogleSheetService;
 
   /**
    * Command
@@ -76,6 +82,7 @@ export class Registry {
     this.arbValidationRepository = new ArbValidationRepository();
     this.historyRepository = new HistoryRepository();
     this.configRepository = new ConfigRepository();
+    this.googleSheetRepository = new GoogleSheetRepository();
 
     // service
     this.historyService = new HistoryService({
@@ -102,6 +109,10 @@ export class Registry {
       languageService: this.languageService,
       translationService: this.translationService,
       arbValidationRepository: this.arbValidationRepository,
+    });
+    this.googleAuthService = new GoogleAuthService();
+    this.googleSheetService = new GoogleSheetService({
+      googleSheetRepository: this.googleSheetRepository,
     });
 
     // cmd
@@ -145,6 +156,8 @@ export class Registry {
       arbService: this.arbService,
     });
     this.uploadToGoogleSheetCmd = new UploadToGoogleSheetCmd({
+      googleSheetService: this.googleSheetService,
+      googleAuthService: this.googleAuthService,
       arbValidationService: this.arbValidationService,
       languageService: this.languageService,
       configService: this.configService,
