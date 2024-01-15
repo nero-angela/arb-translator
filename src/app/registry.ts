@@ -10,6 +10,7 @@ import { DecodeAllHtmlEntitiesCmd } from "./command/decode_all_html_entities.cmd
 import { ExcludeTranslationCmd } from "./command/exclude_translation.cmd";
 import { InitializeCmd } from "./command/initialize.cmd";
 import { TranslateCmd } from "./command/translate.cmd";
+import { UploadToGoogleSheetCmd } from "./command/upload_to_google_sheet.cmd";
 import { ValidateTranslationCmd } from "./command/validate_translation.cmd";
 import { ConfigRepository } from "./config/config.repository";
 import { ConfigService } from "./config/config.service";
@@ -57,6 +58,7 @@ export class Registry {
   public selectTargetLanguageCodeCmd: ConfigureTargetLanguageCodeCmd;
   public validateTranslationCmd: ValidateTranslationCmd;
   public decodeAllHtmlEntitiesCmd: DecodeAllHtmlEntitiesCmd;
+  public uploadToGoogleSheetCmd: UploadToGoogleSheetCmd;
 
   constructor() {
     // data source
@@ -137,6 +139,12 @@ export class Registry {
       arbService: this.arbService,
     });
     this.decodeAllHtmlEntitiesCmd = new DecodeAllHtmlEntitiesCmd({
+      arbValidationService: this.arbValidationService,
+      languageService: this.languageService,
+      configService: this.configService,
+      arbService: this.arbService,
+    });
+    this.uploadToGoogleSheetCmd = new UploadToGoogleSheetCmd({
       arbValidationService: this.arbValidationService,
       languageService: this.languageService,
       configService: this.configService,

@@ -70,8 +70,7 @@
                     "description": "arb file name"
                   }
                 }
-              },
-              "description": "TODO : gist 링크 연결해서 샘플 보여주기"
+              }
             }
           }
         }
@@ -101,6 +100,10 @@
       {
         "command": "arb-translator.decodeAllHtmlEntities",
         "title": "Arb Translator : Decode All HTML Entities"
+      },
+      {
+        "command": "arb-translator.uploadToGoogleSheet",
+        "title": "Arb Translator : Upload To Google Sheet"
       }
     ]
   },
