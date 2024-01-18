@@ -141,8 +141,11 @@ Because settings may differ for each project, adding settings to the project wor
   |`&gt;`|`>`|
 
 ## Upload To Google Sheet
-- Upload the arb file to Google Sheet in the following format. (Please be aware that if an existing value exists, it will be overwritten.)
-  |Key|Decoded HTML entity|
-  |:-:|:-:|
-  |`&quot;`|`"`|
-  |`&gt;`|`>`|
+- Command to upload the arb file to Google Sheet in the following format. (Please be aware that if an existing value exists, it will be overwritten.)
+  |version|language1|language2|
+  |:-:|:-:|:-:|
+  |key1|language1 value1|language2 value1|
+  |key2|language1 value2|language2 value2|
+- It will only be uploaded if it passes the validation.
+- Please note that all existing values will be deleted and uploaded when uploading.
+- The `googleSheet` setting is required to execute the command.
