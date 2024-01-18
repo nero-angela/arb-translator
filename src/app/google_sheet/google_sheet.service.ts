@@ -33,6 +33,6 @@ export class GoogleSheetService {
   }
 
   public open(sheetId: string) {
-    Link.show(`https://docs.google.com/spreadsheets/d/${sheetId}`);
+    Link.show(`https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`);
   }
 }

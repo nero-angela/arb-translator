@@ -90,8 +90,8 @@ export class UploadToGoogleSheetCmd {
       }
     }
 
-    // list of languages to be translated
-    const targetLanguages: Language[] = targetLanguageCodeList.map(
+    // list of languages to upload
+    const uploadLanguages: Language[] = googleSheet.uploadLanguageCodeList.map(
       (languageCode) => {
         return this.languageService.getLanguageByLanguageCode(languageCode);
       }
@@ -102,7 +102,7 @@ export class UploadToGoogleSheetCmd {
     const validationResultList =
       await this.arbValidationService.getValidationResultList(
         sourceArb,
-        targetLanguages
+        uploadLanguages
       );
     if (validationResultList.length > 0) {
       // invalid
@@ -132,8 +132,8 @@ export class UploadToGoogleSheetCmd {
       placeHolder: "e.g. 1.0.0 (The version is written in the A1 input box.)",
     });
 
-    // ready to upload
-    Toast.i(`Ready to upload data...`);
+    // Preparing to upload data
+    Toast.i(`Preparing to upload data...`);
     const data: string[][] = [
       [
         `v${version}` ?? "v1.0.0",
@@ -149,22 +149,23 @@ export class UploadToGoogleSheetCmd {
         }, []),
       ],
     ];
-    for (const targetLanguage of targetLanguages) {
-      const targetFilePath =
+    for (const uploadLanguage of uploadLanguages) {
+      const uploadArbFilePath =
         this.languageService.getArbFilePathFromLanguageCode(
-          targetLanguage.languageCode
+          uploadLanguage.languageCode
         );
-      const targetArb = await this.arbService.getArb(targetFilePath);
+      const uploadArb = await this.arbService.getArb(uploadArbFilePath);
       data.push([
-        targetLanguage.name,
-        ...targetArb.keys.reduce<string[]>((values, key) => {
+        uploadLanguage.name,
+        ...uploadArb.keys.reduce<string[]>((values, key) => {
           if (!key.includes("@")) {
-            values.push(targetArb.data[key]);
+            values.push(uploadArb.data[key]);
           }
           return values;
         }, []),
       ]);
     }
+    Toast.i(`Uploading data...`);
 
     // clear previous data
     await await this.googleSheetService.clear({
@@ -184,7 +185,7 @@ export class UploadToGoogleSheetCmd {
       },
     });
 
-    Toast.i(`🟢 Google Sheet upload completed`);
+    Toast.i(`🟢 Upload completed`);
     await vscode.commands.executeCommand(Cmd.openGoogleSheet);
   }
 }
