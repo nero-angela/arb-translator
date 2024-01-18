@@ -1,7 +1,7 @@
-import { ConfigService } from "../config/config.service";
-import { GoogleSheetService } from "../google_sheet/google_sheet.service";
-import { GoogleSheetConfigRequiredException } from "../util/exceptions";
-import { Workspace } from "../util/workspace";
+import { ConfigService } from "../../config/config.service";
+import { GoogleSheetService } from "../../google_sheet/google_sheet.service";
+import { GoogleSheetConfigRequiredException } from "../../util/exceptions";
+import { Workspace } from "../../util/workspace";
 
 interface InitParams {
   googleSheetService: GoogleSheetService;

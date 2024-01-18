@@ -1,16 +1,16 @@
 import * as vscode from "vscode";
-import { ArbService } from "../arb/arb.service";
-import { ArbValidationService } from "../arb_validation/arb_validation.service";
-import { ConfigService } from "../config/config.service";
-import { GoogleAuthService } from "../google_sheet/google_auth.service";
-import { GoogleSheetService } from "../google_sheet/google_sheet.service";
-import { Language } from "../language/language";
-import { LanguageService } from "../language/language.service";
-import { Dialog } from "../util/dialog";
-import { GoogleSheetConfigRequiredException } from "../util/exceptions";
-import { Toast } from "../util/toast";
-import { Workspace } from "../util/workspace";
-import { Cmd } from "./cmd";
+import { ArbService } from "../../arb/arb.service";
+import { ArbValidationService } from "../../arb_validation/arb_validation.service";
+import { ConfigService } from "../../config/config.service";
+import { GoogleAuthService } from "../../google_sheet/google_auth.service";
+import { GoogleSheetService } from "../../google_sheet/google_sheet.service";
+import { Language } from "../../language/language";
+import { LanguageService } from "../../language/language.service";
+import { Dialog } from "../../util/dialog";
+import { GoogleSheetConfigRequiredException } from "../../util/exceptions";
+import { Toast } from "../../util/toast";
+import { Workspace } from "../../util/workspace";
+import { Cmd } from "../cmd";
 
 interface InitParams {
   googleSheetService: GoogleSheetService;

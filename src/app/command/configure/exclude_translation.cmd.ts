@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
-import { Arb } from "../arb/arb";
-import { ArbService } from "../arb/arb.service";
-import { ConfigService } from "../config/config.service";
-import { HistoryChange } from "../history/history";
-import { HistoryService } from "../history/history.service";
-import { SourceArbFilePathRequiredException } from "../util/exceptions";
-import { Toast } from "../util/toast";
+import { Arb } from "../../arb/arb";
+import { ArbService } from "../../arb/arb.service";
+import { ConfigService } from "../../config/config.service";
+import { HistoryChange } from "../../history/history";
+import { HistoryService } from "../../history/history.service";
+import { SourceArbFilePathRequiredException } from "../../util/exceptions";
+import { Toast } from "../../util/toast";
 
 interface InitParams {
   arbService: ArbService;
