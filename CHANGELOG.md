@@ -2,6 +2,13 @@
 
 All notable changes to the "arb-translator" extension will be documented in this file.
 
+## [1.3.2] - 24.01.18
+### Added
+- Add notification of progress in translation.
+
+### Updated
+- Update logic for inspecting settings in the `Upload To Google Sheet` command.
+
 ## [1.3.1] - 24.01.18
 ### Added
 - Add `googleSheet.uploadLanguageCodeList` setting.
