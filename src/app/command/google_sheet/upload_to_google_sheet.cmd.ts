@@ -49,27 +49,28 @@ export class UploadToGoogleSheetCmd {
       this.configService.config;
     const sourceArb = await this.arbService.getArb(sourceArbFilePath);
 
+    // Select upload language code list
+    const uploadLanguageCodeList =
+      (await this.languageService.selectLanguageCodeList(
+        sourceArb.language,
+        (languageCode) => {
+          return (
+            googleSheet?.uploadLanguageCodeList ?? targetLanguageCodeList
+          ).includes(languageCode);
+        }
+      )) ?? [];
+    if (!uploadLanguageCodeList) {
+      return;
+    }
+
+    // check required google sheet settings
     if (
       !googleSheet ||
       !googleSheet.id ||
       !googleSheet.name ||
       !googleSheet.credentialFilePath ||
-      (googleSheet?.uploadLanguageCodeList?.length ?? 0) === 0
+      uploadLanguageCodeList.length === 0
     ) {
-      // Select upload language code list
-      const uploadLanguageCodeList =
-        await this.languageService.selectLanguageCodeList(
-          sourceArb.language,
-          (languageCode) => {
-            return (
-              googleSheet?.uploadLanguageCodeList ?? targetLanguageCodeList
-            ).includes(languageCode);
-          }
-        );
-      if (!uploadLanguageCodeList) {
-        return;
-      }
-
       Workspace.open();
       this.configService.update({
         ...this.configService.config,
@@ -91,7 +92,7 @@ export class UploadToGoogleSheetCmd {
     }
 
     // list of languages to upload
-    const uploadLanguages: Language[] = googleSheet.uploadLanguageCodeList.map(
+    const uploadLanguages: Language[] = uploadLanguageCodeList.map(
       (languageCode) => {
         return this.languageService.getLanguageByLanguageCode(languageCode);
       }
