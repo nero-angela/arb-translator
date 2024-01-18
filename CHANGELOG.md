@@ -2,6 +2,10 @@
 
 All notable changes to the "arb-translator" extension will be documented in this file.
 
+## [1.3.0] - 24.01.18
+### Added
+- Add `Upload To Google Sheet` command.
+
 ## [1.2.1] - 24.01.14
 
 ### Removed

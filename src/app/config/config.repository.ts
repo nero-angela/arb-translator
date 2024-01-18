@@ -37,6 +37,7 @@ export class ConfigRepository extends BaseInitRequired {
     customArbFileName,
     sourceArbFilePath,
     googleAPIKey,
+    googleSheet,
     targetLanguageCodeList,
   }: ConfigParams): Thenable<void> {
     super.checkInit();
@@ -45,6 +46,7 @@ export class ConfigRepository extends BaseInitRequired {
       customArbFileName: customArbFileName ?? this.config.customArbFileName,
       sourceArbFilePath: sourceArbFilePath ?? this.config.sourceArbFilePath,
       googleAPIKey: googleAPIKey ?? this.config.googleAPIKey,
+      googleSheet: googleSheet ?? this.config.googleSheet,
       targetLanguageCodeList:
         targetLanguageCodeList ?? this.config.targetLanguageCodeList,
     };

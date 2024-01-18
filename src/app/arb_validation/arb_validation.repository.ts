@@ -3,12 +3,7 @@ import { Arb } from "../arb/arb";
 import { BaseDisposable } from "../util/base/base_disposable";
 import { Editor } from "../util/editor";
 import { Highlight, HighlightType } from "../util/highlight";
-import {
-  ArbValidation,
-  ArbValidationData,
-  InvalidType,
-  ValidationResult,
-} from "./arb_validation";
+import { ArbValidation, InvalidType, ValidationResult } from "./arb_validation";
 
 export class ArbValidationRepository extends BaseDisposable {
   public async *generateValidationResult(
@@ -80,11 +75,7 @@ export class ArbValidationRepository extends BaseDisposable {
    * @param key
    * @param sourceArbValidationData
    */
-  public async highlight(
-    sourceArb: Arb,
-    targetArb: Arb,
-    key: string,
-  ) {
+  public async highlight(sourceArb: Arb, targetArb: Arb, key: string) {
     try {
       // clear remain decorations
       Highlight.clear();

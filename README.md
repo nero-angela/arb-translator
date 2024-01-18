@@ -38,15 +38,17 @@ Because settings may differ for each project, adding settings to the project wor
   ```
   {
     "arbTranslator.config": {
-      "arbFilePrefix": "intl_",
       "sourceArbFilePath": "/project/intl_en.arb",
-      "googleAPIKey": "YOUR_GOOGLE_API_KEY",
       "targetLanguageCodeList": ["ko", "zh_CN", "fr"],
-      "customArbFileName": {
-        "ko", "zh_CN"
-      },
+      "arbFilePrefix": "intl_",
+      "googleAPIKey": "YOUR_GOOGLE_API_KEY",
       "customArbFileName": {
         "zh_CN": "intl_zh_Hant"
+      },
+      "googleSheet": {
+        id: "YOUR_GOOGLE_SHEET_ID",
+        name: "YOUR_GOOGLE_SHEET_NAME",
+        credentialFilePath: "YOUR_CREDENTIAL_JSON_FILE_ABSOLUTE_PATH"
       }
     }
   }
@@ -59,6 +61,12 @@ Because settings may differ for each project, adding settings to the project wor
   - `arbFilePrefix` : Arb common string to prepend to file name. (e.g. `intl_` : `intl_ko.arb`, `intl_hi.arb`, `intl_fr.arb`)
   - `googleAPIKey` : This is a Google API key and is required when using the paid translation function.
   - `customArbFileName` : You can customize the arb file name for languageCode in the format `{LanguageCode: CUSTOM_NAME}` and arbFilePrefix is not applied.
+  - `googleSheet` : These settings are required to upload an ARB file to Google Sheets.
+    - `id` : You can find the spreadsheet ID in a Google Sheets URL: `https://docs.google.com/spreadsheets/d/<GOOGLE_SHEET_ID>/edit#gid=0`
+    - `name` : Sheet name at the bottom of google sheet.
+    - `credentialFilePath` : Absolute path to JSON key files created after creating a [service account](https://developers.google.com/workspace/guides/create-credentials?#service-account) on the Google Cloud console.
+
+
 
 
 # Command
@@ -131,3 +139,13 @@ Because settings may differ for each project, adding settings to the project wor
   |:-:|:-:|
   |`&quot;`|`"`|
   |`&gt;`|`>`|
+
+## Upload To Google Sheet
+- Command to upload the arb file to Google Sheet in the following format. (Please be aware that if an existing value exists, it will be overwritten.)
+  |version|language1|language2|
+  |:-:|:-:|:-:|
+  |key1|language1 value1|language2 value1|
+  |key2|language1 value2|language2 value2|
+- It will only be uploaded if it passes the validation.
+- Please note that all existing values will be deleted and uploaded when uploading.
+- The `googleSheet` setting is required to execute the command.

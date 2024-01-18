@@ -39,6 +39,7 @@ export class ArbTranslator implements App {
     [Cmd.validateTranslation]: () => this.registry.validateTranslationCmd.run(),
     [Cmd.decodeAllHtmlEntities]: () =>
       this.registry.decodeAllHtmlEntitiesCmd.run(),
+    [Cmd.uploadToGoogleSheet]: () => this.registry.uploadToGoogleSheetCmd.run(),
   };
 
   public init = async () => {
