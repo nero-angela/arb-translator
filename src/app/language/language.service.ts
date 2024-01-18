@@ -281,18 +281,20 @@ export class LanguageService {
    * @param sourceArbLanguage
    * @returns selected language code list
    */
-  public async selectLanguageCodeList(sourceArbLanguage: Language, picked: (languageCode: LanguageCode) => boolean): Promise<LanguageCode[] | undefined> {
+  public async selectLanguageCodeList(
+    sourceArbLanguage: Language,
+    picked: (languageCode: LanguageCode) => boolean
+  ): Promise<LanguageCode[] | undefined> {
     const currentLanguageCodeList =
       this.configService.config.targetLanguageCodeList;
-    const supportLanguageList: Language[] = this.supportLanguages.reduce<Language[]>(
-      (prev, curr) => {
-        if (curr !== sourceArbLanguage) {
-          prev.push(curr);
-        }
-        return prev;
-      },
-      []
-    );
+    const supportLanguageList: Language[] = this.supportLanguages.reduce<
+      Language[]
+    >((prev, curr) => {
+      if (curr !== sourceArbLanguage) {
+        prev.push(curr);
+      }
+      return prev;
+    }, []);
 
     // pick items
     const pickItems: vscode.QuickPickItem[] = supportLanguageList.map(
@@ -312,5 +314,14 @@ export class LanguageService {
     });
 
     return selectedItems?.map((item) => item.description!);
+  }
+
+  /**
+   * Get file name from LanguageCode
+   * @param languageCode
+   */
+  public getFileNameFromLanguageCode(languageCode: LanguageCode): string {
+    const arbFilePath = this.getArbFilePathFromLanguageCode(languageCode);
+    return path.basename(arbFilePath);
   }
 }

@@ -189,111 +189,152 @@ export class TranslateCmd {
     history: History;
     targetLanguages: Language[];
   }) {
-    const translateStatisticList: TranslationStatistic[] = [];
-    for (const targetLanguage of targetLanguages) {
-      if (targetLanguage.languageCode === sourceArb.language.languageCode) {
-        // skip source arb file
-        continue;
-      }
+    const translationStatisticList: TranslationStatistic[] = [];
 
-      const targetArbFilePath =
-        this.languageService.getArbFilePathFromLanguageCode(
-          targetLanguage.languageCode
-        );
-      // create target arb file if does not exist
-      this.arbService.createIfNotExist(targetArbFilePath, targetLanguage);
+    // show progress
+    const total = targetLanguages.length;
+    let totalTranslated: number = 0;
+    await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        cancellable: true,
+      },
+      async (progress, token) => {
+        for (const targetLanguage of targetLanguages) {
+          if (token.isCancellationRequested) {
+            // cancel
+            Toast.i(`🟠 Canceled`);
+            break;
+          }
+          totalTranslated += 1;
+          const translationStatistic = await this.translateTargetLanguage({
+            translationType,
+            sourceArb,
+            history,
+            targetLanguage,
+          });
+          if (translationStatistic) {
+            const targetArbFileName =
+              this.languageService.getFileNameFromLanguageCode(
+                targetLanguage.languageCode
+              );
 
-      // get targetArb file
-      const targetArb: Arb = await this.arbService.getArb(targetArbFilePath);
-
-      // translation target classification
-      const nextTargetArbData: Record<string, string> = {};
-      const willTranslateData: Record<string, string> = {};
-
-      // statistic
-      const translateStatistic = new TranslationStatistic();
-      for (const sourceArbKey of sourceArb.keys) {
-        if (sourceArbKey === "@@locale") {
-          nextTargetArbData[sourceArbKey] = targetArb.language.languageCode;
-          continue;
-        } else if (sourceArbKey.indexOf("@") !== -1) {
-          continue;
-        }
-
-        const isKeyInHistory: boolean = history.keys.includes(sourceArbKey);
-        const isKeyInTargetArb: boolean = targetArb.keys.includes(sourceArbKey);
-        if (isKeyInHistory && isKeyInTargetArb) {
-          const sourceArbValue = sourceArb.data[sourceArbKey];
-          const historyArbValue = history.data[sourceArbKey];
-          if (sourceArbValue === historyArbValue) {
-            // skip
-            nextTargetArbData[sourceArbKey] = targetArb.data[sourceArbKey];
-            translateStatistic.data.nSkip += 1;
-            continue;
+            progress.report({
+              increment: total / 100,
+              message: `${targetArbFileName} translated. (${totalTranslated} / ${total})`,
+            });
+            translationStatisticList.push(translationStatistic);
           }
         }
-
-        // create & update
-        // remove deleted items by adding only the key of sourceArbFile
-        if (isKeyInTargetArb) {
-          translateStatistic.data.nUpdate += 1;
-        } else {
-          translateStatistic.data.nCreate += 1;
-        }
-        nextTargetArbData[sourceArbKey] = "will be translated";
-        willTranslateData[sourceArbKey] = sourceArb.data[sourceArbKey];
       }
-
-      const willTranslateKeys: string[] = Object.keys(willTranslateData);
-      const willTranslateValues: string[] = Object.values(willTranslateData);
-      const nWillTranslate: number = willTranslateKeys.length;
-      if (nWillTranslate > 0) {
-        // translate
-        const translateResult =
-          translationType === TranslationType.paid
-            ? await this.translationService.paidTranslate({
-                apiKey: this.configService.config.googleAPIKey,
-                queries: willTranslateValues,
-                sourceLang: sourceArb.language,
-                targetLang: targetArb.language,
-              })
-            : await this.translationService.freeTranslate({
-                queries: willTranslateValues,
-                sourceLang: sourceArb.language,
-                targetLang: targetArb.language,
-              });
-        willTranslateKeys.forEach(
-          (key, index) => (nextTargetArbData[key] = translateResult.data[index])
-        );
-        translateStatistic.data.nAPICall = translateResult.nAPICall;
-        translateStatistic.data.nCache = translateResult.nCache;
-      }
-
-      // upsert target arb file
-      this.arbService.upsert(targetArbFilePath, nextTargetArbData);
-      const targetArbFileName = targetArb.filePath.split("/").pop();
-      translateStatisticList.push(translateStatistic);
-      Toast.i(
-        `🟢 ${targetArbFileName} translated. (${translationType.toString()} ${
-          translateStatistic.log
-        })`
-      );
-    }
+    );
 
     // create arb history
     this.historyService.update(sourceArb.data);
-    const totalTranslateStatistic = translateStatisticList.reduce(
+    const totalTranslateStatistic = translationStatisticList.reduce(
       (prev, curr) => {
         return prev.sum(curr);
       },
       new TranslationStatistic()
     );
     Toast.i(
-      `Total ${
-        targetLanguages.length
-      } languages translated. (${translationType.toString()} ${
+      `Total ${totalTranslated} languages translated. (${translationType.toString()} ${
         totalTranslateStatistic.log
       })`
     );
+  }
+
+  private async translateTargetLanguage({
+    translationType,
+    sourceArb,
+    history,
+    targetLanguage,
+  }: {
+    translationType: TranslationType;
+    sourceArb: Arb;
+    history: History;
+    targetLanguage: Language;
+  }): Promise<TranslationStatistic | undefined> {
+    if (targetLanguage.languageCode === sourceArb.language.languageCode) {
+      // skip source arb file
+      return;
+    }
+
+    const targetArbFilePath =
+      this.languageService.getArbFilePathFromLanguageCode(
+        targetLanguage.languageCode
+      );
+    // create target arb file if does not exist
+    this.arbService.createIfNotExist(targetArbFilePath, targetLanguage);
+
+    // get targetArb file
+    const targetArb: Arb = await this.arbService.getArb(targetArbFilePath);
+
+    // translation target classification
+    const nextTargetArbData: Record<string, string> = {};
+    const willTranslateData: Record<string, string> = {};
+
+    // statistic
+    const translationStatistic = new TranslationStatistic();
+    for (const sourceArbKey of sourceArb.keys) {
+      if (sourceArbKey === "@@locale") {
+        nextTargetArbData[sourceArbKey] = targetArb.language.languageCode;
+        continue;
+      } else if (sourceArbKey.indexOf("@") !== -1) {
+        continue;
+      }
+
+      const isKeyInHistory: boolean = history.keys.includes(sourceArbKey);
+      const isKeyInTargetArb: boolean = targetArb.keys.includes(sourceArbKey);
+      if (isKeyInHistory && isKeyInTargetArb) {
+        const sourceArbValue = sourceArb.data[sourceArbKey];
+        const historyArbValue = history.data[sourceArbKey];
+        if (sourceArbValue === historyArbValue) {
+          // skip
+          nextTargetArbData[sourceArbKey] = targetArb.data[sourceArbKey];
+          translationStatistic.data.nSkip += 1;
+          continue;
+        }
+      }
+
+      // create & update
+      // remove deleted items by adding only the key of sourceArbFile
+      if (isKeyInTargetArb) {
+        translationStatistic.data.nUpdate += 1;
+      } else {
+        translationStatistic.data.nCreate += 1;
+      }
+      nextTargetArbData[sourceArbKey] = "will be translated";
+      willTranslateData[sourceArbKey] = sourceArb.data[sourceArbKey];
+    }
+
+    const willTranslateKeys: string[] = Object.keys(willTranslateData);
+    const willTranslateValues: string[] = Object.values(willTranslateData);
+    const nWillTranslate: number = willTranslateKeys.length;
+    if (nWillTranslate > 0) {
+      // translate
+      const translateResult =
+        translationType === TranslationType.paid
+          ? await this.translationService.paidTranslate({
+              apiKey: this.configService.config.googleAPIKey,
+              queries: willTranslateValues,
+              sourceLang: sourceArb.language,
+              targetLang: targetArb.language,
+            })
+          : await this.translationService.freeTranslate({
+              queries: willTranslateValues,
+              sourceLang: sourceArb.language,
+              targetLang: targetArb.language,
+            });
+      willTranslateKeys.forEach(
+        (key, index) => (nextTargetArbData[key] = translateResult.data[index])
+      );
+      translationStatistic.data.nAPICall = translateResult.nAPICall;
+      translationStatistic.data.nCache = translateResult.nCache;
+    }
+
+    // upsert target arb file
+    this.arbService.upsert(targetArbFilePath, nextTargetArbData);
+    return translationStatistic;
   }
 }

@@ -1,6 +1,17 @@
 import * as vscode from "vscode";
 import { Link } from "./link";
 
+type SectionLabel = string;
+type SectionedPickerItem<D> = {
+  section: SectionLabel;
+  item: vscode.QuickPickItem;
+  data: D;
+};
+
+interface PickItem<D> extends vscode.QuickPickItem {
+  data?: D;
+}
+
 export class Dialog {
   public static showTargetLanguageCodeListRequiredDialog() {
     vscode.window
@@ -125,15 +136,4 @@ export class Dialog {
       );
     }
   }
-}
-
-type SectionLabel = string;
-type SectionedPickerItem<D> = {
-  section: SectionLabel;
-  item: vscode.QuickPickItem;
-  data: D;
-};
-
-interface PickItem<D> extends vscode.QuickPickItem {
-  data?: D;
 }
