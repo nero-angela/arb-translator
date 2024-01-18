@@ -1,5 +1,6 @@
 import { GaxiosPromise } from "gaxios";
 import { sheets_v4 } from "googleapis";
+import { Link } from "../util/link";
 import {
   GSheetClearParams,
   GSheetGetParams,
@@ -29,5 +30,9 @@ export class GoogleSheetService {
 
   public clear(params: GSheetClearParams) {
     return this.googleSheetRepository.clear(params);
+  }
+
+  public open(sheetId: string) {
+    Link.show(`https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=0`);
   }
 }

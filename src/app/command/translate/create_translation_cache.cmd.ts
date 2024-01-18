@@ -1,12 +1,12 @@
 import path from "path";
 import * as vscode from "vscode";
-import { Arb } from "../arb/arb";
-import { ArbService } from "../arb/arb.service";
-import { TranslationCacheKey } from "../cache/translation_cache";
-import { TranslationCacheRepository } from "../cache/translation_cache.repository";
-import { ConfigService } from "../config/config.service";
-import { SourceArbFilePathRequiredException } from "../util/exceptions";
-import { Toast } from "../util/toast";
+import { Arb } from "../../arb/arb";
+import { ArbService } from "../../arb/arb.service";
+import { TranslationCacheKey } from "../../cache/translation_cache";
+import { TranslationCacheRepository } from "../../cache/translation_cache.repository";
+import { ConfigService } from "../../config/config.service";
+import { SourceArbFilePathRequiredException } from "../../util/exceptions";
+import { Toast } from "../../util/toast";
 
 interface InitParams {
   arbService: ArbService;

@@ -6,6 +6,7 @@ export type GoogleSheetConfig = {
   id: string;
   name: string;
   credentialFilePath: string;
+  uploadLanguageCodeList: LanguageCode[];
 };
 
 export interface Config {

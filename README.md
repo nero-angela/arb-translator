@@ -48,7 +48,8 @@ Because settings may differ for each project, adding settings to the project wor
       "googleSheet": {
         id: "YOUR_GOOGLE_SHEET_ID",
         name: "YOUR_GOOGLE_SHEET_NAME",
-        credentialFilePath: "YOUR_CREDENTIAL_JSON_FILE_ABSOLUTE_PATH"
+        credentialFilePath: "YOUR_CREDENTIAL_JSON_FILE_ABSOLUTE_PATH",
+        uploadLanguageCodeList: ["ko", "zh_CN", "fr"]
       }
     }
   }
@@ -65,6 +66,7 @@ Because settings may differ for each project, adding settings to the project wor
     - `id` : You can find the spreadsheet ID in a Google Sheets URL: `https://docs.google.com/spreadsheets/d/<GOOGLE_SHEET_ID>/edit#gid=0`
     - `name` : Sheet name at the bottom of google sheet.
     - `credentialFilePath` : Absolute path to JSON key files created after creating a [service account](https://developers.google.com/workspace/guides/create-credentials?#service-account) on the Google Cloud console.
+    - `uploadLanguageCodeList` : List of languageCode you want to upload to google sheet.
 
 
 
@@ -149,3 +151,7 @@ Because settings may differ for each project, adding settings to the project wor
 - It will only be uploaded if it passes the validation.
 - Please note that all existing values will be deleted and uploaded when uploading.
 - The `googleSheet` setting is required to execute the command.
+
+## Open Google Sheet
+- Command to open the google sheet.
+- The `googleSheet.id` setting is required to execute this command.

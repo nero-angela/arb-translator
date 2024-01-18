@@ -8,9 +8,7 @@ export class APIKeyRequiredException extends BaseException {}
 
 export class GoogleSheetConfigRequiredException extends BaseException {
   constructor() {
-    super(
-      `Please add "googleSheet.id" and "googleSheet.name" to the settings.`
-    );
+    super(`Please add "googleSheet" settings.`);
   }
 }
 

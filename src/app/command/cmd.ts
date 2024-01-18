@@ -6,6 +6,7 @@ export enum Cmd {
   validateTranslation = "arb-translator.validateTranslation",
   decodeAllHtmlEntities = "arb-translator.decodeAllHtmlEntities",
   uploadToGoogleSheet = "arb-translator.uploadToGoogleSheet",
+  openGoogleSheet = "arb-translator.openGoogleSheet",
 }
 
 export const cmdName: Record<Cmd, string> = {
@@ -17,4 +18,5 @@ export const cmdName: Record<Cmd, string> = {
     "Arb Translator : Configure Target Language Code",
   [Cmd.decodeAllHtmlEntities]: "Arb Translator : Decode All HTML Entities",
   [Cmd.uploadToGoogleSheet]: "Arb Translator : Upload To Google Sheet",
+  [Cmd.openGoogleSheet]: "Arb Translator : Open Google Sheet",
 };

@@ -1,11 +1,10 @@
 import path from "path";
 import * as vscode from "vscode";
-import { ArbService } from "../arb/arb.service";
-import { LanguageCode } from "../config/config";
-import { ConfigService } from "../config/config.service";
-import { Language } from "../language/language";
-import { LanguageService } from "../language/language.service";
-import { Toast } from "../util/toast";
+import { ArbService } from "../../arb/arb.service";
+import { LanguageCode } from "../../config/config";
+import { ConfigService } from "../../config/config.service";
+import { LanguageService } from "../../language/language.service";
+import { Toast } from "../../util/toast";
 
 enum Action {
   select = "Select",
@@ -34,12 +33,17 @@ export class ConfigureTargetLanguageCodeCmd {
 
     // select action
     const action: Action | undefined = await this.selectAction();
-    if (!action) {return;}
+    if (!action) {
+      return;
+    }
 
     let newLanguageCodeList: LanguageCode[] | undefined;
     switch (action) {
       case Action.select:
-        newLanguageCodeList = await this.selectLanguageCode(sourceArb.language);
+        newLanguageCodeList = await this.languageService.selectLanguageCodeList(
+          sourceArb.language,
+          (languageCode) => config.targetLanguageCodeList.includes(languageCode)
+        );
         if (!newLanguageCodeList) {
           return;
         }
@@ -86,58 +90,10 @@ export class ConfigureTargetLanguageCodeCmd {
         title: "Please select a list of language to translate to.",
       }
     );
-    if (!select) {return undefined;}
+    if (!select) {
+      return undefined;
+    }
     return <Action>select.action;
-  }
-
-  /**
-   * Select language code
-   * @param sourceArbLanguage
-   */
-  private async selectLanguageCode(
-    sourceArbLanguage: Language
-  ): Promise<LanguageCode[] | undefined> {
-    const currentLanguageCodeList =
-      this.configService.config.targetLanguageCodeList;
-    const supportLanguageList: Language[] =
-      this.getSupportLanguageList(sourceArbLanguage);
-
-    // pick items
-    const pickItems: vscode.QuickPickItem[] = supportLanguageList.map(
-      (language) => {
-        const picked = currentLanguageCodeList.includes(language.languageCode);
-        return {
-          label: language.name,
-          description: language.languageCode,
-          picked,
-        };
-      }
-    );
-
-    // select pick items
-    const selectedItems = await vscode.window.showQuickPick(pickItems, {
-      title: `Please select the language code of the language you wish to translate`,
-      canPickMany: true,
-    });
-
-    return selectedItems?.map((item) => item.description!);
-  }
-
-  /**
-   * Get list of supported language codes excluding languageCode of source arb
-   * @param sourceArbLanguage
-   * @param selectedTargetLanguageCodeList
-   */
-  private getSupportLanguageList(sourceArbLanguage: Language): Language[] {
-    return this.languageService.supportLanguages.reduce<Language[]>(
-      (prev, curr) => {
-        if (curr !== sourceArbLanguage) {
-          prev.push(curr);
-        }
-        return prev;
-      },
-      []
-    );
   }
 
   /**

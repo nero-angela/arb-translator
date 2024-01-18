@@ -4,7 +4,7 @@
   "license": "SEE LICENSE IN LICENSE",
   "displayName": "ARB Translator",
   "description": "Translates ARB files to Google Translator.",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "engines": {
     "vscode": "^1.84.0"
   },
@@ -104,6 +104,10 @@
       {
         "command": "arb-translator.uploadToGoogleSheet",
         "title": "Arb Translator : Upload To Google Sheet"
+      },
+      {
+        "command": "arb-translator.openGoogleSheet",
+        "title": "Arb Translator : Open Google Sheet"
       }
     ]
   },
