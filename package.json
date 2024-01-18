@@ -104,6 +104,10 @@
       {
         "command": "arb-translator.uploadToGoogleSheet",
         "title": "Arb Translator : Upload To Google Sheet"
+      },
+      {
+        "command": "arb-translator.openGoogleSheet",
+        "title": "Arb Translator : Open Google Sheet"
       }
     ]
   },

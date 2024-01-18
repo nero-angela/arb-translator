@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import { Arb } from "../arb/arb";
 import { ArbService } from "../arb/arb.service";
 import { ArbValidationService } from "../arb_validation/arb_validation.service";
 import { ConfigService } from "../config/config.service";
@@ -48,13 +47,29 @@ export class UploadToGoogleSheetCmd {
   async run() {
     const { sourceArbFilePath, targetLanguageCodeList, googleSheet } =
       this.configService.config;
+    const sourceArb = await this.arbService.getArb(sourceArbFilePath);
 
     if (
       !googleSheet ||
       !googleSheet.id ||
       !googleSheet.name ||
-      !googleSheet.credentialFilePath
+      !googleSheet.credentialFilePath ||
+      (googleSheet?.uploadLanguageCodeList?.length ?? 0) === 0
     ) {
+      // Select upload language code list
+      const uploadLanguageCodeList =
+        await this.languageService.selectLanguageCodeList(
+          sourceArb.language,
+          (languageCode) => {
+            return (
+              googleSheet?.uploadLanguageCodeList ?? targetLanguageCodeList
+            ).includes(languageCode);
+          }
+        );
+      if (!uploadLanguageCodeList) {
+        return;
+      }
+
       Workspace.open();
       this.configService.update({
         ...this.configService.config,
@@ -62,13 +77,18 @@ export class UploadToGoogleSheetCmd {
           id: googleSheet?.id ?? "",
           name: googleSheet?.name ?? "",
           credentialFilePath: googleSheet?.credentialFilePath ?? "",
+          uploadLanguageCodeList,
         },
       });
-      throw new GoogleSheetConfigRequiredException();
+      if (
+        !googleSheet?.id ||
+        !googleSheet?.name ||
+        !googleSheet?.credentialFilePath ||
+        uploadLanguageCodeList.length === 0
+      ) {
+        throw new GoogleSheetConfigRequiredException();
+      }
     }
-
-    // load source arb
-    const sourceArb: Arb = await this.arbService.getArb(sourceArbFilePath);
 
     // list of languages to be translated
     const targetLanguages: Language[] = targetLanguageCodeList.map(
@@ -163,6 +183,8 @@ export class UploadToGoogleSheetCmd {
         values: data,
       },
     });
+
     Toast.i(`🟢 Google Sheet upload completed`);
+    await vscode.commands.executeCommand(Cmd.openGoogleSheet);
   }
 }

@@ -1,4 +1,5 @@
 import path from "path";
+import * as vscode from "vscode";
 import { ArbFilePath, LanguageCode } from "../config/config";
 import { ConfigService } from "../config/config.service";
 import {
@@ -273,5 +274,43 @@ export class LanguageService {
       `${prefix + language.languageCode + ext}`
     );
     return arbFilePath;
+  }
+
+  /**
+   * Select language code list except source arb language code
+   * @param sourceArbLanguage
+   * @returns selected language code list
+   */
+  public async selectLanguageCodeList(sourceArbLanguage: Language, picked: (languageCode: LanguageCode) => boolean): Promise<LanguageCode[] | undefined> {
+    const currentLanguageCodeList =
+      this.configService.config.targetLanguageCodeList;
+    const supportLanguageList: Language[] = this.supportLanguages.reduce<Language[]>(
+      (prev, curr) => {
+        if (curr !== sourceArbLanguage) {
+          prev.push(curr);
+        }
+        return prev;
+      },
+      []
+    );
+
+    // pick items
+    const pickItems: vscode.QuickPickItem[] = supportLanguageList.map(
+      (language) => {
+        return {
+          label: language.name,
+          description: language.languageCode,
+          picked: picked(language.languageCode),
+        };
+      }
+    );
+
+    // select pick items
+    const selectedItems = await vscode.window.showQuickPick(pickItems, {
+      title: `Please select the language code of the language you wish to translate`,
+      canPickMany: true,
+    });
+
+    return selectedItems?.map((item) => item.description!);
   }
 }

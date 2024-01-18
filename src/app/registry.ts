@@ -9,6 +9,7 @@ import { CreateTranslationCacheCmd } from "./command/create_translation_cache.cm
 import { DecodeAllHtmlEntitiesCmd } from "./command/decode_all_html_entities.cmd";
 import { ExcludeTranslationCmd } from "./command/exclude_translation.cmd";
 import { InitializeCmd } from "./command/initialize.cmd";
+import { OpenGoogleSheetCmd } from "./command/open_google_sheet.cmd";
 import { TranslateCmd } from "./command/translate.cmd";
 import { UploadToGoogleSheetCmd } from "./command/upload_to_google_sheet.cmd";
 import { ValidateTranslationCmd } from "./command/validate_translation.cmd";
@@ -65,6 +66,7 @@ export class Registry {
   public validateTranslationCmd: ValidateTranslationCmd;
   public decodeAllHtmlEntitiesCmd: DecodeAllHtmlEntitiesCmd;
   public uploadToGoogleSheetCmd: UploadToGoogleSheetCmd;
+  public openGoogleSheetCmd: OpenGoogleSheetCmd;
 
   constructor() {
     // data source
@@ -162,6 +164,10 @@ export class Registry {
       languageService: this.languageService,
       configService: this.configService,
       arbService: this.arbService,
+    });
+    this.openGoogleSheetCmd = new OpenGoogleSheetCmd({
+      googleSheetService: this.googleSheetService,
+      configService: this.configService,
     });
   }
 
