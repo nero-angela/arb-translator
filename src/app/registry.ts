@@ -172,6 +172,7 @@ export class Registry {
       configService: this.configService,
     });
     this.changeKeyCmd = new ChangeKeyCmd({
+      historyService: this.historyService,
       configService: this.configService,
       arbService: this.arbService,
     });

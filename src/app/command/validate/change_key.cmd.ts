@@ -2,17 +2,21 @@ import * as vscode from "vscode";
 import { Arb } from "../../arb/arb";
 import { ArbService } from "../../arb/arb.service";
 import { ConfigService } from "../../config/config.service";
+import { HistoryService } from "../../history/history.service";
 import { Toast } from "../../util/toast";
 
 interface InitParams {
   configService: ConfigService;
   arbService: ArbService;
+  historyService: HistoryService;
 }
 
 export class ChangeKeyCmd {
+  private historyService: HistoryService;
   private configService: ConfigService;
   private arbService: ArbService;
-  constructor({ configService, arbService }: InitParams) {
+  constructor({ configService, arbService, historyService }: InitParams) {
+    this.historyService = historyService;
     this.configService = configService;
     this.arbService = arbService;
   }
@@ -79,6 +83,21 @@ export class ChangeKeyCmd {
         {}
       );
       this.arbService.upsert(arbFilePath, data);
+    }
+
+    // update history key
+    const history = this.historyService.get();
+    const historyKeyIndex = history.keys.indexOf(oldKey);
+    if (historyKeyIndex !== -1) {
+      history.keys[historyKeyIndex] = newKey;
+      const historyData = history.keys.reduce<Record<string, string>>(
+        (prev, key, index) => {
+          prev[key] = history.values[index];
+          return prev;
+        },
+        {}
+      );
+      this.historyService.update(historyData);
     }
 
     Toast.i(`Changed ${oldKey} to ${newKey} completed.`);
