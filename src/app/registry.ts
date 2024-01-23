@@ -11,6 +11,7 @@ import { OpenGoogleSheetCmd } from "./command/google_sheet/open_google_sheet.cmd
 import { UploadToGoogleSheetCmd } from "./command/google_sheet/upload_to_google_sheet.cmd";
 import { CreateTranslationCacheCmd } from "./command/translate/create_translation_cache.cmd";
 import { TranslateCmd } from "./command/translate/translate.cmd";
+import { ChangeKeyCmd } from "./command/validate/change_key.cmd";
 import { DecodeAllHtmlEntitiesCmd } from "./command/validate/decode_all_html_entities.cmd";
 import { ValidateTranslationCmd } from "./command/validate/validate_translation.cmd";
 import { ConfigRepository } from "./config/config.repository";
@@ -67,6 +68,7 @@ export class Registry {
   public decodeAllHtmlEntitiesCmd: DecodeAllHtmlEntitiesCmd;
   public uploadToGoogleSheetCmd: UploadToGoogleSheetCmd;
   public openGoogleSheetCmd: OpenGoogleSheetCmd;
+  public changeKeyCmd: ChangeKeyCmd;
 
   constructor() {
     // data source
@@ -168,6 +170,10 @@ export class Registry {
     this.openGoogleSheetCmd = new OpenGoogleSheetCmd({
       googleSheetService: this.googleSheetService,
       configService: this.configService,
+    });
+    this.changeKeyCmd = new ChangeKeyCmd({
+      configService: this.configService,
+      arbService: this.arbService,
     });
   }
 

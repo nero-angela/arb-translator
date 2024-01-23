@@ -157,3 +157,7 @@ Because settings may differ for each project, adding settings to the project wor
 ## Open Google Sheet
 - Command to open the google sheet.
 - The `googleSheet.id` setting is required to execute this command.
+
+
+## Change key
+- Command to change the key of arb files.

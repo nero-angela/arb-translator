@@ -108,6 +108,10 @@
       {
         "command": "arb-translator.openGoogleSheet",
         "title": "Arb Translator : Open Google Sheet"
+      },
+      {
+        "command": "arb-translator.changeKey",
+        "title": "Arb Translator : Change Key"
       }
     ]
   },
