@@ -13,6 +13,7 @@ import { CreateTranslationCacheCmd } from "./command/translate/create_translatio
 import { TranslateCmd } from "./command/translate/translate.cmd";
 import { ChangeKeyCmd } from "./command/validate/change_key.cmd";
 import { DecodeAllHtmlEntitiesCmd } from "./command/validate/decode_all_html_entities.cmd";
+import { DeleteKeyCmd } from "./command/validate/delete_key.cmd";
 import { ValidateTranslationCmd } from "./command/validate/validate_translation.cmd";
 import { ConfigRepository } from "./config/config.repository";
 import { ConfigService } from "./config/config.service";
@@ -69,6 +70,7 @@ export class Registry {
   public uploadToGoogleSheetCmd: UploadToGoogleSheetCmd;
   public openGoogleSheetCmd: OpenGoogleSheetCmd;
   public changeKeyCmd: ChangeKeyCmd;
+  public deleteKeyCmd: DeleteKeyCmd;
 
   constructor() {
     // data source
@@ -172,6 +174,11 @@ export class Registry {
       configService: this.configService,
     });
     this.changeKeyCmd = new ChangeKeyCmd({
+      historyService: this.historyService,
+      configService: this.configService,
+      arbService: this.arbService,
+    });
+    this.deleteKeyCmd = new DeleteKeyCmd({
       historyService: this.historyService,
       configService: this.configService,
       arbService: this.arbService,

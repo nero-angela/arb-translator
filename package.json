@@ -112,6 +112,10 @@
       {
         "command": "arb-translator.changeKey",
         "title": "Arb Translator : Change Key"
+      },
+      {
+        "command": "arb-translator.deleteKey",
+        "title": "Arb Translator : Delete Key"
       }
     ]
   },
