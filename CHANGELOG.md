@@ -2,6 +2,10 @@
 
 All notable changes to the "arb-translator" extension will be documented in this file.
 
+## [1.3.4] - 24.01.23
+### Added
+- Add `Change key` command.
+
 ## [1.3.3] - 24.01.23
 ### Added
 - Add `validateLanguageCodeList` setting.
