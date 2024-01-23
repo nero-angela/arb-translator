@@ -161,3 +161,6 @@ Because settings may differ for each project, adding settings to the project wor
 
 ## Change key
 - Command to change the key of arb files.
+
+## Delete key
+- Command to delete the key of arb files.

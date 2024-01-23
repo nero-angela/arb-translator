@@ -11,7 +11,7 @@ interface InitParams {
   historyService: HistoryService;
 }
 
-export class ChangeKeyCmd {
+export class DeleteKeyCmd {
   private historyService: HistoryService;
   private configService: ConfigService;
   private arbService: ArbService;
@@ -26,7 +26,7 @@ export class ChangeKeyCmd {
     const { sourceArbFilePath } = this.configService.config;
     const sourceArb: Arb = await this.arbService.getArb(sourceArbFilePath);
 
-    // select a key to change
+    // select a key to delete
     const selection = await vscode.window.showQuickPick(
       sourceArb.keys.map(
         (key) =>
@@ -35,71 +35,37 @@ export class ChangeKeyCmd {
           }
       ),
       {
-        title: "Please select the key to change.",
-        placeHolder: "Please select the key to change.",
+        title: "Please select the key to delete.",
+        placeHolder: "Please select the key to delete.",
       }
     );
     if (!selection) {
       return;
     }
-    const oldKey = selection.label;
-
-    // enter the key to change
-    const newKey = await vscode.window.showInputBox({
-      prompt: "Please enter the key to change.",
-    });
-    if (!newKey) {
-      return;
-    }
-
-    // check validation
-    if (/^[\d\s]|[^a-zA-Z0-9]/.test(newKey)) {
-      Toast.e("The key is invalid.");
-      return;
-    }
-
-    // check duplication
-    if (sourceArb.keys.includes(newKey)) {
-      Toast.e(`"${newKey}" already exists.`);
-      return;
-    }
+    const deleteKey = selection.label;
 
     // get entire arb file
     const arbFilePathList = this.arbService.getArbFiles(sourceArbFilePath);
     for (const arbFilePath of arbFilePathList) {
       const arbFile = await this.arbService.getArb(arbFilePath);
-      const keyIndex = arbFile.keys.indexOf(oldKey);
+      const keyIndex = arbFile.keys.indexOf(deleteKey);
       if (keyIndex === -1) {
         continue;
       }
 
-      // replace key
-      arbFile.keys[keyIndex] = newKey;
-      const data = arbFile.keys.reduce<Record<string, string>>(
-        (prev, key, index) => {
-          prev[key] = arbFile.values[index];
-          return prev;
-        },
-        {}
-      );
-      this.arbService.upsert(arbFilePath, data);
+      // delete key
+      delete arbFile.data[deleteKey];
+      this.arbService.upsert(arbFilePath, arbFile.data);
     }
 
-    // update history key
+    // delete history key
     const history = this.historyService.get();
-    const historyKeyIndex = history.keys.indexOf(oldKey);
+    const historyKeyIndex = history.keys.indexOf(deleteKey);
     if (historyKeyIndex !== -1) {
-      history.keys[historyKeyIndex] = newKey;
-      const historyData = history.keys.reduce<Record<string, string>>(
-        (prev, key, index) => {
-          prev[key] = history.values[index];
-          return prev;
-        },
-        {}
-      );
-      this.historyService.update(historyData);
+      delete history.data[deleteKey];
+      this.historyService.update(history.data);
     }
 
-    Toast.i(`Changed ${oldKey} to ${newKey} completed.`);
+    Toast.i(`${deleteKey} key deleted.`);
   }
 }

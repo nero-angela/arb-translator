@@ -8,6 +8,7 @@ export enum Cmd {
   uploadToGoogleSheet = "arb-translator.uploadToGoogleSheet",
   openGoogleSheet = "arb-translator.openGoogleSheet",
   changeKey = "arb-translator.changeKey",
+  deleteKey = "arb-translator.deleteKey",
 }
 
 export const cmdName: Record<Cmd, string> = {
@@ -21,4 +22,5 @@ export const cmdName: Record<Cmd, string> = {
   [Cmd.uploadToGoogleSheet]: "Arb Translator : Upload To Google Sheet",
   [Cmd.openGoogleSheet]: "Arb Translator : Open Google Sheet",
   [Cmd.changeKey]: "Arb Translator : Change Key",
+  [Cmd.deleteKey]: "Arb Translator : Delete Key",
 };
