@@ -38,20 +38,24 @@ export class ValidateTranslationCmd {
 
   public async run() {
     // load source arb
-    const sourceArb: Arb = await this.arbService.getArb(
-      this.configService.config.sourceArbFilePath
-    );
+    const {
+      sourceArbFilePath,
+      targetLanguageCodeList,
+      validateLanguageCodeList,
+    } = this.configService.config;
+    const sourceArb: Arb = await this.arbService.getArb(sourceArbFilePath);
 
-    // list of languages to be translated
-    const targetLanguages: Language[] =
-      this.configService.config.targetLanguageCodeList.map((languageCode) => {
-        return this.languageService.getLanguageByLanguageCode(languageCode);
-      });
+    // list of languages for whitch to run validation
+    const validateLanguages: Language[] = (
+      validateLanguageCodeList ?? targetLanguageCodeList
+    ).map((languageCode) => {
+      return this.languageService.getLanguageByLanguageCode(languageCode);
+    });
 
     const validationResultList =
       await this.arbValidationService.getValidationResultList(
         sourceArb,
-        targetLanguages
+        validateLanguages
       );
     if (validationResultList.length === 0) {
       return Toast.i("🟢 The translation has been successfully completed.");
