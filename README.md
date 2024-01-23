@@ -50,7 +50,8 @@ Because settings may differ for each project, adding settings to the project wor
         name: "YOUR_GOOGLE_SHEET_NAME",
         credentialFilePath: "YOUR_CREDENTIAL_JSON_FILE_ABSOLUTE_PATH",
         uploadLanguageCodeList: ["ko", "zh_CN", "fr"]
-      }
+      },
+      "validateLanguageCodeList: ["ko", "zh_CN", "fr", "en]
     }
   }
   ```
@@ -66,7 +67,8 @@ Because settings may differ for each project, adding settings to the project wor
     - `id` : You can find the spreadsheet ID in a Google Sheets URL: `https://docs.google.com/spreadsheets/d/<GOOGLE_SHEET_ID>/edit#gid=0`
     - `name` : Sheet name at the bottom of google sheet.
     - `credentialFilePath` : Absolute path to JSON key files created after creating a [service account](https://developers.google.com/workspace/guides/create-credentials?#service-account) on the Google Cloud console.
-    - `uploadLanguageCodeList` : List of languageCode you want to upload to google sheet.
+    - `uploadLanguageCodeList` : List of languageCode you want to upload to google sheet. When omitted, use `targetLanguageCodeList`.
+  - `validateLanguageCodeList` : List of languageCode you want to validate. When omitted, use `targetLanguageCodeList`.
 
 
 

@@ -16,6 +16,7 @@ export interface Config {
   arbFilePrefix?: string;
   customArbFileName?: Record<LanguageCode, ArbFileName>;
   googleSheet?: GoogleSheetConfig;
+  validateLanguageCodeList?: LanguageCode[];
 }
 
 export interface ConfigParams {
@@ -25,4 +26,5 @@ export interface ConfigParams {
   googleAPIKey?: string;
   targetLanguageCodeList?: LanguageCode[];
   googleSheet?: GoogleSheetConfig;
+  validateLanguageCodeList?: LanguageCode[];
 }

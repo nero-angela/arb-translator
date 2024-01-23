@@ -38,11 +38,11 @@ export class ArbValidationService {
 
   public async getValidationResultList(
     sourceArb: Arb,
-    targetLanguages: Language[]
+    validateLanguages: Language[]
   ): Promise<ValidationResult[]> {
     const generator = await this.generateValidationResult(
       sourceArb,
-      targetLanguages
+      validateLanguages
     );
 
     const validationResults: ValidationResult[] = [];

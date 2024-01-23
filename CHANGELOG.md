@@ -2,6 +2,10 @@
 
 All notable changes to the "arb-translator" extension will be documented in this file.
 
+## [1.3.3] - 24.01.23
+### Added
+- Add `validateLanguageCodeList` setting.
+
 ## [1.3.2] - 24.01.18
 ### Added
 - Add notification of progress in translation.
