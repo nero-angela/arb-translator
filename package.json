@@ -4,7 +4,7 @@
   "license": "SEE LICENSE IN LICENSE",
   "displayName": "ARB Translator",
   "description": "Translates ARB files to Google Translator.",
-  "version": "1.3.7",
+  "version": "1.3.8",
   "engines": {
     "vscode": "^1.84.0"
   },
