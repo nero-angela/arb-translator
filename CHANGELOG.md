@@ -2,6 +2,11 @@
 
 All notable changes to the "arb-translator" extension will be documented in this file.
 
+## [1.3.6] - 24.01.24
+### Updated
+- Update `Change key` command to support multiple changes.
+- Update `Delete key` command to support multiple deletion.
+
 ## [1.3.5] - 24.01.23
 ### Added
 - Add `Delete key` command.
