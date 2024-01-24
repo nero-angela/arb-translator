@@ -1,4 +1,5 @@
 import { Arb } from "../arb/arb";
+import { InvalidArgumentsException } from "../util/exceptions";
 import { History, HistoryChange } from "./history";
 import { HistoryRepository } from "./history.repository";
 
@@ -48,5 +49,35 @@ export class HistoryService {
 
   public get(): History {
     return this.historyRepository.get();
+  }
+
+  public updateKeys(oldKeys: string[], newKeys: string[]) {
+    if (oldKeys.length !== newKeys.length) {
+      throw new InvalidArgumentsException(
+        `The number of old keys(${oldKeys.length}) and the number of new keys(${newKeys.length}) are different.`
+      );
+    }
+    const history = this.get();
+    let nChanged = 0;
+    for (let i = 0; i < oldKeys.length; i++) {
+      const oldKey = oldKeys[i];
+      const newKey = newKeys[i];
+      const oldKeyIndex = history.keys.indexOf(oldKey);
+      if (oldKeyIndex !== -1) {
+        history.keys[oldKeyIndex] = newKey;
+        nChanged += 1;
+      }
+    }
+
+    if (nChanged) {
+      const historyData = history.keys.reduce<Record<string, string>>(
+        (prev, key, index) => {
+          prev[key] = history.values[index];
+          return prev;
+        },
+        {}
+      );
+      this.update(historyData);
+    }
   }
 }

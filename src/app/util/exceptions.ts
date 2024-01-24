@@ -6,6 +6,12 @@ export class ConfigurationRequiredException extends BaseException {}
 
 export class APIKeyRequiredException extends BaseException {}
 
+export class InvalidArgumentsException extends BaseException {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
 export class GoogleSheetConfigRequiredException extends BaseException {
   constructor() {
     super(`Please add "googleSheet" settings.`);

@@ -110,12 +110,12 @@
         "title": "Arb Translator : Open Google Sheet"
       },
       {
-        "command": "arb-translator.changeKey",
-        "title": "Arb Translator : Change Key"
+        "command": "arb-translator.changeArbKeys",
+        "title": "Arb Translator : Change Arb Keys"
       },
       {
-        "command": "arb-translator.deleteKey",
-        "title": "Arb Translator : Delete Key"
+        "command": "arb-translator.deleteArbKeys",
+        "title": "Arb Translator : Delete Arb Keys"
       }
     ]
   },
