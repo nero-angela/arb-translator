@@ -38,7 +38,7 @@ export class ChangeKeysCmd {
     }
 
     // check if the keys exist
-    const oldKeys = oldKeysInput.split(",").map((key) => key.trim());
+    const oldKeys = this.split(oldKeysInput);
     for (const oldKey of oldKeys) {
       if (!sourceArb.keys.includes(oldKey)) {
         throw new InvalidArgumentsException(
@@ -53,30 +53,32 @@ export class ChangeKeysCmd {
       prompt: "Please enter the keys to change.",
       placeHolder:
         "e.g. newKey1, newKey2 (Replaced in the order entered previously.)",
+      validateInput: (value) => {
+        const newKeys = this.split(value);
+        const newKeysLength = newKeys.length;
+        if (newKeysLength !== oldKeys.length) {
+          return `Please enter ${oldKeys.length} keys. (current ${newKeysLength})`;
+        }
+
+        for (const newKey of newKeys) {
+          // check validation
+          if (/^[\d\s]|[^a-zA-Z0-9]/.test(newKey)) {
+            return `"${newKey}" key is invalid.`;
+          }
+
+          // check duplication
+          if (sourceArb.keys.includes(newKey)) {
+            return `"${newKey}" already exists.`;
+          }
+        }
+        return null;
+      },
     });
     if (!newKeysInput) {
       return;
     }
 
-    const newKeys = newKeysInput.split(",").map((key) => key.trim());
-    // check count
-    if (newKeys.length !== oldKeys.length) {
-      throw new InvalidArgumentsException(
-        `The number of old keys(${oldKeys.length}) and the number of new keys(${newKeys.length}) are different.`
-      );
-    }
-
-    for (const newKey of newKeys) {
-      // check validation
-      if (/^[\d\s]|[^a-zA-Z0-9]/.test(newKey)) {
-        throw new InvalidArgumentsException(`"${newKey}" key is invalid.`);
-      }
-
-      // check duplication
-      if (sourceArb.keys.includes(newKey)) {
-        throw new InvalidArgumentsException(`"${newKey}" already exists.`);
-      }
-    }
+    const newKeys = this.split(newKeysInput);
 
     // update keys
     const arbFilePathList = this.arbService.getArbFiles(sourceArbFilePath);
@@ -88,5 +90,12 @@ export class ChangeKeysCmd {
     this.historyService.updateKeys(oldKeys, newKeys);
 
     Toast.i(`🟢 Change arb keys complete.`);
+  }
+
+  private split(input: string): string[] {
+    return input
+      .split(/\s|,/)
+      .filter((key) => key)
+      .map((key) => key.trim());
   }
 }
