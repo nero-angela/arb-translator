@@ -120,4 +120,19 @@ export class ArbService {
 
     this.upsert(arbFilePath, data);
   }
+
+  public async deleteKeys(arbFilePath:string, deleteKeys: string[]) {
+    const arbFile = await this.getArb(arbFilePath);
+    for (const deleteKey of deleteKeys) {
+      const keyIndex = arbFile.keys.indexOf(deleteKey);
+      if (keyIndex === -1) {
+        // skip if there is no key in arb file
+        continue;
+      }
+
+      // delete key
+      delete arbFile.data[deleteKey];
+      this.upsert(arbFilePath, arbFile.data);
+    }
+  }
 }

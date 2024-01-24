@@ -80,4 +80,19 @@ export class HistoryService {
       this.update(historyData);
     }
   }
+
+  public deleteKeys(deleteKeys: string[]) {
+    const history = this.get();
+    const newData = { ...history.data };
+    let nDeleted = 0;
+    for (const deleteKey of deleteKeys) {
+      if (history.keys.includes(deleteKey)) {
+        delete newData[deleteKey];
+        nDeleted += 1;
+      }
+    }
+    if (nDeleted > 0) {
+      this.update(newData);
+    }
+  }
 }

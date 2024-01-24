@@ -87,6 +87,6 @@ export class ChangeKeysCmd {
     // update history key
     this.historyService.updateKeys(oldKeys, newKeys);
 
-    Toast.i(`🟢 Change arb keys completed.`);
+    Toast.i(`🟢 Change arb keys complete.`);
   }
 }
