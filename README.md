@@ -159,8 +159,8 @@ Because settings may differ for each project, adding settings to the project wor
 - The `googleSheet.id` setting is required to execute this command.
 
 
-## Change key
-- Command to change the key of arb files.
+## Change Arb Keys
+- Command to change the keys of arb files.
 
-## Delete key
-- Command to delete the key of arb files.
+## Delete Arb Keys
+- Command to delete the keys of arb files.
