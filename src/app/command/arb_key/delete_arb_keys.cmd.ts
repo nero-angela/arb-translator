@@ -27,7 +27,7 @@ export class DeleteKeyCmd {
     const sourceArb: Arb = await this.arbService.getArb(sourceArbFilePath);
 
     // select a key to delete
-    const selection = await vscode.window.showQuickPick(
+    const selections = await vscode.window.showQuickPick(
       sourceArb.keys.map(
         (key) =>
           <vscode.QuickPickItem>{
@@ -37,35 +37,23 @@ export class DeleteKeyCmd {
       {
         title: "Please select the key to delete.",
         placeHolder: "Please select the key to delete.",
+        canPickMany: true,
       }
     );
-    if (!selection) {
+    if (!selections) {
       return;
     }
-    const deleteKey = selection.label;
+    const deleteKeys = selections.map((selection) => selection.label);
 
-    // get entire arb file
+    // delete keys
     const arbFilePathList = this.arbService.getArbFiles(sourceArbFilePath);
     for (const arbFilePath of arbFilePathList) {
-      const arbFile = await this.arbService.getArb(arbFilePath);
-      const keyIndex = arbFile.keys.indexOf(deleteKey);
-      if (keyIndex === -1) {
-        continue;
-      }
-
-      // delete key
-      delete arbFile.data[deleteKey];
-      this.arbService.upsert(arbFilePath, arbFile.data);
+      await this.arbService.deleteKeys(arbFilePath, deleteKeys);
     }
 
     // delete history key
-    const history = this.historyService.get();
-    const historyKeyIndex = history.keys.indexOf(deleteKey);
-    if (historyKeyIndex !== -1) {
-      delete history.data[deleteKey];
-      this.historyService.update(history.data);
-    }
+    this.historyService.deleteKeys(deleteKeys);
 
-    Toast.i(`${deleteKey} key deleted.`);
+    Toast.i(`🟢 Delete arb keys complete.`);
   }
 }

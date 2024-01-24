@@ -7,8 +7,8 @@ export enum Cmd {
   decodeAllHtmlEntities = "arb-translator.decodeAllHtmlEntities",
   uploadToGoogleSheet = "arb-translator.uploadToGoogleSheet",
   openGoogleSheet = "arb-translator.openGoogleSheet",
-  changeKey = "arb-translator.changeKey",
-  deleteKey = "arb-translator.deleteKey",
+  changeArbKeys = "arb-translator.changeArbKeys",
+  deleteArbKeys = "arb-translator.deleteArbKeys",
 }
 
 export const cmdName: Record<Cmd, string> = {
@@ -21,6 +21,6 @@ export const cmdName: Record<Cmd, string> = {
   [Cmd.decodeAllHtmlEntities]: "Arb Translator : Decode All HTML Entities",
   [Cmd.uploadToGoogleSheet]: "Arb Translator : Upload To Google Sheet",
   [Cmd.openGoogleSheet]: "Arb Translator : Open Google Sheet",
-  [Cmd.changeKey]: "Arb Translator : Change Key",
-  [Cmd.deleteKey]: "Arb Translator : Delete Key",
+  [Cmd.changeArbKeys]: "Arb Translator : Change Arb Keys",
+  [Cmd.deleteArbKeys]: "Arb Translator : Delete Arb Keys",
 };

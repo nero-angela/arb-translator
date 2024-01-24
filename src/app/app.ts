@@ -41,8 +41,8 @@ export class ArbTranslator implements App {
       this.registry.decodeAllHtmlEntitiesCmd.run(),
     [Cmd.uploadToGoogleSheet]: () => this.registry.uploadToGoogleSheetCmd.run(),
     [Cmd.openGoogleSheet]: () => this.registry.openGoogleSheetCmd.run(),
-    [Cmd.changeKey]: () => this.registry.changeKeyCmd.run(),
-    [Cmd.deleteKey]: () => this.registry.deleteKeyCmd.run(),
+    [Cmd.changeArbKeys]: () => this.registry.changeArbKeysCmd.run(),
+    [Cmd.deleteArbKeys]: () => this.registry.deleteArbKeysCmd.run(),
   };
 
   public init = async () => {
