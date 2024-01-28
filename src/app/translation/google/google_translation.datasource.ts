@@ -27,7 +27,7 @@ export class GoogleTranslationDataSource implements TranslationDataSource {
     targetLang,
   }: FreeTranslateDataSourceParams): Promise<string> {
     const response = await axios.get(
-      encodeURI(
+      encodeURIComponent(
         `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang.gt}&tl=${targetLang.gt}&dt=t&dt=bd&dj=1&source=icon&hl=${targetLang.gt}&q=${text}`
       )
     );
@@ -68,7 +68,7 @@ export class GoogleTranslationDataSource implements TranslationDataSource {
 
     const format = hasHtmlTags(text) ? "html" : "text";
     const response = await axios.get(
-      encodeURI(
+      encodeURIComponent(
         `https://translation.googleapis.com/language/translate/v2?key=${apiKey}&q=${text}&target=${targetLang.gt}&source=${sourceLang.gt}&alt=json&format=${format}`
       )
     );
