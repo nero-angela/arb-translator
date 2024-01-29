@@ -26,10 +26,9 @@ export class GoogleTranslationDataSource implements TranslationDataSource {
     sourceLang,
     targetLang,
   }: FreeTranslateDataSourceParams): Promise<string> {
+    const q = encodeURIComponent(text);
     const response = await axios.get(
-      encodeURIComponent(
-        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang.gt}&tl=${targetLang.gt}&dt=t&dt=bd&dj=1&source=icon&hl=${targetLang.gt}&q=${text}`
-      )
+      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang.gt}&tl=${targetLang.gt}&dt=t&dt=bd&dj=1&source=icon&hl=${targetLang.gt}&q=${q}`
     );
     if (response.status === 429) {
       throw new TranslationFailureException(
@@ -67,10 +66,9 @@ export class GoogleTranslationDataSource implements TranslationDataSource {
     }
 
     const format = hasHtmlTags(text) ? "html" : "text";
+    const q = encodeURIComponent(text);
     const response = await axios.get(
-      encodeURIComponent(
-        `https://translation.googleapis.com/language/translate/v2?key=${apiKey}&q=${text}&target=${targetLang.gt}&source=${sourceLang.gt}&alt=json&format=${format}`
-      )
+      `https://translation.googleapis.com/language/translate/v2?key=${apiKey}&q=${q}&target=${targetLang.gt}&source=${sourceLang.gt}&alt=json&format=${format}`
     );
     return response.data.data.translations[0].translatedText;
   }
