@@ -89,7 +89,7 @@ export class ArbStatisticService {
     history: History
   ): Promise<ArbStatistic> {
     const nKeysToBeTranslated: number = sourceArb.keys.filter(
-      (key) => !key.includes("@")
+      (key) => !key.includes("@") || key === "@@locale"
     ).length;
     const arbStatistic: ArbStatistic = {};
     for (const targetLanguage of targetLanguages) {
@@ -152,7 +152,7 @@ export class ArbStatisticService {
       ).length,
     };
     for (const sourceArbKey of sourceArb.keys) {
-      if (sourceArbKey.includes("@")) {
+      if (sourceArbKey !== "@@locale" && sourceArbKey.includes("@")) {
         continue;
       }
 
@@ -197,7 +197,7 @@ export class ArbStatisticService {
     targetLanguage: Language
   ): APIStatistic {
     return sourceArb.keys
-      .filter((key) => !key.includes("@"))
+      .filter((key) => !key.includes("@") || key === "@@locale")
       .reduce<APIStatistic>(
         (statistic, sourceArbKey) => {
           const isCache: boolean = this.translationCacheRepository.hasKey(

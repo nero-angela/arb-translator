@@ -2,6 +2,11 @@
 
 All notable changes to the "arb-translator" extension will be documented in this file.
 
+## [1.3.11] - 24.01.30
+### Update
+- Update to create @@locale during translation if it does not exist.
+- Update to check the existence of @@locale.
+
 ## [1.3.10] - 24.01.29
 ### Fixed
 - Fix an invalid url encoding problem.

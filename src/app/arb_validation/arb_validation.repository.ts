@@ -190,7 +190,7 @@ export class ArbValidationRepository extends BaseDisposable {
   public getParamsValidation(arb: Arb): ArbValidation {
     const parmsValidation: ArbValidation = {};
     for (const [key, value] of Object.entries(arb.data)) {
-      if (key.includes("@")) {
+      if (key !== "@@locale" && key.includes("@")) {
         continue;
       }
 
